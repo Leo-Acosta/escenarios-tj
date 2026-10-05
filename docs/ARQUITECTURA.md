@@ -34,6 +34,8 @@ El código de aplicación es propio: no se copiaron implementaciones, prompts ni
 
 ## Objetivo
 
+Chat inicial: POST `/api/intake` recibe una descripción de hasta 12000 caracteres. En modo guiado devuelve una estructura de preguntas, variables y escenarios genéricos; no interpreta el caso ni cambia los cálculos. Hay un adaptador opcional compatible con chat/completions mediante MODEL_BASE_URL, MODEL_NAME y MODEL_API_KEY, con validación de estructura y salida insertada como texto. No está configurado en esta instalación: el usuario eligió continuar sin IA. La interpretación automática y formalización matemática completas siguen pendientes.
+
 Avance del editor de redes: el panel permite crear una red propia de hasta 200 entidades y 1000 relaciones, guardarla en SQLite y recuperarla al abrir la aplicación. Los nombres se escapan al dibujarse en SVG. La red del analista permanece separada de la matriz ilustrativa; todavía no se calculan estrategias a partir de sus vínculos. Actualmente se conserva una red propia por instalación, sin historial de versiones de esa red.
 
 Explorar escenarios documentados mediante agentes, contrastar alternativas y producir informes trazables en español. La aplicación se implementará en Python. Una interfaz de navegador seguirá renderizando HTML/CSS; no se necesita mantener el frontend Vue ni una cadena Node.
