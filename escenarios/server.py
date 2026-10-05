@@ -46,6 +46,14 @@ class Handler(BaseHTTPRequestHandler):
                 from .sequential_report import build_pdf
             except ImportError:return self.send(503,{'error':'ReportLab no está disponible. Usá la impresión del navegador.'})
             return self.send(200,build_pdf(record),'application/pdf')
+        if url.path in ('/api/agents/report.pdf','/api/agents/rounds.csv'):
+            try:record=agents.get_run(DB,parse_qs(url.query)['id'][0])
+            except (KeyError,IndexError):return self.send(404,{'error':'Corrida guardada no encontrada.'})
+            if url.path.endswith('.csv'):return self.send(200,agents.build_csv(record),'text/csv; charset=utf-8')
+            try:
+                from .agent_report import build_pdf
+            except ImportError:return self.send(503,{'error':'ReportLab no está disponible para exportar PDF.'})
+            return self.send(200,build_pdf(record),'application/pdf')
         if url.path == '/api/agents':
             return self.send(200,agents.history(DB))
         if url.path == '/api/sequential':

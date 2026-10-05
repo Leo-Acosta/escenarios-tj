@@ -123,5 +123,10 @@ class ApiTests(unittest.TestCase):
         with post() as response:saved=json.load(response)
         with urlopen(self.base+'/api/agents') as response:rows=json.load(response)
         self.assertEqual(rows[0]['id'],saved['id']);self.assertEqual(rows[0]['rounds'][1]['memory'][0]['observed_rounds'],1)
+        for endpoint,mime,signature in [('report.pdf','application/pdf',b'%PDF-'),('rounds.csv','text/csv; charset=utf-8',b'\xef\xbb\xbf')]:
+            with urlopen(self.base+'/api/agents/'+endpoint+'?id='+saved['id']) as response:
+                self.assertEqual(response.headers['Content-Type'],mime);self.assertTrue(response.read().startswith(signature))
+            with self.assertRaises(HTTPError) as error:urlopen(self.base+'/api/agents/'+endpoint+'?id=missing')
+            self.assertEqual(error.exception.code,404)
 
 if __name__ == '__main__':unittest.main()

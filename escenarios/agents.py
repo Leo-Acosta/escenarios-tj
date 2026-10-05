@@ -72,3 +72,28 @@ def save(path,result):
 
 def history(path):
     with closing(connection(path)) as db:return [json.loads(row[0]) for row in db.execute('SELECT payload FROM agent_runs ORDER BY rowid DESC LIMIT 20')]
+
+
+def get_run(path,identity):
+    with closing(connection(path)) as db:
+        row=db.execute('SELECT payload FROM agent_runs WHERE id=?',(identity,)).fetchone()
+    if row is None:raise KeyError('Corrida inexistente.')
+    return json.loads(row[0])
+
+
+def build_csv(record):
+    import csv
+    from io import StringIO
+    out=StringIO(newline='');writer=csv.writer(out,delimiter=';')
+    writer.writerow(['version','motor','caso','semilla','error_ejecucion','ronda','actor','politica','intencion_indice','intencion','accion_indice','accion','pago','acumulado','rondas_observadas','rival_alternativa_1','rival_alternativa_2','motivo'])
+    def cell(value):
+        if isinstance(value,str) and value.lstrip().startswith(('=','+','-','@')):return "'"+value
+        return value
+    for row in record['rounds']:
+        for i in range(2):
+            memory=row['memory'][i];m=record['model'];o=record['options']
+            cells=[record['id'],record['engine'],m['title'],o['seed'],o['noise'],row['round'],m['actors'][i],o['policies'][i],
+                row['intended'][i]+1,m['strategies'][i][row['intended'][i]],row['actions'][i]+1,m['strategies'][i][row['actions'][i]],
+                row['payments'][i],row['totals'][i],memory['observed_rounds'],*memory['opponent_counts'],row['reasons'][i]]
+            writer.writerow([cell(v) for v in cells])
+    return out.getvalue().encode('utf-8-sig')

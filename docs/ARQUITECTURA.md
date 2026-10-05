@@ -1,6 +1,6 @@
 # Arquitectura de Escenarios TJ
 
-Estado al 5 de octubre de 2026: coordinador guiado, IA local revisable, árboles secuenciales, Monte Carlo y PDF secuencial implementados. La IA propone decisiones tanto para juegos simultáneos como secuenciales. Agentes con memoria implementados con políticas explícitas para juegos repetidos. PDF de agentes y de casos simultáneos propios, unificación de expedientes y empaquetado siguen pendientes.
+Estado al 5 de octubre de 2026: coordinador guiado, IA local revisable, árboles secuenciales, Monte Carlo y PDF secuencial implementados. La IA propone decisiones tanto para juegos simultáneos como secuenciales. Agentes con memoria implementados con políticas explícitas para juegos repetidos. PDF y CSV de agentes implementados. PDF de casos simultáneos propios, unificación de expedientes y empaquetado siguen pendientes.
 
 ## Flujo implementado
 
@@ -136,3 +136,7 @@ Contrato `proposal-sequential-v1`: dos actores, tres pares de acciones (A, B tra
 `agents.py` implementa seis políticas explícitas, con memoria limitada a acciones ejecutadas en rondas terminadas. A y B deciden antes de actualizar la historia; la mejor respuesta de A usa filas de A y la de B columnas de B. La adaptación estima frecuencias con prior 1/1 y resuelve empates por alternativa 1. Se usan generadores separados `Random(seed*2)` y `Random(seed*2+1)`. El ruido invierte acciones independientemente por actor/ronda.
 
 GET/POST `/api/agents` lista, simula y guarda corridas inmutables en `agent_runs`. Cada corrida registra modelo, versión del motor, políticas, semilla, ruido, supuestos, intenciones/acciones, pagos, acumulados, motivos y conteos previos por ronda. Se limita a 500 rondas; no se ejecuta IA ni herramientas externas. La visualización usa la matriz congelada de esa corrida. Las políticas copiadoras se refieren a índices y requieren revisar su interpretación cuando las alternativas difieren entre actores. No hay descuento temporal ni parámetros calibrados.
+
+## Exportación de corridas de agentes
+
+`agents.get_run` recupera por UUID sin limitarse a las veinte corridas visibles. GET `/api/agents/report.pdf?id=UUID` genera el informe con `agent_report.py`; `/api/agents/rounds.csv?id=UUID` exporta todas las rondas con `csv.writer`. No se recalculan decisiones. El PDF usa gráficos vectoriales, tablas repetidas y texto escapado; las muestras son primeras y últimas diez rondas, sin duplicados. El CSV identifica corrida/motor y conserva intenciones, acciones, razones y conteos de memoria previos. Los campos de texto que podrían ejecutarse como fórmulas en una planilla se prefijan con apóstrofo; los pagos negativos permanecen numéricos.

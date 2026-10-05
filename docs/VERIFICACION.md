@@ -64,3 +64,7 @@ La prueba real es un caso ilustrativo; no demuestra precisión general ni valida
 ## Agentes con memoria
 
 60 pruebas aprobadas. Nuevos casos: memoria sin observar la ronda actual, cambio persistente, orientación de la mejor respuesta de B, ruido observado en la siguiente ronda, reproducibilidad sin mutar entradas, configuración inválida, versiones inmutables y revisión requerida por API. Navegador: Municipio copia la segunda alternativa de Vecinos recién en ronda 2; en ronda 25 se verificaron 24 observaciones previas y acumulados A=24/B=29. Guardado y recuperación tras recargar comprobados. JavaScript validado con Node. El PDF de agentes y la calibración con datos siguen pendientes.
+
+## Informes de agentes y traza CSV
+
+65 pruebas aprobadas. Nuevas verificaciones: PDF con UUID, políticas, totales y semilla; gráfico con pagos acumulados nulos; marcado de usuario literal; supuestos largos paginados; dos filas por ronda en CSV y memoria previa; texto de fórmula neutralizado sin alterar pagos negativos. API: formatos, firmas y 404 para corrida inexistente. Descargas reales desde navegador verificadas: tres páginas y 100 filas para 50 rondas; UUID conservado y acumulado final de B=54. PDF output/pdf/informe-agentes-memoria.pdf renderizado con Poppler e inspeccionado en sus tres páginas finales; corregida una página casi vacía. CSV de ejemplo output/rondas-agentes.csv. El empaquetado Windows, PDF propio simultáneo y calibración predictiva siguen pendientes.
