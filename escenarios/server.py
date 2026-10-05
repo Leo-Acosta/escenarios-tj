@@ -61,7 +61,8 @@ class Handler(BaseHTTPRequestHandler):
                  '/graphs.js': ('graphs.js', 'text/javascript; charset=utf-8'),
                  '/network.js': ('network.js', 'text/javascript; charset=utf-8'),
                  '/intake.js': ('intake.js', 'text/javascript; charset=utf-8'),
-                 '/case.js': ('case.js', 'text/javascript; charset=utf-8')}
+                 '/case.js': ('case.js', 'text/javascript; charset=utf-8'),
+                 '/case-visuals.js': ('case-visuals.js', 'text/javascript; charset=utf-8')}
         if url.path in files:
             name, mime = files[url.path]
             return self.send(200, (ROOT / 'web' / name).read_bytes(), mime)

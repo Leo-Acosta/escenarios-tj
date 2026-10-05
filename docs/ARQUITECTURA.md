@@ -63,3 +63,5 @@ Explorar escenarios documentados mediante agentes, contrastar alternativas y pro
 Definir el primer caso de uso, tamaño esperado de las simulaciones y proveedor/modelo disponible. Empezar con una instalación local para un usuario. Autenticación y permisos son requisitos previos a cualquier exposición compartida.
 
 La auditoría y la versión local inicial son los entregables actuales. Las etapas anteriores describen la evolución prevista, no capacidades ya completadas. No se pretende paridad con Miro-Fish.
+
+Los resultados de /api/cases se transfieren a case-visuals.js como una copia del último cálculo. Esta copia alimenta árbol, vectores e informe propio. Editar el formulario requiere recalcular para actualizarla. El selector de informe distingue el ejemplo y el caso propio; imprimir usa el contenido seleccionado.
