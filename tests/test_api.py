@@ -56,5 +56,17 @@ class ApiTests(unittest.TestCase):
             data=json.load(response)
         self.assertEqual(data[0]['result']['recommendation'],'Cooperar')
 
+    def test_workflow_creation_retrieval_and_revision_conflict(self):
+        payload={'action':'create','title':'Caso API','description':'Una descripción suficiente del problema.'}
+        headers={'Origin':self.base,'Content-Type':'application/json'}
+        with urlopen(Request(self.base+'/api/workflows',data=json.dumps(payload).encode(),headers=headers)) as response:
+            created=json.load(response)
+        with urlopen(self.base+'/api/workflows?id='+created['id']) as response:
+            self.assertEqual(json.load(response)['question']['key'],'objective')
+        stale={'action':'message','id':created['id'],'revision':0,'text':'Respuesta'}
+        with self.assertRaises(HTTPError) as error:
+            urlopen(Request(self.base+'/api/workflows',data=json.dumps(stale).encode(),headers=headers))
+        self.assertEqual(error.exception.code,409)
+
 
 if __name__ == '__main__':unittest.main()

@@ -9,6 +9,7 @@ from .storage import save_snapshot, list_snapshots
 from .graph import save_graph, load_graph
 from .intake import prepare
 from .case_model import analyze_case,save_case,list_cases
+from .workflow import operate,get_workflow,list_workflows,get_version,Conflict,NotFound
 
 ROOT = Path(__file__).resolve().parent.parent
 DB = ROOT / 'data' / 'escenarios.sqlite3'
@@ -35,6 +36,16 @@ class Handler(BaseHTTPRequestHandler):
         if not self.allowed():
             return self.send(403, {'error': 'Host no autorizado.'})
         url = urlsplit(self.path)
+        if url.path == '/api/workflows':
+            try:
+                args=parse_qs(url.query)
+                if 'id' not in args:return self.send(200,list_workflows(DB))
+                if 'version' in args:return self.send(200,get_version(DB,args['id'][0],args['version'][0]))
+                return self.send(200,get_workflow(DB,args['id'][0]))
+            except NotFound as error:
+                return self.send(404,{'error':str(error)})
+            except (ValueError,TypeError):
+                return self.send(400,{'error':'Referencia de expediente inválida.'})
         if url.path == '/api/cases':
             return self.send(200, list_cases(DB))
         if url.path == '/api/graph':
@@ -64,6 +75,7 @@ class Handler(BaseHTTPRequestHandler):
                  '/case.js': ('case.js', 'text/javascript; charset=utf-8'),
                  '/case-visuals.js': ('case-visuals.js', 'text/javascript; charset=utf-8'),
                  '/sensitivity.js': ('sensitivity.js', 'text/javascript; charset=utf-8')}
+        files['/workflow.js']=('workflow.js','text/javascript; charset=utf-8')
         if url.path in files:
             name, mime = files[url.path]
             return self.send(200, (ROOT / 'web' / name).read_bytes(), mime)
@@ -72,13 +84,22 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         if not self.allowed() or self.headers.get('Origin') not in (f'http://127.0.0.1:{self.server.server_port}', f'http://localhost:{self.server.server_port}'):
             return self.send(403, {'error': 'Origen no autorizado.'})
-        if self.path not in ('/api/snapshots','/api/graph','/api/intake','/api/cases'):
+        if self.path not in ('/api/snapshots','/api/graph','/api/intake','/api/cases','/api/workflows'):
             return self.send(404, {'error': 'Recurso inexistente.'})
         try:
             length = int(self.headers.get('Content-Length', 0))
-            if not 0 < length <= (100000 if self.path in ('/api/graph','/api/intake','/api/cases') else 2048):
+            if not 0 < length <= (100000 if self.path in ('/api/graph','/api/intake','/api/cases','/api/workflows') else 2048):
                 raise ValueError()
             payload = json.loads(self.rfile.read(length))
+            if self.path == '/api/workflows':
+                try:
+                    return self.send(200,operate(DB,payload))
+                except Conflict as error:
+                    return self.send(409,{'error':str(error)})
+                except NotFound as error:
+                    return self.send(404,{'error':str(error)})
+                except (ValueError,KeyError,TypeError) as error:
+                    return self.send(400,{'error':str(error) if isinstance(error,ValueError) else 'Datos de expediente inválidos.'})
             if self.path == '/api/cases':
                 case=analyze_case(payload)
                 if payload.get('save') is True:case['id']=save_case(DB,case)

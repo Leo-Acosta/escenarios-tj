@@ -2,7 +2,7 @@
 
 Proyecto para construir un laboratorio de escenarios multiagente en Python, con interfaz y documentación en español y almacenamiento local.
 
-Estado: versión 0.1 local implementada. Incluye mesa de análisis interactiva, dos actores seleccionables, matriz, equilibrios puros, árbol de consecuencias, tres escenarios, historial SQLite y vista ejecutiva imprimible.
+Estado: primera entrega funcional del coordinador guiado. Incluye expedientes persistentes con conversación, fuentes, supuestos revisados, versiones de cálculo, gráficos propios e informe ejecutivo imprimible. Conserva matrices libres y el ejemplo institucional.
 
 ## Ejecutar
 
@@ -40,3 +40,15 @@ La copia original se conserva en `reference/Miro-Fish`, excluida del control de 
 La mesa permite definir un juego simultáneo 2×2 con nombres, estrategias, ocho pagos y probabilidades supuestas. Calcula utilidades esperadas, mejores respuestas de A, equilibrios puros y un equilibrio mixto interior aislado, si existe. Compara tres supuestos de conducta de B y guarda versiones en SQLite. No interpreta automáticamente el texto del chat ni calibra pronósticos. Los casos propios alimentan un árbol de consecuencias interactivo, vectores de utilidad y un informe ejecutivo imprimible. El informe propio se exporta con Imprimir → Guardar como PDF del navegador; la descarga directa de PDF sigue disponible para el ejemplo institucional.
 
 El panel propio incluye sensibilidad de la utilidad de A al supuesto de B entre 0 % y 100 %, un umbral analítico de indiferencia y exportación de la curva SVG. La exploración es temporal hasta aplicar al análisis; puede guardarse como una nueva versión. El informe incluye la curva para el supuesto aplicado. Esto no estima la conducta de B con datos.
+
+### Expedientes guiados
+
+1. Crear un expediente con nombre y descripción.
+2. Responder las cinco preguntas de preparación. Cada respuesta se guarda en SQLite.
+3. Completar dos actores, sus estrategias y ocho pagos; registrar fundamentos, referencias y supuestos.
+4. Guardar el borrador, o confirmar la revisión y calcular. Cada cálculo guarda una versión con el contexto completo.
+5. Explorar gráficos e informe. Recuperar expedientes y consultar versiones en Análisis guardados.
+
+El borrador matemático se guarda explícitamente; los campos no guardados no se recuperan al recargar. Los expedientes nuevos no traen pagos: los define el analista. El supuesto inicial 50 % / 50 % debe revisarse. Las fuentes registradas no se descargan ni se verifican automáticamente.
+
+Esta entrega corresponde a A y B del prompt maestro. La IA local, el ejecutable y el PDF propio directo siguen pendientes. Hay 23 pruebas automatizadas, incluyendo persistencia, revisión requerida, versiones históricas y conflictos de revisión.

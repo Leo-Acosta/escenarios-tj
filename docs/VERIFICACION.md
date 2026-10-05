@@ -24,3 +24,12 @@ Avance de casos propios: 14 pruebas aprobadas (incluye dilema del prisionero, co
 Integración visual de casos propios: comprobados actores personalizados Municipio/Vecinos, selección sincronizada del resultado 4, informe con pagos propios y cambio de fuente a ejemplo institucional. Vectores SVG con escala común y flechas. Revisada captura de pantalla del informe; CSS de impresión agregado, sin verificación de paginación en un PDF impreso. Sintaxis de los tres JavaScript modificados validada.
 
 Sensibilidad: 17 pruebas aprobadas, incluyendo cruce en 1/3, empate en todo el intervalo, dominancia y umbral en 0. En navegador: curva del caso propio, cambio de Cooperar a Competir al bajar q a 0, nueva versión guardada e informe con B 0 % y umbral 33,33 %. Sintaxis JavaScript validada.
+
+
+## Coordinador guiado — primera entrega A y B
+
+23 pruebas aprobadas. Cubren persistencia de conversación y pregunta pendiente, rechazo de cálculos sin preparación o revisión, rechazo de no finitos, fuentes incompletas, versiones con contexto inmutable, borrador incompleto sin resultados falsos, conflicto de revisión y API del expediente.
+
+Flujo en navegador: creación de un expediente de obra pública con datos hipotéticos; recuperación tras recargar en la segunda pregunta; cinco respuestas; modelo manual; guardado del borrador; rechazo de cálculo sin revisión; referencia de prueba; cálculo de versión 1; gráficos e informe con objetivo, datos pendientes, fuentes y supuestos. Aplicar sensibilidad a q=0 produjo versión 2 del mismo expediente. El informe histórico de versión 1 conservó B=50 %. Captura de la vista ejecutiva revisada; paginación de impresión pendiente.
+
+Los JavaScript modificados pasaron la validación de sintaxis con Node. No se configuró IA ni se descargaron modelos. No se generó un ejecutable ni un PDF propio directo en esta entrega.
