@@ -125,4 +125,3 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(rows[0]['id'],saved['id']);self.assertEqual(rows[0]['rounds'][1]['memory'][0]['observed_rounds'],1)
 
 if __name__ == '__main__':unittest.main()
-
