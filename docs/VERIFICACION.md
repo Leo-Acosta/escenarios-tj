@@ -50,3 +50,7 @@ La segunda generación real finalizó correctamente en 132,51 segundos (421 toke
 ## Simulación de incertidumbre en árboles
 
 43 pruebas aprobadas. Nuevos casos: amplitud cero coincide con solución base; semilla idéntica reproduce resultados y muestras; otra semilla cambia las muestras; pagos respetan los intervalos; empate total conserva ambigüedad y rutas; se rechazan configuraciones inválidas. La API guarda y recupera estadísticas. En navegador: 1000 repeticiones, semilla 42, amplitud ±2: Entrar 79,7 %, No entrar 20,3 %. Inspección de repetición 2, guardado y recuperación tras recargar verificados. El informe incorpora estadísticas y supuestos; la paginación de impresión sigue sin verificación.
+
+## Exportación directa de PDF secuencial
+
+46 pruebas aprobadas: modelo e identificador guardados en PDF, simulación con semilla y conteos, literalidad de marcado del usuario y paginación de supuestos largos. API: MIME application/pdf, cabecera PDF y 404 para versión inexistente. Descarga real desde navegador: informe-arbol-escenarios-tj.pdf, tres páginas, UUID de la versión y semilla 42 verificados. El ejemplo output/pdf/informe-arbol-monte-carlo.pdf fue renderizado con Poppler; las tres páginas finales se inspeccionaron visualmente sin superposiciones ni recortes. Corregidos una página casi vacía y artefacto de barra a 0 %. El PDF propio simultáneo, conexión de IA al árbol, agentes y ejecutable siguen pendientes.

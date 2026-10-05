@@ -59,3 +59,10 @@ def save(path,result):
 def history(path):
     with closing(connect(path)) as db:
         return [json.loads(row[0]) for row in db.execute('SELECT payload FROM sequential_versions ORDER BY rowid DESC LIMIT 30')]
+
+
+def get_version(path,identity):
+    with closing(connect(path)) as db:
+        row=db.execute('SELECT payload FROM sequential_versions WHERE id=?',(identity,)).fetchone()
+    if row is None:raise KeyError('Versión de árbol inexistente.')
+    return json.loads(row[0])

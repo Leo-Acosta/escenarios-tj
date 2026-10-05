@@ -85,5 +85,10 @@ class ApiTests(unittest.TestCase):
         with urlopen(self.base+'/api/sequential') as response:rows=json.load(response)
         self.assertEqual(rows[0]['id'],record['id'])
         self.assertEqual(rows[0]['simulation']['decision_counts'],[100,0,0])
+        with urlopen(self.base+'/api/sequential/report.pdf?id='+record['id']) as response:
+            self.assertEqual(response.headers['Content-Type'],'application/pdf')
+            self.assertTrue(response.read().startswith(b'%PDF-'))
+        with self.assertRaises(HTTPError) as error:urlopen(self.base+'/api/sequential/report.pdf?id=missing')
+        self.assertEqual(error.exception.code,404)
 
 if __name__ == '__main__':unittest.main()

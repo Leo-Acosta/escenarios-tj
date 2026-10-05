@@ -77,3 +77,7 @@ Este módulo es independiente del expediente simultáneo y la IA aún no constru
 Abrí **Incertidumbre y simulación Monte Carlo**, activá la simulación y elegí amplitud, 100–5000 repeticiones y semilla. Cada pago se muestrea uniformemente en base ± amplitud, de forma independiente. Los actores observan los pagos del escenario; el árbol se resuelve de nuevo en cada repetición. El gráfico muestra frecuencias de decisiones, escenarios con empates, rutas compatibles y percentiles de utilidad. Podés inspeccionar las primeras 20 repeticiones. Guardar el árbol conserva configuración y resultados; el informe de impresión incluye la simulación.
 
 Esto explora sensibilidad de incentivos; todavía no modela agentes con memoria, conducta aprendida, pagos correlacionados ni incertidumbre oculta al decidir.
+
+### PDF ejecutivo del árbol y Monte Carlo
+
+Después de **Resolver y guardar versión** (o recuperar una versión del historial), aparece **Descargar PDF ejecutivo**. Exporta el modelo guardado, planes completos, árbol vectorial, pagos, supuestos y simulación si existe. El PDF identifica la versión y fecha del cálculo. Editar el formulario oculta la descarga hasta resolver y guardar de nuevo; no se exportan cambios sin guardar. Requiere ReportLab instalado en el Python que ejecuta el servidor. El informe del caso simultáneo propio sigue usando la impresión del navegador.

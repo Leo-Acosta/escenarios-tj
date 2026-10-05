@@ -37,6 +37,15 @@ class Handler(BaseHTTPRequestHandler):
         if not self.allowed():
             return self.send(403, {'error': 'Host no autorizado.'})
         url = urlsplit(self.path)
+        if url.path == '/api/sequential/report.pdf':
+            try:
+                identity=parse_qs(url.query)['id'][0]
+                record=sequential.get_version(DB,identity)
+            except (KeyError,IndexError):return self.send(404,{'error':'Versión guardada no encontrada.'})
+            try:
+                from .sequential_report import build_pdf
+            except ImportError:return self.send(503,{'error':'ReportLab no está disponible. Usá la impresión del navegador.'})
+            return self.send(200,build_pdf(record),'application/pdf')
         if url.path == '/api/sequential':
             return self.send(200,sequential.history(DB))
         if url.path == '/api/ai/status':

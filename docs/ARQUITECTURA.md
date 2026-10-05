@@ -122,3 +122,7 @@ Cada nueva propuesta registra el extracto enviado, el modelo actual, los supuest
 ## Monte Carlo reproducible
 
 `simulation.py` usa `random.Random(seed)` local, 100–5000 repeticiones, ocho distribuciones uniformes independientes base ± radio. Valida intervalos, semilla e iteraciones. Cada escenario se resuelve con `sequential.analyze`. Las decisiones se cuentan por conjunto de primeras decisiones compatibles: A0, A1 o ambas. Las rutas cuentan compatibilidad, no seleccionan equilibrios arbitrariamente. P5 inferior/P95 superior usan interpolación lineal sobre mínimos/máximos de utilidad de A entre equilibrios de cada escenario. Se guardan versión del algoritmo, opciones, métricas y primeras 20 muestras, junto con la versión inmutable del árbol. La API acepta `simulation` opcional; sin ella conserva el comportamiento anterior.
+
+## PDF de versiones secuenciales
+
+GET `/api/sequential/report.pdf?id=UUID` consulta la versión inmutable en SQLite y genera un PDF con `sequential_report.py` y ReportLab. La exportación utiliza los resultados y la simulación guardados: no vuelve a muestrear ni acepta contenido de informe desde el navegador. No altera la versión. Si falta ReportLab responde 503; si falta la versión, 404. Diagramas y barras vectoriales; tablas con encabezados repetidos y texto escapado.
