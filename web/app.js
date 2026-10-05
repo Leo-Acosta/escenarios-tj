@@ -19,7 +19,7 @@ async function recalculate() {
     const data = await response.json();
     if(current !== generation) return;
     result = data; render(); $('status').textContent = '';
-  } catch(e) {if(current === generation) $('status').textContent = e.message;}
+  } catch(e) {if(current === generation) {result = null; $('status').textContent = e.message; $('download-pdf').removeAttribute('href');}}
   finally {if(current === generation) {$('save').disabled = !result; $('report-open').disabled = !result;}}
 }
 function render() {
@@ -27,7 +27,7 @@ function render() {
   $('q-label').textContent = format(p.cooperation*100)+' %'; $('cost-label').textContent = format(p.cost);
   $('recommendation').textContent = result.recommendation;
   $('expected-coop').textContent = format(result.values[0])+' pts'; $('expected-comp').textContent = format(result.values[1])+' pts';
-  $('matrix').innerHTML = result.matrix_a.map((row,i)=>`<tr><th>A ${strategies[i].toLowerCase()}</th>${row.map((v,j)=>`<td class="${result.equilibria.some(e=>e[0]===i&&e[1]===j)?'equilibrium':''}">(${format(v)}, ${format(result.matrix_b[i][j])})</td>`).join('')}</tr>`).join('');
+  $('matrix').innerHTML = result.matrix_a.map((row,i)=>`<tr><th>A ${i===0?'coopera':'compite'}</th>${row.map((v,j)=>`<td class="${result.equilibria.some(e=>e[0]===i&&e[1]===j)?'equilibrium':''}">(${format(v)}, ${format(result.matrix_b[i][j])})</td>`).join('')}</tr>`).join('');
   $('equilibrium-label').textContent = result.equilibria.map(e=>`A: ${strategies[e[0]].toLowerCase()} · B: ${strategies[e[1]].toLowerCase()}`).join(' / ');
   for(const id of ['tree-q1','tree-q2']) $(id).textContent = format(p.cooperation*100)+' %';
   for(const id of ['tree-p1','tree-p2']) $(id).textContent = format((1-p.cooperation)*100)+' %';
@@ -46,7 +46,7 @@ async function loadHistory(){
     const response = await fetch('/api/history'); if(!response.ok)throw Error(); const history=await response.json();
     $('history-list').replaceChildren();
     if(!history.length){$('history-list').textContent='Todavía no hay análisis guardados.';return;}
-    for(const item of history){const section=document.createElement('section');section.className='panel history-item';const text=document.createElement('div');const heading=document.createElement('h2');heading.textContent=`Análisis #${item.id}`;const p=document.createElement('p');p.textContent=`${new Date(item.created_at).toLocaleString('es-AR')} · cooperación ${format(item.result.parameters.cooperation*100)} % · costo ${format(item.result.parameters.cost)}`;text.append(heading,p);const button=document.createElement('button');button.className='secondary';button.textContent='Abrir análisis';button.addEventListener('click',()=>{$('cooperation').value=item.result.parameters.cooperation*100;$('cost').value=item.result.parameters.cost;recalculate();show('analysis');});section.append(text,button);$('history-list').append(section);}
+    for(const item of history){const section=document.createElement('section');section.className='panel history-item';const text=document.createElement('div');const heading=document.createElement('h2');heading.textContent=`Análisis #${item.id}`;const p=document.createElement('p');p.textContent=`${new Date(item.created_at).toLocaleString('es-AR', {timeZone:'America/Buenos_Aires'})} · cooperación ${format(item.result.parameters.cooperation*100)} % · costo ${format(item.result.parameters.cost)}`;text.append(heading,p);const button=document.createElement('button');button.className='secondary';button.textContent='Abrir análisis';button.addEventListener('click',()=>{$('cooperation').value=item.result.parameters.cooperation*100;$('cost').value=item.result.parameters.cost;recalculate();show('analysis');});section.append(text,button);$('history-list').append(section);}
   }catch{$('history-list').textContent='No se pudo leer el historial.';}
 }
 document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.view)));

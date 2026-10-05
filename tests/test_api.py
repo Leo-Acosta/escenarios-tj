@@ -1,0 +1,60 @@
+import json
+import tempfile
+import threading
+import unittest
+from pathlib import Path
+from urllib.request import Request, urlopen
+from urllib.error import HTTPError
+from http.server import ThreadingHTTPServer
+from unittest.mock import patch
+from escenarios.server import Handler
+
+
+class ApiTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.directory = tempfile.TemporaryDirectory()
+        cls.db_patch = patch('escenarios.server.DB', Path(cls.directory.name)/'test.sqlite3')
+        cls.db_patch.start()
+        cls.server = ThreadingHTTPServer(('127.0.0.1',0),Handler)
+        cls.thread = threading.Thread(target=cls.server.serve_forever,daemon=True)
+        cls.thread.start()
+        cls.base = f'http://127.0.0.1:{cls.server.server_port}'
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.server.shutdown()
+        cls.server.server_close()
+        cls.thread.join()
+        cls.db_patch.stop()
+        cls.directory.cleanup()
+
+    def test_analysis_and_nonfinite_input(self):
+        with urlopen(self.base+'/api/analysis?q=0.6&cost=1') as response:
+            data=json.load(response)
+        self.assertEqual(data['recommendation'],'Competir')
+        with self.assertRaises(HTTPError) as error:
+            urlopen(self.base+'/api/analysis?q=nan')
+        self.assertEqual(error.exception.code,400)
+
+    def test_disallowed_host_and_static_path(self):
+        with self.assertRaises(HTTPError) as error:
+            urlopen(Request(self.base+'/',headers={'Host':'outside.example'}))
+        self.assertEqual(error.exception.code,403)
+        with self.assertRaises(HTTPError) as error:
+            urlopen(self.base+'/../escenarios/core.py')
+        self.assertEqual(error.exception.code,404)
+
+    def test_snapshot_origin_and_server_recalculation(self):
+        payload=json.dumps({'cooperation':.6,'cost':3,'recommendation':'Inventada'}).encode()
+        with self.assertRaises(HTTPError) as error:
+            urlopen(Request(self.base+'/api/snapshots',data=payload,headers={'Origin':'https://outside.example'}))
+        self.assertEqual(error.exception.code,403)
+        with urlopen(Request(self.base+'/api/snapshots',data=payload,headers={'Origin':self.base,'Content-Type':'application/json'})) as response:
+            self.assertEqual(response.status,201)
+        with urlopen(self.base+'/api/history') as response:
+            data=json.load(response)
+        self.assertEqual(data[0]['result']['recommendation'],'Cooperar')
+
+
+if __name__ == '__main__':unittest.main()

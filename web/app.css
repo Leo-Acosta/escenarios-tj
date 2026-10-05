@@ -4,3 +4,5 @@
 @media(prefers-reduced-motion:no-preference){.bar{transition:left .2s,width .2s}.agent .avatar{transition:box-shadow .2s}.primary:hover{filter:brightness(1.08)}}
 
 .report-actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.report-actions a{text-decoration:none;display:inline-block}
+@media(min-width:1060px) and (max-width:1200px){.paired{grid-template-columns:1fr 1fr}}
+.network .agent{top:calc(50% - 40px)} @media(max-width:650px){.agent{width:110px}.network .halo{display:none}}
