@@ -34,6 +34,8 @@ El código de aplicación es propio: no se copiaron implementaciones, prompts ni
 
 ## Objetivo
 
+Avance del editor de redes: el panel permite crear una red propia de hasta 200 entidades y 1000 relaciones, guardarla en SQLite y recuperarla al abrir la aplicación. Los nombres se escapan al dibujarse en SVG. La red del analista permanece separada de la matriz ilustrativa; todavía no se calculan estrategias a partir de sus vínculos. Actualmente se conserva una red propia por instalación, sin historial de versiones de esa red.
+
 Explorar escenarios documentados mediante agentes, contrastar alternativas y producir informes trazables en español. La aplicación se implementará en Python. Una interfaz de navegador seguirá renderizando HTML/CSS; no se necesita mantener el frontend Vue ni una cadena Node.
 
 ## Componentes

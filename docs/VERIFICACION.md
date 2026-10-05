@@ -15,4 +15,6 @@ Ningún caso histórico ha sido utilizado: estas pruebas no demuestran precisió
 
 ## Panel gráfico interactivo
 
+Editor de red propia: ocho pruebas automáticas pasaron, con persistencia SQLite y rechazo de nombres/tipos/relaciones inválidos. En el navegador se crearon dos entidades y un vínculo, sin guardarlos como datos del usuario. Los nombres ingresados se escapan en el SVG y se insertan como texto en el inspector.
+
 Verificado en navegador: selección directa de vector y nodo, selección por Enter, zoom 125 %, restablecimiento 100 %, plegado y expansión de rama (dos/cuatro hojas visibles). Selección sincronizada entre árbol, plano y lectura de pagos. Sin desbordamiento medido en los paneles de escritorio. Exportación SVG conserva el encuadre completo del árbol aunque se amplíe en pantalla. El plano usa igual escala por unidad en ambos ejes. Captura visual automatizada sigue sin estar disponible.

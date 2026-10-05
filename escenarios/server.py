@@ -6,6 +6,7 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 from .core import Parameters, analyze
 from .storage import save_snapshot, list_snapshots
+from .graph import save_graph, load_graph
 
 ROOT = Path(__file__).resolve().parent.parent
 DB = ROOT / 'data' / 'escenarios.sqlite3'
@@ -32,6 +33,8 @@ class Handler(BaseHTTPRequestHandler):
         if not self.allowed():
             return self.send(403, {'error': 'Host no autorizado.'})
         url = urlsplit(self.path)
+        if url.path == '/api/graph':
+            return self.send(200, {'graph': load_graph(DB)})
         if url.path in ('/api/analysis', '/api/report.pdf'):
             try:
                 args = parse_qs(url.query)
@@ -61,13 +64,15 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         if not self.allowed() or self.headers.get('Origin') not in (f'http://127.0.0.1:{self.server.server_port}', f'http://localhost:{self.server.server_port}'):
             return self.send(403, {'error': 'Origen no autorizado.'})
-        if self.path != '/api/snapshots':
+        if self.path not in ('/api/snapshots','/api/graph'):
             return self.send(404, {'error': 'Recurso inexistente.'})
         try:
             length = int(self.headers.get('Content-Length', 0))
-            if not 0 < length <= 2048:
+            if not 0 < length <= (100000 if self.path == '/api/graph' else 2048):
                 raise ValueError()
             payload = json.loads(self.rfile.read(length))
+            if self.path == '/api/graph':
+                return self.send(200, {'graph':save_graph(DB,payload)})
             result = analyze(Parameters(float(payload['cooperation']), float(payload['cost'])))
             return self.send(201, {'id': save_snapshot(DB, result)})
         except (ValueError, KeyError, TypeError):
