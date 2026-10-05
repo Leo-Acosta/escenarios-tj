@@ -50,7 +50,8 @@ class Handler(BaseHTTPRequestHandler):
             return self.send(200, list_snapshots(DB))
         files = {'/': ('index.html', 'text/html; charset=utf-8'),
                  '/app.css': ('app.css', 'text/css; charset=utf-8'),
-                 '/app.js': ('app.js', 'text/javascript; charset=utf-8')}
+                 '/app.js': ('app.js', 'text/javascript; charset=utf-8'),
+                 '/graphs.js': ('graphs.js', 'text/javascript; charset=utf-8')}
         if url.path in files:
             name, mime = files[url.path]
             return self.send(200, (ROOT / 'web' / name).read_bytes(), mime)

@@ -4,7 +4,8 @@ const strategies = ['Cooperar', 'Competir'];
 let result, activeView = 'analysis', generation = 0;
 function show(view) {
   activeView = view;
-  for (const name of ['analysis','report','history']) $(`${name}-view`).hidden = name !== view;
+  for (const name of ['analysis','report','history','visual']) $(`${name}-view`).hidden = name !== view;
+  if(view === 'visual') drawGraphs();
   document.querySelectorAll('[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === view));
   if(view === 'report' && result) renderReport();
   if(view === 'history') loadHistory();
@@ -35,6 +36,7 @@ function render() {
   const vals = result.scenarios.flatMap(s=>s.values), min=Math.min(0,...vals)-1,max=Math.max(0,...vals)+1,position=v=>(v-min)/(max-min)*100;
   $('scenario-chart').innerHTML = result.scenarios.map(s=>`<div class="scenario-row"><div class="scenario-title"><strong>${s.name}</strong><small>B: ${format(s.cooperation*100)} % · costo ${format(s.cost)}</small></div><div class="bars" role="img" aria-label="${s.name}: cooperar ${format(s.values[0])}, competir ${format(s.values[1])} puntos"><div class="zero-line" style="left:${position(0)}%"></div>${s.values.map((v,i)=>`<div class="bar ${i===0?'coop':'comp'}" style="left:${Math.min(position(v),position(0))}%;width:${Math.abs(position(v)-position(0))}%"></div>`).join('')}</div><div class="bar-labels">${s.values.map(format).join('<br>')}</div></div>`).join('');
   renderReport();
+  drawGraphs();
 }
 function renderReport() {
   const p=result.parameters;
