@@ -1,6 +1,6 @@
 # Arquitectura de Escenarios TJ
 
-Estado al 5 de octubre de 2026: primera entrega del coordinador guiado (etapas A y B). La aplicación existente sigue funcionando. IA local, juegos secuenciales, agentes autónomos, PDF propio directo y empaquetado están pendientes.
+Estado al 5 de octubre de 2026: primera entrega del coordinador guiado (etapas A y B). La aplicación existente sigue funcionando. Primera integración de IA local implementada; juegos secuenciales, agentes autónomos, PDF propio directo y empaquetado están pendientes.
 
 ## Flujo implementado
 
@@ -95,3 +95,22 @@ Para evaluación predictiva, separar datos de desarrollo y evaluación, utilizar
 Servidor local para un usuario, datos en `data/`, excluidos de Git. No exponer en Internet sin autenticación, autorización y un servidor apropiado. No se descargaron modelos ni se instaló un motor de IA para esta entrega.
 
 El código de aplicación es propio: no se copiaron implementaciones, prompts ni imágenes de Miro-Fish. La licencia de distribución del proyecto queda pendiente de elección.
+
+
+## IA local — primera entrega C
+
+`local_ai.py` conecta exclusivamente con Ollama en loopback, sin proxies ni redirecciones. La configuración se guarda en SQLite. El catálogo de esta entrega admite Mistral 7B v0.3 Q4_K_M, publicado por Mistral AI con licencia Apache-2.0, con digest revisado. Un cambio de digest requiere revisar la versión antes de habilitarla. No se utiliza un modelo de familia Qwen ni un proveedor remoto.
+
+`ai_jobs.py` ejecuta una generación en segundo plano y conserva estado, errores, modelo, digest, contrato y resultado. GET `/api/ai/status` comprueba disponibilidad; POST `/api/ai/config` configura activación; POST `/api/ai/jobs` inicia una solicitud con ID/revisión del expediente; GET `/api/ai/jobs?job=<id>` o `?workflow=<uuid>` consulta resultados.
+
+Se solicita JSON Schema a `/api/chat` y se valida otra vez en Python. El esquema admite resumen, dos actores, dos estrategias por actor, variables propuestas, preguntas, hipótesis y límites. No admite pagos, probabilidades, código ni herramientas. La validación asegura la estructura y límites; no certifica la veracidad del contenido generado.
+
+La acción `accept_ai` exige que la propuesta corresponda al expediente y a su revisión original. Registra su procedencia, incorpora nombres y estrategias al borrador y deja pagos y probabilidades sin modificación. La revisión del analista sigue siendo obligatoria. Las versiones calculadas conservan las propuestas aceptadas en su contexto y las muestran separadas de la evidencia en el informe.
+
+Una generación por proceso, timeout de 240 segundos, 600 tokens de salida solicitados y contexto de 4096 tokens. Se envían extractos acotados y se registra `context_limited`. No se ejecutan instrucciones procedentes de textos o del modelo. Si el servicio no está disponible o la estructura falla, el expediente y el modo guiado permanecen utilizables.
+
+Equipo inspeccionado por consultas de solo lectura: 24509800448 bytes de RAM (22,8 GiB), AMD Radeon integrada con 1 GiB reportado y aproximadamente 445 GiB libres en C. Ollama 0.35.1 ya instalado. Mistral pesa 4372824384 bytes (4,4 GB); no se descargó. La memoria reportada del adaptador integrado no equivale necesariamente a toda su memoria compartida disponible; el rendimiento se evalúa con inferencia real.
+
+Procedencia y contratos: https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3 y https://docs.ollama.com/api/chat. Licencia Apache confirmada también mediante `ollama show mistral:latest --license`. Esta integración usa un modelo instalado; no distribuye sus pesos.
+
+Cada nueva propuesta registra el extracto enviado, el modelo actual, los supuestos, las opciones de generación y la versión del mensaje del sistema. Las respuestas históricas pueden discrepar del borrador: la IA debe señalarlo y el analista revisar. La conformidad del esquema no garantiza exactitud semántica. Cambiar el significado de estrategias exige revisar los pagos aunque el sistema conserve sus valores.

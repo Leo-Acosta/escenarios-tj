@@ -51,4 +51,17 @@ El panel propio incluye sensibilidad de la utilidad de A al supuesto de B entre 
 
 El borrador matemático se guarda explícitamente; los campos no guardados no se recuperan al recargar. Los expedientes nuevos no traen pagos: los define el analista. El supuesto inicial 50 % / 50 % debe revisarse. Las fuentes registradas no se descargan ni se verifican automáticamente.
 
-Esta entrega corresponde a A y B del prompt maestro. La IA local, el ejecutable y el PDF propio directo siguen pendientes. Hay 23 pruebas automatizadas, incluyendo persistencia, revisión requerida, versiones históricas y conflictos de revisión.
+Esta entrega corresponde a A y B del prompt maestro. En esa entrega quedaban pendientes la IA local, el ejecutable y el PDF propio directo. Se aprobaron 23 pruebas automatizadas, incluyendo persistencia, revisión requerida, versiones históricas y conflictos de revisión.
+
+
+### IA local revisable (primera integración de C)
+
+Abrí **IA local y propuestas de modelado** en el coordinador. La aplicación comprueba Ollama en `http://127.0.0.1:11434`, permite activar o desactivar la asistencia y usa un modelo ya instalado. Esta entrega admite `mistral:latest` con el digest revisado en `local_ai.py`; no descarga modelos ni instala servicios.
+
+**Proponer actores y variables** guarda antes el borrador del formulario y solicita una propuesta en segundo plano. Revisá el resumen, actores, estrategias, variables, preguntas, hipótesis y límites. Aplicar incorpora únicamente actores y estrategias al modelo y registra la propuesta. No completa pagos ni estima probabilidades. El cálculo sigue requiriendo preparación, datos completos y revisión del analista.
+
+Cambiar el expediente o editar campos mientras se genera una propuesta impide aplicarla a un estado distinto; guardá y generá de nuevo. Los errores y propuestas se conservan en SQLite. Al reiniciar, las generaciones interrumpidas quedan marcadas como fallidas. Una generación a la vez, tiempo de respuesta limitado y contexto acotado; la interfaz informa si se usó un extracto.
+
+Desactivar la asistencia evita nuevas solicitudes; una generación ya iniciada puede terminar. El modo guiado permanece disponible. Las propuestas no son evidencia ni predicciones validadas.
+
+Verificado con una generación real de Mistral en 133 segundos y 33 pruebas aprobadas. El ejecutable, el PDF propio directo y los juegos secuenciales siguen pendientes.

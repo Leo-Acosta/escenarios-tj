@@ -10,6 +10,7 @@ from .graph import save_graph, load_graph
 from .intake import prepare
 from .case_model import analyze_case,save_case,list_cases
 from .workflow import operate,get_workflow,list_workflows,get_version,Conflict,NotFound
+from . import local_ai,ai_jobs
 
 ROOT = Path(__file__).resolve().parent.parent
 DB = ROOT / 'data' / 'escenarios.sqlite3'
@@ -36,6 +37,18 @@ class Handler(BaseHTTPRequestHandler):
         if not self.allowed():
             return self.send(403, {'error': 'Host no autorizado.'})
         url = urlsplit(self.path)
+        if url.path == '/api/ai/status':
+            return self.send(200,local_ai.status(DB))
+        if url.path == '/api/ai/jobs':
+            try:
+                args=parse_qs(url.query)
+                if 'job' in args:return self.send(200,ai_jobs.get_job(DB,args['job'][0]))
+                if 'workflow' in args:return self.send(200,ai_jobs.list_jobs(DB,args['workflow'][0]))
+                raise ValueError()
+            except NotFound as error:
+                return self.send(404,{'error':str(error)})
+            except (ValueError,TypeError):
+                return self.send(400,{'error':'Referencia de propuesta inválida.'})
         if url.path == '/api/workflows':
             try:
                 args=parse_qs(url.query)
@@ -76,6 +89,7 @@ class Handler(BaseHTTPRequestHandler):
                  '/case-visuals.js': ('case-visuals.js', 'text/javascript; charset=utf-8'),
                  '/sensitivity.js': ('sensitivity.js', 'text/javascript; charset=utf-8')}
         files['/workflow.js']=('workflow.js','text/javascript; charset=utf-8')
+        files['/ai.js']=('ai.js','text/javascript; charset=utf-8')
         if url.path in files:
             name, mime = files[url.path]
             return self.send(200, (ROOT / 'web' / name).read_bytes(), mime)
@@ -84,13 +98,23 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         if not self.allowed() or self.headers.get('Origin') not in (f'http://127.0.0.1:{self.server.server_port}', f'http://localhost:{self.server.server_port}'):
             return self.send(403, {'error': 'Origen no autorizado.'})
-        if self.path not in ('/api/snapshots','/api/graph','/api/intake','/api/cases','/api/workflows'):
+        if self.path not in ('/api/snapshots','/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/config','/api/ai/jobs'):
             return self.send(404, {'error': 'Recurso inexistente.'})
         try:
             length = int(self.headers.get('Content-Length', 0))
-            if not 0 < length <= (100000 if self.path in ('/api/graph','/api/intake','/api/cases','/api/workflows') else 2048):
+            if not 0 < length <= (100000 if self.path in ('/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/config','/api/ai/jobs') else 2048):
                 raise ValueError()
             payload = json.loads(self.rfile.read(length))
+            if self.path in ('/api/ai/config','/api/ai/jobs'):
+                try:
+                    if self.path=='/api/ai/config':return self.send(200,local_ai.save_config(DB,payload))
+                    return self.send(202,ai_jobs.start(DB,payload))
+                except Conflict as error:
+                    return self.send(409,{'error':str(error)})
+                except NotFound as error:
+                    return self.send(404,{'error':str(error)})
+                except (ValueError,TypeError,KeyError) as error:
+                    return self.send(400,{'error':str(error) if isinstance(error,ValueError) else 'Solicitud de IA inválida.'})
             if self.path == '/api/workflows':
                 try:
                     return self.send(200,operate(DB,payload))
@@ -123,6 +147,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--port', type=int, default=8765)
     args = parser.parse_args()
+    ai_jobs.recover_interrupted(DB)
     server = ThreadingHTTPServer(('127.0.0.1', args.port), Handler)
     print(f'Escenarios TJ: http://127.0.0.1:{args.port}', flush=True)
     try:

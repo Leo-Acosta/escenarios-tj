@@ -33,3 +33,12 @@ Sensibilidad: 17 pruebas aprobadas, incluyendo cruce en 1/3, empate en todo el i
 Flujo en navegador: creación de un expediente de obra pública con datos hipotéticos; recuperación tras recargar en la segunda pregunta; cinco respuestas; modelo manual; guardado del borrador; rechazo de cálculo sin revisión; referencia de prueba; cálculo de versión 1; gráficos e informe con objetivo, datos pendientes, fuentes y supuestos. Aplicar sensibilidad a q=0 produjo versión 2 del mismo expediente. El informe histórico de versión 1 conservó B=50 %. Captura de la vista ejecutiva revisada; paginación de impresión pendiente.
 
 Los JavaScript modificados pasaron la validación de sintaxis con Node. No se configuró IA ni se descargaron modelos. No se generó un ejecutable ni un PDF propio directo en esta entrega.
+
+
+## Primera integración C — IA local
+
+33 pruebas aprobadas. Nuevas verificaciones: configuración limitada a un modelo revisado, rechazo de digest modificado, desconexión con modo guiado disponible, esquema sin campos de pagos/probabilidades/código, aplicación de nombres sin cambiar números, rechazo de propuestas desactualizadas, registro de fallos y recuperación de trabajos interrumpidos. Pruebas del contrato /api/chat con esquema y rechazo de JSON inválido o generación incompleta.
+
+Equipo inspeccionado: 22,8 GiB RAM, AMD Radeon integrada, Ollama 0.35.1 y Mistral 7B Q4_K_M instalados. Procedencia contrastada con la ficha oficial del publicador; licencia Apache en el modelo instalado. No se instalaron servicios ni se descargaron modelos. La primera prueba real alcanzó el timeout de 180 segundos y conservó el expediente. Se redujeron contexto/salida a 4096/600 tokens y se ajustó el timeout a 240 segundos para esta CPU.
+
+La segunda generación real finalizó correctamente en 132,51 segundos (421 tokens). En navegador se aplicó al expediente de prueba, se conservaron A/B y p=0,5/q=0, se confirmó la revisión y se guardó versión 3. El informe propio mostró modelo, digest, licencia y variables propuestas, separados de las fuentes. La IA retomó el 50 % de una respuesta anterior: se agregó el borrador numérico actual al contexto y una instrucción para señalar contradicciones. Esta corrección de contexto está cubierta por prueba de contrato; su efecto semántico requiere nuevas evaluaciones reales. El contexto enviado y las opciones se conservan en nuevas propuestas.

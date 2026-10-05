@@ -121,6 +121,10 @@ def operate(path, payload):
     if not isinstance(payload,dict):
         raise ValueError('Solicitud inválida.')
     action=payload.get('action')
+    proposal_job=None
+    if action=='accept_ai':
+        from .ai_jobs import get_job
+        proposal_job=get_job(path,text(payload['job_id'],40))
     with closing(connect(path)) as db, db:
         db.execute('BEGIN IMMEDIATE')
         if action=='create':
@@ -148,6 +152,24 @@ def operate(path, payload):
             d['messages'].append({'role':'assistant','text':reply,'source':'guided','at':stamp})
             d['stage']='collecting' if next_q else 'modeling'
             d['result']=None
+        elif action=='accept_ai':
+            if proposal_job['workflow_id']!=d['id'] or proposal_job['state']!='ready':
+                raise ValueError('La propuesta no corresponde a este expediente o no está lista.')
+            if proposal_job['base_revision']!=d['revision']:
+                raise Conflict('El expediente cambió después de solicitar la propuesta. Generá una nueva antes de aplicarla.')
+            from .local_ai import validate_proposal
+            proposal=validate_proposal(proposal_job['result']['proposal'])
+            if len(d.get('ai_proposals',[]))>=10 or len(d['messages'])>=100:
+                raise ValueError('El expediente alcanzó el límite de propuestas o mensajes.')
+            m=d['model'] or {'title':d['title'],'actors':['',''],'strategies':[['',''],['','']],
+                            'a':[[None,None],[None,None]],'b':[[None,None],[None,None]],'p':.5,'q':.5}
+            m['actors']=proposal['actors'];m['strategies']=proposal['strategies']
+            d['model']=draft(m)
+            record={'job_id':proposal_job['id'],'accepted_at':now(),**proposal_job['result']}
+            d.setdefault('ai_proposals',[]).append(record)
+            d['messages'].append({'role':'assistant','text':proposal['summary'],'source':'ai-draft',
+                                  'at':now(),'model':record['metadata']['model'],'job_id':proposal_job['id']})
+            d['result']=None;d['stage']='collecting' if question(d) else 'modeling'
         elif action in ('draft','calculate'):
             d['model']=draft(payload['model']);d['title']=text(d['model']['title'],100)
             d['evidence']=evidence(payload.get('evidence',[]))
@@ -161,7 +183,9 @@ def operate(path, payload):
                 version=db.execute('SELECT COALESCE(MAX(version),0)+1 FROM workflow_versions WHERE workflow_id=?',(d['id'],)).fetchone()[0]
                 result['context']={'workflow_id':d['id'],'version':version,'description':d['description'],
                     'answers':d['answers'],'evidence':d['evidence'],'assumptions':d['assumptions'],
-                    'conversation':d['messages'],'reviewed_at':now(),'mode':'guided'}
+                    'conversation':d['messages'],'reviewed_at':now(),
+                    'ai_proposals':d.get('ai_proposals',[]),
+                    'mode':'ai-assisted' if d.get('ai_proposals') else 'guided'}
                 db.execute('INSERT INTO workflow_versions VALUES (?,?,?,?)',(d['id'],version,now(),encoded(result)))
                 d['result']=result;d['stage']='calculated'
         else:
