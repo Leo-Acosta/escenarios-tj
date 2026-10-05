@@ -81,3 +81,7 @@ Esto explora sensibilidad de incentivos; todavía no modela agentes con memoria,
 ### PDF ejecutivo del árbol y Monte Carlo
 
 Después de **Resolver y guardar versión** (o recuperar una versión del historial), aparece **Descargar PDF ejecutivo**. Exporta el modelo guardado, planes completos, árbol vectorial, pagos, supuestos y simulación si existe. El PDF identifica la versión y fecha del cálculo. Editar el formulario oculta la descarga hasta resolver y guardar de nuevo; no se exportan cambios sin guardar. Requiere ReportLab instalado en el Python que ejecuta el servidor. El informe del caso simultáneo propio sigue usando la impresión del navegador.
+
+### IA local para decisiones secuenciales
+
+El panel **Asistente local para el árbol** recibe una descripción del caso y el borrador completo. Activá Mistral en el coordinador y usá **Proponer decisiones por etapa**. La generación conserva una propuesta separada con actores, tres pares de decisiones, variables, preguntas, hipótesis y límites. Aplicar cambia solamente nombres y decisiones del borrador; revisá nuevamente la correspondencia de los pagos, resolvé y guardá. Si cambian descripción, modelo u opciones de simulación antes de aplicar, se exige una propuesta nueva. Las versiones guardadas y PDF conservan la procedencia de la IA. La propuesta no acredita evidencia ni genera pagos automáticamente.

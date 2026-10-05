@@ -25,3 +25,10 @@ class SequentialReportTests(unittest.TestCase):
         r['model']['assumptions']='Supuesto de prueba. '*250
         reader=PdfReader(BytesIO(build_pdf(r)));text=' '.join(p.extract_text() for p in reader.pages)
         self.assertIn('<b>literal</b>',text);self.assertGreater(len(reader.pages),2)
+
+    def test_ai_provenance_is_separate_from_final_model(self):
+        from test_sequential_ai import proposal
+        r=self.record();r['ai_proposal']={'job_id':'tree-job','proposal':proposal(),
+            'metadata':{'model':'mistral:latest','publisher':'Mistral AI','license':'Apache-2.0','digest':'abc'}}
+        text=' '.join(p.extract_text() for p in PdfReader(BytesIO(build_pdf(r))).pages)
+        self.assertIn('Asistencia local de IA',text);self.assertIn('tree-job',text);self.assertIn('Demanda',text)

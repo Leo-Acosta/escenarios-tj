@@ -100,6 +100,7 @@ class Handler(BaseHTTPRequestHandler):
                  '/case-visuals.js': ('case-visuals.js', 'text/javascript; charset=utf-8'),
                  '/sensitivity.js': ('sensitivity.js', 'text/javascript; charset=utf-8')}
         files['/workflow.js']=('workflow.js','text/javascript; charset=utf-8')
+        files['/sequential-ai.js']=('sequential-ai.js','text/javascript; charset=utf-8')
         files['/sequential.js']=('sequential.js','text/javascript; charset=utf-8')
         files['/ai.js']=('ai.js','text/javascript; charset=utf-8')
         if url.path in files:
@@ -110,15 +111,22 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         if not self.allowed() or self.headers.get('Origin') not in (f'http://127.0.0.1:{self.server.server_port}', f'http://localhost:{self.server.server_port}'):
             return self.send(403, {'error': 'Origen no autorizado.'})
-        if self.path not in ('/api/snapshots','/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/config','/api/ai/jobs','/api/sequential'):
+        if self.path not in ('/api/snapshots','/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/config','/api/ai/jobs','/api/sequential','/api/sequential/ai-jobs','/api/sequential/ai-apply'):
             return self.send(404, {'error': 'Recurso inexistente.'})
         try:
             length = int(self.headers.get('Content-Length', 0))
-            if not 0 < length <= (100000 if self.path in ('/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/config','/api/ai/jobs','/api/sequential') else 2048):
+            if not 0 < length <= (100000 if self.path in ('/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/config','/api/ai/jobs','/api/sequential','/api/sequential/ai-jobs','/api/sequential/ai-apply') else 2048):
                 raise ValueError()
             payload = json.loads(self.rfile.read(length))
+            if self.path in ('/api/sequential/ai-jobs','/api/sequential/ai-apply'):
+                try:
+                    if self.path.endswith('ai-jobs'):return self.send(202,ai_jobs.start_tree(DB,payload))
+                    return self.send(200,ai_jobs.apply_tree(DB,payload))
+                except Conflict as error:return self.send(409,{'error':str(error)})
+                except NotFound as error:return self.send(404,{'error':str(error)})
             if self.path == '/api/sequential':
                 result=sequential.analyze(payload)
+                if payload.get('ai_job_id'):result['ai_proposal']=ai_jobs.tree_provenance(DB,payload['ai_job_id'])
                 if payload.get('simulation') is not None:result['simulation']=simulation.simulate(result['model'],payload['simulation'])
                 if payload.get('save') is True:
                     if payload.get('reviewed') is not True:raise ValueError('Confirmá la revisión antes de guardar.')

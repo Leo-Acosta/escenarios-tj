@@ -67,7 +67,7 @@ def start(path,payload):
 def worker(path,workflow,value):
     global RUNNING
     try:
-        value['result']=local_ai.propose(path,workflow);value['state']='ready'
+        value['result']=(local_ai.propose_tree(path,workflow) if value.get('kind')=='sequential' else local_ai.propose(path,workflow));value['state']='ready'
     except local_ai.AIError as error:
         value['state']='failed';value['error']=str(error)
     except Exception:
@@ -77,3 +77,47 @@ def worker(path,workflow,value):
         try:store(path,value)
         finally:
             with LOCK:RUNNING=False
+
+
+def tree_snapshot(payload):
+    from .sequential import analyze
+    if not isinstance(payload,dict):raise ValueError('Descripción y modelo inválidos.')
+    description=payload.get('description')
+    if not isinstance(description,str) or not 10<=len(description.strip())<=12000:raise ValueError('Describí el caso del árbol con entre 10 y 12000 caracteres.')
+    return {'model':analyze(payload['model'])['model'],'description':description.strip(),'simulation':payload.get('simulation')}
+
+
+def fingerprint(snapshot):
+    import hashlib
+    return hashlib.sha256(json.dumps(snapshot,sort_keys=True,ensure_ascii=False,allow_nan=False).encode()).hexdigest()
+
+
+def start_tree(path,payload):
+    global RUNNING
+    snapshot=tree_snapshot(payload)
+    with LOCK:
+        if RUNNING:raise Conflict('Ya hay una generación local en curso. Esperá a que termine.')
+        RUNNING=True
+    value={'id':str(uuid4()),'workflow_id':'sequential','kind':'sequential','base_fingerprint':fingerprint(snapshot),
+        'created_at':now(),'state':'running','result':None,'error':None}
+    try:
+        store(path,value);threading.Thread(target=worker,args=(path,snapshot,value),daemon=True).start()
+    except Exception:
+        with LOCK:RUNNING=False
+        raise
+    return value
+
+
+def tree_provenance(path,identity):
+    job=get_job(path,identity)
+    if job.get('kind')!='sequential' or job['state']!='ready':raise ValueError('La propuesta secuencial no está lista.')
+    local_ai.validate_tree_proposal(job['result']['proposal'])
+    return {'job_id':job['id'],**job['result']}
+
+
+def apply_tree(path,payload):
+    snapshot=tree_snapshot(payload);job=get_job(path,payload['job_id'])
+    provenance=tree_provenance(path,job['id'])
+    if job['base_fingerprint']!=fingerprint(snapshot):raise Conflict('El árbol o su descripción cambió. Generá una propuesta nueva.')
+    model=snapshot['model'];proposal=provenance['proposal'];model['actors']=proposal['actors'];model['actions']=proposal['actions']
+    return {'model':model,'ai_proposal':provenance}

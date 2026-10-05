@@ -54,3 +54,9 @@ La segunda generación real finalizó correctamente en 132,51 segundos (421 toke
 ## Exportación directa de PDF secuencial
 
 46 pruebas aprobadas: modelo e identificador guardados en PDF, simulación con semilla y conteos, literalidad de marcado del usuario y paginación de supuestos largos. API: MIME application/pdf, cabecera PDF y 404 para versión inexistente. Descarga real desde navegador: informe-arbol-escenarios-tj.pdf, tres páginas, UUID de la versión y semilla 42 verificados. El ejemplo output/pdf/informe-arbol-monte-carlo.pdf fue renderizado con Poppler; las tres páginas finales se inspeccionaron visualmente sin superposiciones ni recortes. Corregidos una página casi vacía y artefacto de barra a 0 %. El PDF propio simultáneo, conexión de IA al árbol, agentes y ejecutable siguen pendientes.
+
+## IA local para árboles secuenciales
+
+52 pruebas aprobadas. Nuevas verificaciones: tres nodos obligatorios, rechazo de campos de pagos y alternativas duplicadas, conservación de pagos/supuestos, conflicto por descripción o simulación modificadas, generador específico, registro de esquema/contexto, API de aplicación y procedencia en PDF. Prueba real de Mistral: 143,61 segundos, 442 tokens; seis decisiones válidas y variables/preguntas. En navegador se modificó el título y se verificó aplicación deshabilitada; se restauró, aplicó y guardó una versión con Monte Carlo. PDF output/pdf/informe-arbol-ia-local.pdf: cuatro páginas renderizadas e inspeccionadas visualmente, con propuesta separada de modelo final y metadatos.
+
+La prueba real es un caso ilustrativo; no demuestra precisión general ni validación predictiva. Todavía faltan agentes con memoria, ejecutable y unificación del expediente simultáneo y secuencial.

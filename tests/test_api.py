@@ -91,4 +91,25 @@ class ApiTests(unittest.TestCase):
         with self.assertRaises(HTTPError) as error:urlopen(self.base+'/api/sequential/report.pdf?id=missing')
         self.assertEqual(error.exception.code,404)
 
+    def test_sequential_ai_application_and_saved_provenance(self):
+        from escenarios import ai_jobs
+        from test_sequential import MODEL
+        from test_sequential_ai import proposal
+        snapshot={'model':MODEL,'description':'La empresa decide antes que la contraparte.','simulation':None}
+        path=Path(self.directory.name)/'test.sqlite3'
+        job={'id':'api-tree-job','workflow_id':'sequential','kind':'sequential','state':'ready',
+             'base_fingerprint':ai_jobs.fingerprint(ai_jobs.tree_snapshot(snapshot)),
+             'result':{'proposal':proposal(),'metadata':{'model':'mistral:latest','digest':'test'}}}
+        ai_jobs.store(path,job)
+        headers={'Origin':self.base,'Content-Type':'application/json'}
+        def post(route,payload):
+            with urlopen(Request(self.base+route,data=json.dumps(payload).encode(),headers=headers)) as r:return json.load(r)
+        applied=post('/api/sequential/ai-apply',{**snapshot,'job_id':job['id']})
+        self.assertEqual(applied['model']['payoffs'],MODEL['payoffs'])
+        saved=post('/api/sequential',{**applied['model'],'ai_job_id':job['id'],'save':True,'reviewed':True})
+        self.assertEqual(saved['ai_proposal']['job_id'],job['id'])
+        with self.assertRaises(HTTPError) as error:post('/api/sequential/ai-apply',{**snapshot,'description':'Cambió la descripción del caso.','job_id':job['id']})
+        self.assertEqual(error.exception.code,409)
+
+
 if __name__ == '__main__':unittest.main()

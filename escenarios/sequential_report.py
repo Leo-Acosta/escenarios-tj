@@ -71,6 +71,15 @@ def build_pdf(record):
             for j in range(2):rows.append([m['actions'][0][i]+' / '+m['actions'][i+1][j],f"{s['route_counts'][i][j]} / {options['iterations']}"])
         flow.extend([p('Rutas compatibles','TJSection'),table(rows,[132*mm,40*mm]),p('En empates pueden coincidir varias rutas en la misma repetición; los conteos de rutas no deben sumarse.','TJSmall')])
         for assumption in s['assumptions']:flow.append(p('- '+assumption,'TJSmall'))
+    if record.get('ai_proposal'):
+        source=record['ai_proposal'];proposal=source['proposal'];meta=source['metadata']
+        flow.extend([PageBreak(),p('Asistencia local de IA','TJTitle'),p('Propuesta incorporada como borrador; no constituye evidencia. Los actores, decisiones y pagos finales son los revisados por el analista.'),p('Modelo: '+meta['model']+' / '+meta.get('publisher','')+' / '+meta.get('license',''),'TJSmall'),p('Digest: '+meta['digest'],'TJSmall'),p('Trabajo: '+source['job_id'],'TJSmall'),p(proposal['summary'])])
+        flow.append(table([['Nodo','Alternativas propuestas']]+[[['A decide','B después de A1','B después de A2'][i],' / '.join(row)] for i,row in enumerate(proposal['actions'])],[55*mm,117*mm]))
+        flow.append(p('Variables propuestas','TJSection'))
+        for variable in proposal['variables']:flow.append(p(variable['name']+': '+variable['reason'],'TJSmall'))
+        for key,title in [('questions','Preguntas pendientes'),('assumptions','Hipótesis de la propuesta'),('limitations','Límites declarados por la IA')]:
+            flow.append(p(title,'TJSection'))
+            for text in proposal[key]:flow.append(p('- '+text,'TJSmall'))
     def footer(canvas,document):
         canvas.saveState();canvas.setStrokeColor(colors.HexColor('#d2dfe5'));canvas.line(19*mm,16*mm,191*mm,16*mm);canvas.setFont('Helvetica',8);canvas.setFillColor(MUTED);canvas.drawString(19*mm,11*mm,'ESCENARIOS TJ / Análisis exploratorio / Versión guardada');canvas.drawRightString(191*mm,11*mm,str(document.page));canvas.restoreState()
     doc.build(flow,onFirstPage=footer,onLaterPages=footer)

@@ -1,6 +1,6 @@
 # Arquitectura de Escenarios TJ
 
-Estado al 5 de octubre de 2026: primera entrega del coordinador guiado (etapas A y B). La aplicación existente sigue funcionando. Primera integración de IA local implementada; juegos secuenciales, agentes autónomos, PDF propio directo y empaquetado están pendientes.
+Estado al 5 de octubre de 2026: coordinador guiado, IA local revisable, árboles secuenciales, Monte Carlo y PDF secuencial implementados. La IA propone decisiones tanto para juegos simultáneos como secuenciales. Agentes con memoria, PDF directo de casos simultáneos propios, unificación de expedientes y empaquetado siguen pendientes.
 
 ## Flujo implementado
 
@@ -126,3 +126,7 @@ Cada nueva propuesta registra el extracto enviado, el modelo actual, los supuest
 ## PDF de versiones secuenciales
 
 GET `/api/sequential/report.pdf?id=UUID` consulta la versión inmutable en SQLite y genera un PDF con `sequential_report.py` y ReportLab. La exportación utiliza los resultados y la simulación guardados: no vuelve a muestrear ni acepta contenido de informe desde el navegador. No altera la versión. Si falta ReportLab responde 503; si falta la versión, 404. Diagramas y barras vectoriales; tablas con encabezados repetidos y texto escapado.
+
+## IA en árboles secuenciales
+
+Contrato `proposal-sequential-v1`: dos actores, tres pares de acciones (A, B tras A1, B tras A2), variables, preguntas, hipótesis y límites. `local_ai.propose_tree` usa Ollama local con modelo y digest aprobados. Trabajos persistidos en `ai_jobs` con tipo secuencial; comparten la exclusión de una generación con el coordinador simultáneo. POST `/api/sequential/ai-jobs` toma una instantánea validada y guarda su SHA-256 canónico. `/api/sequential/ai-apply` exige una instantánea coincidente, aplica solo actores/acciones y devuelve procedencia. El cliente invalida resultados y revisión, conserva números y simulación. Las nuevas versiones guardan la propuesta recuperada del servidor, su contexto y metadatos; el PDF agrega un apartado de asistencia local. No hay ejecución de herramientas o código del modelo.

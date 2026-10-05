@@ -139,3 +139,45 @@ def propose(path,workflow):
         'context_limited':limited,'eval_count':response.get('eval_count'),
         'duration_seconds':round(response.get('total_duration',0)/1e9,2),'schema':'proposal-2x2-v1',
         'options':{'temperature':0.1,'num_ctx':4096,'num_predict':600},'system_version':'strategic-proposal-v1'}}
+
+
+# Contrato distinto: A decide una vez y B tiene dos nodos observados.
+from copy import deepcopy
+TREE_SCHEMA=deepcopy(SCHEMA)
+TREE_SCHEMA['properties']['actions']=TREE_SCHEMA['properties'].pop('strategies')
+TREE_SCHEMA['properties']['actions']['minItems']=3
+TREE_SCHEMA['properties']['actions']['maxItems']=3
+TREE_SCHEMA['required']=['actions' if k=='strategies' else k for k in SCHEMA['required']]
+TREE_SYSTEM=SYSTEM.replace('juego simultáneo 2x2','juego secuencial de información perfecta con dos etapas').replace('Proponé dos estrategias distintas por actor','A decide primero entre dos alternativas. B observa la decisión de A y responde en dos nodos distintos. actions tiene tres filas: decisiones de A, respuestas de B tras A1, respuestas de B tras A2. Proponé dos alternativas distintas por nodo')
+
+
+def validate_tree_proposal(value):
+    if not isinstance(value,dict) or set(value)!=set(TREE_SCHEMA['required']):raise AIError('Campos de propuesta secuencial inválidos.')
+    actions=value['actions']
+    if not isinstance(actions,list) or len(actions)!=3:raise AIError('Se requieren tres nodos de decisión.')
+    clean=validate_proposal({**{k:v for k,v in value.items() if k!='actions'},'strategies':actions[:2]})
+    last=validate_proposal({**{k:v for k,v in value.items() if k!='actions'},'strategies':[actions[2],actions[2]]})['strategies'][0]
+    clean['actions']=clean.pop('strategies')+[last]
+    if any(not all(row) or row[0]==row[1] for row in clean['actions']) or not all(clean['actors']):raise AIError('La propuesta necesita actores y alternativas distintas por nodo.')
+    return clean
+
+
+def propose_tree(path,snapshot):
+    state=status(path)
+    if not state['ready']:raise AIError(state['message'])
+    model=deepcopy(snapshot['model']);assumptions=model['assumptions'];model['assumptions']=assumptions[:2000]
+    context={'description':snapshot['description'][:4000],'current_model':model,'information':'B observa la decisión de A antes de responder.'}
+    chosen=state['config']['model'];options={'temperature':0.1,'num_ctx':4096,'num_predict':600}
+    response=request('/api/chat',{'model':chosen,'stream':False,'format':TREE_SCHEMA,
+        'messages':[{'role':'system','content':TREE_SYSTEM},{'role':'user','content':json.dumps(context,ensure_ascii=False)}],
+        'options':options,'keep_alive':'2m'},timeout=240)
+    try:
+        if not response.get('done') or response.get('done_reason')=='length':raise AIError('Generación incompleta.')
+        content=response['message']['content']
+        if not isinstance(content,str) or len(content)>20000:raise AIError('Respuesta demasiado extensa.')
+        proposal=validate_tree_proposal(json.loads(content))
+    except (KeyError,ValueError,TypeError,AttributeError):raise AIError('La IA no devolvió un árbol válido. El modelo manual sigue disponible.') from None
+    return {'proposal':proposal,'input_context':context,'metadata':{'model':chosen,**CATALOG[chosen],
+        'context_limited':len(snapshot['description'])>4000 or len(assumptions)>2000,
+        'duration_seconds':round(response.get('total_duration',0)/1e9,2),'eval_count':response.get('eval_count'),
+        'schema':'proposal-sequential-v1','system_version':'sequential-proposal-v1','options':options}}
