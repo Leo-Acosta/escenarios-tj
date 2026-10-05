@@ -10,7 +10,7 @@ from .graph import save_graph, load_graph
 from .intake import prepare
 from .case_model import analyze_case,save_case,list_cases
 from .workflow import operate,get_workflow,list_workflows,get_version,Conflict,NotFound
-from . import local_ai,ai_jobs
+from . import local_ai,ai_jobs,sequential
 
 ROOT = Path(__file__).resolve().parent.parent
 DB = ROOT / 'data' / 'escenarios.sqlite3'
@@ -37,6 +37,8 @@ class Handler(BaseHTTPRequestHandler):
         if not self.allowed():
             return self.send(403, {'error': 'Host no autorizado.'})
         url = urlsplit(self.path)
+        if url.path == '/api/sequential':
+            return self.send(200,sequential.history(DB))
         if url.path == '/api/ai/status':
             return self.send(200,local_ai.status(DB))
         if url.path == '/api/ai/jobs':
@@ -89,6 +91,7 @@ class Handler(BaseHTTPRequestHandler):
                  '/case-visuals.js': ('case-visuals.js', 'text/javascript; charset=utf-8'),
                  '/sensitivity.js': ('sensitivity.js', 'text/javascript; charset=utf-8')}
         files['/workflow.js']=('workflow.js','text/javascript; charset=utf-8')
+        files['/sequential.js']=('sequential.js','text/javascript; charset=utf-8')
         files['/ai.js']=('ai.js','text/javascript; charset=utf-8')
         if url.path in files:
             name, mime = files[url.path]
@@ -98,13 +101,19 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         if not self.allowed() or self.headers.get('Origin') not in (f'http://127.0.0.1:{self.server.server_port}', f'http://localhost:{self.server.server_port}'):
             return self.send(403, {'error': 'Origen no autorizado.'})
-        if self.path not in ('/api/snapshots','/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/config','/api/ai/jobs'):
+        if self.path not in ('/api/snapshots','/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/config','/api/ai/jobs','/api/sequential'):
             return self.send(404, {'error': 'Recurso inexistente.'})
         try:
             length = int(self.headers.get('Content-Length', 0))
-            if not 0 < length <= (100000 if self.path in ('/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/config','/api/ai/jobs') else 2048):
+            if not 0 < length <= (100000 if self.path in ('/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/config','/api/ai/jobs','/api/sequential') else 2048):
                 raise ValueError()
             payload = json.loads(self.rfile.read(length))
+            if self.path == '/api/sequential':
+                result=sequential.analyze(payload)
+                if payload.get('save') is True:
+                    if payload.get('reviewed') is not True:raise ValueError('Confirmá la revisión antes de guardar.')
+                    result=sequential.save(DB,result)
+                return self.send(200,result)
             if self.path in ('/api/ai/config','/api/ai/jobs'):
                 try:
                     if self.path=='/api/ai/config':return self.send(200,local_ai.save_config(DB,payload))

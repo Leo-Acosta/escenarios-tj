@@ -65,3 +65,9 @@ Cambiar el expediente o editar campos mientras se genera una propuesta impide ap
 Desactivar la asistencia evita nuevas solicitudes; una generación ya iniciada puede terminar. El modo guiado permanece disponible. Las propuestas no son evidencia ni predicciones validadas.
 
 Verificado con una generación real de Mistral en 133 segundos y 33 pruebas aprobadas. El ejecutable, el PDF propio directo y los juegos secuenciales siguen pendientes.
+
+### Árbol secuencial (primera entrega de D)
+
+En la Mesa estratégica, el panel Árbol secuencial permite editar dos decisiones de A y dos respuestas de B por cada decisión observada. Cargá los ocho pagos, los supuestos y resolvé. El núcleo Python calcula todos los equilibrios puros perfectos en subjuegos mediante inducción hacia atrás, incluyendo empates. El gráfico permite ampliación y exploración de hojas. Confirmá la revisión para guardar una versión inmutable; el historial permite recuperarla. El botón de impresión prepara un informe específico del árbol.
+
+Este módulo es independiente del expediente simultáneo y la IA aún no construye estos árboles. No incluye azar, información oculta, agentes ni Monte Carlo.

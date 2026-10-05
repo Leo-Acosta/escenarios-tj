@@ -114,3 +114,7 @@ Equipo inspeccionado por consultas de solo lectura: 24509800448 bytes de RAM (22
 Procedencia y contratos: https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3 y https://docs.ollama.com/api/chat. Licencia Apache confirmada también mediante `ollama show mistral:latest --license`. Esta integración usa un modelo instalado; no distribuye sus pesos.
 
 Cada nueva propuesta registra el extracto enviado, el modelo actual, los supuestos, las opciones de generación y la versión del mensaje del sistema. Las respuestas históricas pueden discrepar del borrador: la IA debe señalarlo y el analista revisar. La conformidad del esquema no garantiza exactitud semántica. Cambiar el significado de estrategias exige revisar los pagos aunque el sistema conserve sus valores.
+
+## Juegos secuenciales: dos etapas
+
+`sequential.py` resuelve un árbol binario A → B con información perfecta. Se enumeran todas las respuestas óptimas de B en ambos nodos; para cada plan completo se calculan las decisiones óptimas de A. Los empates conservan todas las soluciones, incluidas estrategias fuera de la ruta. GET/POST `/api/sequential` recupera versiones y calcula/guarda en la tabla `sequential_versions`. Guardar requiere revisión; cada versión tiene UUID y modelo completo. El editor y el informe son independientes del coordinador 2x2 y su IA.

@@ -69,4 +69,19 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(error.exception.code,409)
 
 
+
+
+    def test_sequential_api_requires_review_to_save(self):
+        from test_sequential import MODEL
+        payload={**MODEL,'save':True,'reviewed':False}
+        def submit():
+            return urlopen(Request(self.base+'/api/sequential',data=json.dumps(payload).encode(),headers={'Content-Type':'application/json','Origin':self.base}))
+        with self.assertRaises(HTTPError) as error:submit()
+        self.assertEqual(error.exception.code,400)
+        payload['reviewed']=True
+        with submit() as response:record=json.load(response)
+        self.assertEqual(record['equilibria'][0]['outcome'],[0,1])
+        with urlopen(self.base+'/api/sequential') as response:rows=json.load(response)
+        self.assertEqual(rows[0]['id'],record['id'])
+
 if __name__ == '__main__':unittest.main()
