@@ -112,4 +112,17 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(error.exception.code,409)
 
 
+    def test_agent_simulation_save_requires_review_and_recovers_trace(self):
+        from test_agents import payload
+        data={**payload(),'save':True,'reviewed':False}
+        def post():
+            return urlopen(Request(self.base+'/api/agents',data=json.dumps(data).encode(),headers={'Origin':self.base,'Content-Type':'application/json'}))
+        with self.assertRaises(HTTPError) as error:post()
+        self.assertEqual(error.exception.code,400)
+        data['reviewed']=True
+        with post() as response:saved=json.load(response)
+        with urlopen(self.base+'/api/agents') as response:rows=json.load(response)
+        self.assertEqual(rows[0]['id'],saved['id']);self.assertEqual(rows[0]['rounds'][1]['memory'][0]['observed_rounds'],1)
+
 if __name__ == '__main__':unittest.main()
+

@@ -10,7 +10,7 @@ from .graph import save_graph, load_graph
 from .intake import prepare
 from .case_model import analyze_case,save_case,list_cases
 from .workflow import operate,get_workflow,list_workflows,get_version,Conflict,NotFound
-from . import local_ai,ai_jobs,sequential,simulation
+from . import local_ai,ai_jobs,sequential,simulation,agents
 
 ROOT = Path(__file__).resolve().parent.parent
 DB = ROOT / 'data' / 'escenarios.sqlite3'
@@ -46,6 +46,8 @@ class Handler(BaseHTTPRequestHandler):
                 from .sequential_report import build_pdf
             except ImportError:return self.send(503,{'error':'ReportLab no está disponible. Usá la impresión del navegador.'})
             return self.send(200,build_pdf(record),'application/pdf')
+        if url.path == '/api/agents':
+            return self.send(200,agents.history(DB))
         if url.path == '/api/sequential':
             return self.send(200,sequential.history(DB))
         if url.path == '/api/ai/status':
@@ -101,6 +103,7 @@ class Handler(BaseHTTPRequestHandler):
                  '/sensitivity.js': ('sensitivity.js', 'text/javascript; charset=utf-8')}
         files['/workflow.js']=('workflow.js','text/javascript; charset=utf-8')
         files['/sequential-ai.js']=('sequential-ai.js','text/javascript; charset=utf-8')
+        files['/agents.js']=('agents.js','text/javascript; charset=utf-8')
         files['/sequential.js']=('sequential.js','text/javascript; charset=utf-8')
         files['/ai.js']=('ai.js','text/javascript; charset=utf-8')
         if url.path in files:
@@ -111,13 +114,19 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         if not self.allowed() or self.headers.get('Origin') not in (f'http://127.0.0.1:{self.server.server_port}', f'http://localhost:{self.server.server_port}'):
             return self.send(403, {'error': 'Origen no autorizado.'})
-        if self.path not in ('/api/snapshots','/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/config','/api/ai/jobs','/api/sequential','/api/sequential/ai-jobs','/api/sequential/ai-apply'):
+        if self.path not in ('/api/snapshots','/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/config','/api/ai/jobs','/api/sequential','/api/sequential/ai-jobs','/api/sequential/ai-apply','/api/agents'):
             return self.send(404, {'error': 'Recurso inexistente.'})
         try:
             length = int(self.headers.get('Content-Length', 0))
-            if not 0 < length <= (100000 if self.path in ('/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/config','/api/ai/jobs','/api/sequential','/api/sequential/ai-jobs','/api/sequential/ai-apply') else 2048):
+            if not 0 < length <= (100000 if self.path in ('/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/config','/api/ai/jobs','/api/sequential','/api/sequential/ai-jobs','/api/sequential/ai-apply','/api/agents') else 2048):
                 raise ValueError()
             payload = json.loads(self.rfile.read(length))
+            if self.path == '/api/agents':
+                result=agents.run(payload)
+                if payload.get('save') is True:
+                    if payload.get('reviewed') is not True:raise ValueError('Confirmá la revisión para guardar.')
+                    result=agents.save(DB,result)
+                return self.send(200,result)
             if self.path in ('/api/sequential/ai-jobs','/api/sequential/ai-apply'):
                 try:
                     if self.path.endswith('ai-jobs'):return self.send(202,ai_jobs.start_tree(DB,payload))

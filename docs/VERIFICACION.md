@@ -60,3 +60,7 @@ La segunda generación real finalizó correctamente en 132,51 segundos (421 toke
 52 pruebas aprobadas. Nuevas verificaciones: tres nodos obligatorios, rechazo de campos de pagos y alternativas duplicadas, conservación de pagos/supuestos, conflicto por descripción o simulación modificadas, generador específico, registro de esquema/contexto, API de aplicación y procedencia en PDF. Prueba real de Mistral: 143,61 segundos, 442 tokens; seis decisiones válidas y variables/preguntas. En navegador se modificó el título y se verificó aplicación deshabilitada; se restauró, aplicó y guardó una versión con Monte Carlo. PDF output/pdf/informe-arbol-ia-local.pdf: cuatro páginas renderizadas e inspeccionadas visualmente, con propuesta separada de modelo final y metadatos.
 
 La prueba real es un caso ilustrativo; no demuestra precisión general ni validación predictiva. Todavía faltan agentes con memoria, ejecutable y unificación del expediente simultáneo y secuencial.
+
+## Agentes con memoria
+
+60 pruebas aprobadas. Nuevos casos: memoria sin observar la ronda actual, cambio persistente, orientación de la mejor respuesta de B, ruido observado en la siguiente ronda, reproducibilidad sin mutar entradas, configuración inválida, versiones inmutables y revisión requerida por API. Navegador: Municipio copia la segunda alternativa de Vecinos recién en ronda 2; en ronda 25 se verificaron 24 observaciones previas y acumulados A=24/B=29. Guardado y recuperación tras recargar comprobados. JavaScript validado con Node. El PDF de agentes y la calibración con datos siguen pendientes.

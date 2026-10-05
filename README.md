@@ -85,3 +85,9 @@ Después de **Resolver y guardar versión** (o recuperar una versión del histor
 ### IA local para decisiones secuenciales
 
 El panel **Asistente local para el árbol** recibe una descripción del caso y el borrador completo. Activá Mistral en el coordinador y usá **Proponer decisiones por etapa**. La generación conserva una propuesta separada con actores, tres pares de decisiones, variables, preguntas, hipótesis y límites. Aplicar cambia solamente nombres y decisiones del borrador; revisá nuevamente la correspondencia de los pagos, resolvé y guardá. Si cambian descripción, modelo u opciones de simulación antes de aplicar, se exige una propuesta nueva. Las versiones guardadas y PDF conservan la procedencia de la IA. La propuesta no acredita evidencia ni genera pagos automáticamente.
+
+### Agentes con memoria: juegos repetidos
+
+En la Mesa estratégica, **Agentes con memoria** toma la matriz del formulario del caso simultáneo. Elegí una política para cada actor, 1–500 rondas, semilla y error de ejecución. Las seis políticas usan alternativas por índice: fija 1, fija 2, copiar la última alternativa rival, cambiar permanentemente tras observar la alternativa 2, mejor respuesta a frecuencias observadas y aleatorio 50/50. Las políticas de memoria comienzan con alternativa 1.
+
+El gráfico muestra pagos acumulados. El control de ronda revela intención, acción ejecutada, pago y memoria previa de ambos agentes. Guardar exige revisión y conserva la matriz, opciones y todas las rondas; el historial recupera cada corrida sin cambiar el formulario principal. p/q del modelo base no se usan. El error invierte cada decisión con la frecuencia configurada y el rival observa la acción ejecutada. Estas conductas son supuestos, no predicciones aprendidas ni decisiones de un LLM. La exportación PDF de agentes sigue pendiente.
