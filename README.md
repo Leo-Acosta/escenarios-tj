@@ -38,3 +38,5 @@ La copia original se conserva en `reference/Miro-Fish`, excluida del control de 
 
 ### Casos propios sin IA
 La mesa permite definir un juego simultáneo 2×2 con nombres, estrategias, ocho pagos y probabilidades supuestas. Calcula utilidades esperadas, mejores respuestas de A, equilibrios puros y un equilibrio mixto interior aislado, si existe. Compara tres supuestos de conducta de B y guarda versiones en SQLite. No interpreta automáticamente el texto del chat ni calibra pronósticos. Los casos propios alimentan un árbol de consecuencias interactivo, vectores de utilidad y un informe ejecutivo imprimible. El informe propio se exporta con Imprimir → Guardar como PDF del navegador; la descarga directa de PDF sigue disponible para el ejemplo institucional.
+
+El panel propio incluye sensibilidad de la utilidad de A al supuesto de B entre 0 % y 100 %, un umbral analítico de indiferencia y exportación de la curva SVG. La exploración es temporal hasta aplicar al análisis; puede guardarse como una nueva versión. El informe incluye la curva para el supuesto aplicado. Esto no estima la conducta de B con datos.

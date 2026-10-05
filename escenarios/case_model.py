@@ -41,7 +41,19 @@ def analyze_case(payload):
     scenarios=[]
     for name,qq in [('Base',q),('Menor presencia de la primera estrategia de B',max(0,q-.2)),('Mayor presencia de la primera estrategia de B',min(1,q+.2))]:
         scenarios.append({'name':name,'q':qq,'values':[row[0]*qq+row[1]*(1-qq) for row in a]})
+    intercept=a[0][1]-a[1][1]
+    slope=(a[0][0]-a[0][1])-(a[1][0]-a[1][1])
+    threshold=None
+    if slope!=0:
+        candidate=-intercept/slope
+        if 0<=candidate<=1:threshold=candidate
+    sensitivity={'threshold':threshold,'always_tied':slope==0 and intercept==0,'points':[]}
+    for k in range(101):
+        qq=k/100
+        values=[row[0]*qq+row[1]*(1-qq) for row in a]
+        sensitivity['points'].append({'q':qq,'values':values,'best':[i for i,v in enumerate(values) if math.isclose(v,max(values),rel_tol=1e-12,abs_tol=1e-9)]})
     return {'model':m,'pure':pure,'mixed':mixed,'values_a':va,'values_b':vb,'best_a':best,'scenarios':scenarios,
+            'sensitivity':sensitivity,
             'limitations':['Pagos y probabilidades definidos por el analista; no calibrados con datos.',
                             'Juego simultáneo de dos actores y dos estrategias. No es un juego secuencial.',
                             'En juegos degenerados puede haber familias de equilibrios mixtos; no se enumeran aquí.']}

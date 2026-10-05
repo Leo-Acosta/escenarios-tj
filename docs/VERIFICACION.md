@@ -22,3 +22,5 @@ Verificado en navegador: selección directa de vector y nodo, selección por Ent
 Avance de casos propios: 14 pruebas aprobadas (incluye dilema del prisionero, coordinación y juego sin equilibrio puro). Sintaxis de case.js validada con Node. Flujo de navegador comprobado: cálculo, guardado y recuperación de un caso 2×2; utilidades A de 1,8 y 3,4 bajo q=0,6. La revisión visual por captura no estuvo disponible.
 
 Integración visual de casos propios: comprobados actores personalizados Municipio/Vecinos, selección sincronizada del resultado 4, informe con pagos propios y cambio de fuente a ejemplo institucional. Vectores SVG con escala común y flechas. Revisada captura de pantalla del informe; CSS de impresión agregado, sin verificación de paginación en un PDF impreso. Sintaxis de los tres JavaScript modificados validada.
+
+Sensibilidad: 17 pruebas aprobadas, incluyendo cruce en 1/3, empate en todo el intervalo, dominancia y umbral en 0. En navegador: curva del caso propio, cambio de Cooperar a Competir al bajar q a 0, nueva versión guardada e informe con B 0 % y umbral 33,33 %. Sintaxis JavaScript validada.
