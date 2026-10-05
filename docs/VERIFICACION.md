@@ -12,3 +12,7 @@ Fecha: 5 de octubre de 2026.
 - La captura visual de la interfaz mediante la herramienta de navegador no estuvo disponible; la revisión de esa pantalla se limita al DOM, interacción y mediciones de composición. El PDF sí fue inspeccionado visualmente.
 
 Ningún caso histórico ha sido utilizado: estas pruebas no demuestran precisión predictiva.
+
+## Panel gráfico interactivo
+
+Verificado en navegador: selección directa de vector y nodo, selección por Enter, zoom 125 %, restablecimiento 100 %, plegado y expansión de rama (dos/cuatro hojas visibles). Selección sincronizada entre árbol, plano y lectura de pagos. Sin desbordamiento medido en los paneles de escritorio. Exportación SVG conserva el encuadre completo del árbol aunque se amplíe en pantalla. El plano usa igual escala por unidad en ambos ejes. Captura visual automatizada sigue sin estar disponible.
