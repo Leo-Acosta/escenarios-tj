@@ -1,0 +1,8 @@
+reference/
+.venv/
+__pycache__/
+.env
+data/
+*.pyc
+.tools/
+work/

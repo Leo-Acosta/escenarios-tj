@@ -1,0 +1,9 @@
+[project]
+name = "escenarios-tj"
+version = "0.1.0"
+description = "Laboratorio estratégico local con teoría de juegos e informes ejecutivos"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+reports = ["reportlab>=4.0,<5"]

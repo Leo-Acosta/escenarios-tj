@@ -1,0 +1,1 @@
+"""Laboratorio estratégico Escenarios TJ."""
