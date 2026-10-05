@@ -79,9 +79,11 @@ class ApiTests(unittest.TestCase):
         with self.assertRaises(HTTPError) as error:submit()
         self.assertEqual(error.exception.code,400)
         payload['reviewed']=True
+        payload['simulation']={'iterations':100,'seed':42,'radius':0}
         with submit() as response:record=json.load(response)
         self.assertEqual(record['equilibria'][0]['outcome'],[0,1])
         with urlopen(self.base+'/api/sequential') as response:rows=json.load(response)
         self.assertEqual(rows[0]['id'],record['id'])
+        self.assertEqual(rows[0]['simulation']['decision_counts'],[100,0,0])
 
 if __name__ == '__main__':unittest.main()

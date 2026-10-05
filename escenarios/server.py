@@ -10,7 +10,7 @@ from .graph import save_graph, load_graph
 from .intake import prepare
 from .case_model import analyze_case,save_case,list_cases
 from .workflow import operate,get_workflow,list_workflows,get_version,Conflict,NotFound
-from . import local_ai,ai_jobs,sequential
+from . import local_ai,ai_jobs,sequential,simulation
 
 ROOT = Path(__file__).resolve().parent.parent
 DB = ROOT / 'data' / 'escenarios.sqlite3'
@@ -110,6 +110,7 @@ class Handler(BaseHTTPRequestHandler):
             payload = json.loads(self.rfile.read(length))
             if self.path == '/api/sequential':
                 result=sequential.analyze(payload)
+                if payload.get('simulation') is not None:result['simulation']=simulation.simulate(result['model'],payload['simulation'])
                 if payload.get('save') is True:
                     if payload.get('reviewed') is not True:raise ValueError('Confirmá la revisión antes de guardar.')
                     result=sequential.save(DB,result)

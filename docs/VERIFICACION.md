@@ -46,3 +46,7 @@ La segunda generación real finalizó correctamente en 132,51 segundos (421 toke
 ## Primera entrega D: árboles secuenciales
 
 39 pruebas aprobadas: inducción hacia atrás, respuestas fuera de la ruta, ocho planes en empate total, pagos inválidos, versiones inmutables y API con revisión obligatoria para guardar. En navegador: solución Entrar → Acomodar (2,1), exploración Entrar → Competir con aviso de respuesta no óptima, guardado, recuperación tras recargar y ampliación a 140 %. Informe específico preparado para impresión; paginación física/PDF pendiente de revisión. Monte Carlo, agentes y conexión del árbol al coordinador siguen pendientes.
+
+## Simulación de incertidumbre en árboles
+
+43 pruebas aprobadas. Nuevos casos: amplitud cero coincide con solución base; semilla idéntica reproduce resultados y muestras; otra semilla cambia las muestras; pagos respetan los intervalos; empate total conserva ambigüedad y rutas; se rechazan configuraciones inválidas. La API guarda y recupera estadísticas. En navegador: 1000 repeticiones, semilla 42, amplitud ±2: Entrar 79,7 %, No entrar 20,3 %. Inspección de repetición 2, guardado y recuperación tras recargar verificados. El informe incorpora estadísticas y supuestos; la paginación de impresión sigue sin verificación.

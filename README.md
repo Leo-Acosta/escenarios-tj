@@ -71,3 +71,9 @@ Verificado con una generación real de Mistral en 133 segundos y 33 pruebas apro
 En la Mesa estratégica, el panel Árbol secuencial permite editar dos decisiones de A y dos respuestas de B por cada decisión observada. Cargá los ocho pagos, los supuestos y resolvé. El núcleo Python calcula todos los equilibrios puros perfectos en subjuegos mediante inducción hacia atrás, incluyendo empates. El gráfico permite ampliación y exploración de hojas. Confirmá la revisión para guardar una versión inmutable; el historial permite recuperarla. El botón de impresión prepara un informe específico del árbol.
 
 Este módulo es independiente del expediente simultáneo y la IA aún no construye estos árboles. No incluye azar, información oculta, agentes ni Monte Carlo.
+
+### Monte Carlo del árbol secuencial
+
+Abrí **Incertidumbre y simulación Monte Carlo**, activá la simulación y elegí amplitud, 100–5000 repeticiones y semilla. Cada pago se muestrea uniformemente en base ± amplitud, de forma independiente. Los actores observan los pagos del escenario; el árbol se resuelve de nuevo en cada repetición. El gráfico muestra frecuencias de decisiones, escenarios con empates, rutas compatibles y percentiles de utilidad. Podés inspeccionar las primeras 20 repeticiones. Guardar el árbol conserva configuración y resultados; el informe de impresión incluye la simulación.
+
+Esto explora sensibilidad de incentivos; todavía no modela agentes con memoria, conducta aprendida, pagos correlacionados ni incertidumbre oculta al decidir.

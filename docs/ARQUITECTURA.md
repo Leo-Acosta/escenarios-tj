@@ -118,3 +118,7 @@ Cada nueva propuesta registra el extracto enviado, el modelo actual, los supuest
 ## Juegos secuenciales: dos etapas
 
 `sequential.py` resuelve un árbol binario A → B con información perfecta. Se enumeran todas las respuestas óptimas de B en ambos nodos; para cada plan completo se calculan las decisiones óptimas de A. Los empates conservan todas las soluciones, incluidas estrategias fuera de la ruta. GET/POST `/api/sequential` recupera versiones y calcula/guarda en la tabla `sequential_versions`. Guardar requiere revisión; cada versión tiene UUID y modelo completo. El editor y el informe son independientes del coordinador 2x2 y su IA.
+
+## Monte Carlo reproducible
+
+`simulation.py` usa `random.Random(seed)` local, 100–5000 repeticiones, ocho distribuciones uniformes independientes base ± radio. Valida intervalos, semilla e iteraciones. Cada escenario se resuelve con `sequential.analyze`. Las decisiones se cuentan por conjunto de primeras decisiones compatibles: A0, A1 o ambas. Las rutas cuentan compatibilidad, no seleccionan equilibrios arbitrariamente. P5 inferior/P95 superior usan interpolación lineal sobre mínimos/máximos de utilidad de A entre equilibrios de cada escenario. Se guardan versión del algoritmo, opciones, métricas y primeras 20 muestras, junto con la versión inmutable del árbol. La API acepta `simulation` opcional; sin ella conserva el comportamiento anterior.
