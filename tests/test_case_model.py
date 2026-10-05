@@ -1,0 +1,30 @@
+import unittest
+from escenarios.case_model import analyze_case
+
+
+def model(a,b):
+    return {'title':'Caso','actors':['A','B'],'strategies':[['C','D'],['C','D']],'a':a,'b':b,'p':.5,'q':.6}
+
+
+class CaseModelTests(unittest.TestCase):
+    def test_prisoners_dilemma(self):
+        r=analyze_case(model([[3,0],[5,1]],[[3,5],[0,1]]))
+        self.assertEqual(r['pure'],[[1,1]])
+        self.assertIsNone(r['mixed'])
+        self.assertEqual(r['best_a'],[1])
+
+    def test_matching_pennies(self):
+        r=analyze_case(model([[1,-1],[-1,1]],[[-1,1],[1,-1]]))
+        self.assertEqual(r['pure'],[])
+        self.assertEqual(r['mixed'],{'p':.5,'q':.5})
+
+    def test_coordination(self):
+        r=analyze_case(model([[2,0],[0,2]],[[2,0],[0,2]]))
+        self.assertEqual(r['pure'],[[0,0],[1,1]])
+        self.assertEqual(r['mixed'],{'p':.5,'q':.5})
+
+    def test_invalid_inputs(self):
+        m=model([[2,0],[0,2]],[[2,0],[0,2]])
+        for key,value in [('q',float('nan')),('a',[[1,2,3],[1,2]]),('actors',['A','A'])]:
+            invalid={**m,key:value}
+            with self.assertRaises(ValueError):analyze_case(invalid)

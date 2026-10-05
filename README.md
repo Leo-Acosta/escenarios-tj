@@ -35,3 +35,6 @@ Los datos son ilustrativos. No es todavía un motor multiagente autónomo ni un 
 - [Diseño propuesto y etapas de implementación](docs/ARQUITECTURA.md)
 
 La copia original se conserva en `reference/Miro-Fish`, excluida del control de versiones. No se ejecutó su código ni se instalaron sus dependencias. Se conserva intacta con su licencia y atribuciones. No se incorporaron sus implementaciones, prompts ni imágenes a la aplicación propia.
+
+### Casos propios sin IA
+La mesa permite definir un juego simultáneo 2×2 con nombres, estrategias, ocho pagos y probabilidades supuestas. Calcula utilidades esperadas, mejores respuestas de A, equilibrios puros y un equilibrio mixto interior aislado, si existe. Compara tres supuestos de conducta de B y guarda versiones en SQLite. No interpreta automáticamente el texto del chat ni calibra pronósticos. Los gráficos y el PDF del ejemplo institucional todavía corresponden al caso demostrativo, no al caso propio.

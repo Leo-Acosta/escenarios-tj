@@ -8,6 +8,7 @@ from .core import Parameters, analyze
 from .storage import save_snapshot, list_snapshots
 from .graph import save_graph, load_graph
 from .intake import prepare
+from .case_model import analyze_case,save_case,list_cases
 
 ROOT = Path(__file__).resolve().parent.parent
 DB = ROOT / 'data' / 'escenarios.sqlite3'
@@ -34,6 +35,8 @@ class Handler(BaseHTTPRequestHandler):
         if not self.allowed():
             return self.send(403, {'error': 'Host no autorizado.'})
         url = urlsplit(self.path)
+        if url.path == '/api/cases':
+            return self.send(200, list_cases(DB))
         if url.path == '/api/graph':
             return self.send(200, {'graph': load_graph(DB)})
         if url.path in ('/api/analysis', '/api/report.pdf'):
@@ -57,7 +60,8 @@ class Handler(BaseHTTPRequestHandler):
                  '/app.js': ('app.js', 'text/javascript; charset=utf-8'),
                  '/graphs.js': ('graphs.js', 'text/javascript; charset=utf-8'),
                  '/network.js': ('network.js', 'text/javascript; charset=utf-8'),
-                 '/intake.js': ('intake.js', 'text/javascript; charset=utf-8')}
+                 '/intake.js': ('intake.js', 'text/javascript; charset=utf-8'),
+                 '/case.js': ('case.js', 'text/javascript; charset=utf-8')}
         if url.path in files:
             name, mime = files[url.path]
             return self.send(200, (ROOT / 'web' / name).read_bytes(), mime)
@@ -66,13 +70,17 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         if not self.allowed() or self.headers.get('Origin') not in (f'http://127.0.0.1:{self.server.server_port}', f'http://localhost:{self.server.server_port}'):
             return self.send(403, {'error': 'Origen no autorizado.'})
-        if self.path not in ('/api/snapshots','/api/graph','/api/intake'):
+        if self.path not in ('/api/snapshots','/api/graph','/api/intake','/api/cases'):
             return self.send(404, {'error': 'Recurso inexistente.'})
         try:
             length = int(self.headers.get('Content-Length', 0))
-            if not 0 < length <= (100000 if self.path in ('/api/graph','/api/intake') else 2048):
+            if not 0 < length <= (100000 if self.path in ('/api/graph','/api/intake','/api/cases') else 2048):
                 raise ValueError()
             payload = json.loads(self.rfile.read(length))
+            if self.path == '/api/cases':
+                case=analyze_case(payload)
+                if payload.get('save') is True:case['id']=save_case(DB,case)
+                return self.send(200,case)
             if self.path == '/api/intake':
                 try:
                     return self.send(200, prepare(payload['prompt']))
