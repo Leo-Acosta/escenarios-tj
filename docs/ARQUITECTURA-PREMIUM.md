@@ -56,3 +56,5 @@ Los árboles pueden vincularse a expedientes con referencia histórica (ID, tít
 La fase 2 integra agentes, comparaciones e incentivos con expedientes en React. POST /api/laboratories recupera la matriz desde una versión calculada y conserva su referencia; GET /api/laboratories filtra por módulo y expediente. Ver LABORATORIOS-REACT-VERIFICACION.md. El informe ejecutivo unificado sigue pendiente en fase 6.
 
 La sensibilidad Monte Carlo de árboles ya se configura, guarda y consulta desde React. Sus primeras 20 muestras alimentan el mismo diagrama interactivo con pagos y rutas conservadas por Python. Ver MONTE-CARLO-REACT-VERIFICACION.md; fase 2 en curso e informe unificado pendiente en fase 6.
+
+La reproducción de agentes permite recorrer automáticamente rondas conservadas, con pausa, velocidad y navegación por teclado. Ver REPRODUCCION-AGENTES-REACT.md. Fase 2 en curso.
