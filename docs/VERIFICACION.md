@@ -80,3 +80,7 @@ La prueba real es un caso ilustrativo; no demuestra precisión general ni valida
 ## Explorador de incentivos
 
 78 pruebas aprobadas. Nuevos casos: transición de equilibrio con empate incluido, copia de entrada intacta, orientación de utilidad B, índices y rangos inválidos, respuesta API y scripts estáticos. Interfaz Municipio/Vecinos: pago A del resultado 1/2 variado de 0 a 2, empate en muestra 51 con dos equilibrios, muestra 101 con equilibrio A1/B2, selector B y cursor al extremo comprobados. SVG y detalle inspeccionados. Barrido muestreado; guardado y exportación propios pendientes.
+
+## Versiones y CSV de incentivos
+
+82 pruebas aprobadas. Verificados guardado inmutable de matriz y puntos, UUID inexistente, CSV de 101 filas con empate y pagos negativos, neutralización de fórmulas, supuestos inválidos y revisión requerida por API. Interfaz: guardado UUID 36c1f81a-241c-496d-9da8-0eb85eb4724d, recuperación tras recarga y empate A1/B2 más A2/B2 en muestra 51 comprobados. CSV de ejemplo output/escenarios-incentivos.csv. Captura de pantalla del navegador no disponible en esta verificación.

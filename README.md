@@ -107,3 +107,7 @@ Cada comparación guardada ofrece Descargar informe ejecutivo PDF. El documento 
 ## Explorador de pagos y equilibrios
 
 En la mesa estratégica, elegí uno de los ocho pagos y un rango para explorar 101 valores. El gráfico muestra utilidades esperadas por estrategia de A o B; el deslizador y los botones de cambio permiten inspeccionar equilibrios, empates y mejores respuestas. El caso original y p/q permanecen constantes. Los intervalos entre muestras no son umbrales exactos. La exploración es temporal, sin persistencia ni PDF propio.
+
+## Versiones del explorador de incentivos
+
+Los barridos revisados ahora se guardan en SQLite mediante Explorar y guardar versión, con UUID, fecha, motor, matriz original, rango y supuestos. El historial permite recuperar los 101 escenarios sin modificar el caso principal. Cada versión ofrece CSV con utilidades, mejores respuestas, equilibrios y probabilidades del mixto interior. La exportación PDF propia del barrido sigue pendiente.

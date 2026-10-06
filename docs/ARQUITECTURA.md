@@ -152,3 +152,7 @@ comparison_report.py genera PDF desde una versión inmutable obtenida mediante c
 ## Barrido de incentivos
 
 POST /api/payoff-sweep ejecuta payoff_sweep.run: valida rango y pago, copia la matriz y reutiliza analyze_case para 101 valores. Devuelve utilidades y mejores respuestas por actor, equilibrios puros y mixto interior, y cambios de estructura entre muestras. payoff-sweep.js presenta SVG, selector por actor, deslizador y detalle sin modificar caseEditor. No almacena resultados.
+
+## Persistencia de incentivos
+
+payoff_sweeps conserva JSON inmutable por UUID. POST /api/payoff-sweep recalcula desde la matriz, exige revisión y supuestos al guardar. GET devuelve las últimas 20 versiones; GET /api/payoff-sweep/scenarios.csv?id exporta una versión guardada o 404. El CSV UTF-8 con BOM y separador punto y coma contiene 101 filas, identifica alternativas desde 1 y neutraliza fórmulas en texto sin modificar números negativos.

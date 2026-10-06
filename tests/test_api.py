@@ -58,6 +58,20 @@ class ApiTests(unittest.TestCase):
         with urlopen(self.base+'/payoff-sweep.js') as response:self.assertIn(b'sweep-position',response.read())
         with urlopen(self.base+'/comparisons.js') as response:self.assertIn(b'comparison-actor',response.read())
 
+    def test_saved_sweep_review_history_and_csv(self):
+        from test_payoff_sweep import payload
+        p=payload();p.update(save=True,reviewed=False,assumptions='Pagos hipotéticos')
+        def request():return Request(self.base+'/api/payoff-sweep',data=json.dumps(p).encode(),headers={'Origin':self.base,'Content-Type':'application/json'})
+        with self.assertRaises(HTTPError) as error:urlopen(request())
+        self.assertEqual(error.exception.code,400)
+        p['reviewed']=True
+        with urlopen(request()) as response:saved=json.load(response)
+        with urlopen(self.base+'/api/payoff-sweep') as response:self.assertEqual(json.load(response)[0]['id'],saved['id'])
+        with urlopen(self.base+'/api/payoff-sweep/scenarios.csv?id='+saved['id']) as response:
+            self.assertIn('text/csv',response.headers['Content-Type']);self.assertIn(saved['id'].encode(),response.read())
+        with self.assertRaises(HTTPError) as error:urlopen(self.base+'/api/payoff-sweep/scenarios.csv?id=missing')
+        self.assertEqual(error.exception.code,404)
+
     def test_disallowed_host_and_static_path(self):
         with self.assertRaises(HTTPError) as error:
             urlopen(Request(self.base+'/',headers={'Host':'outside.example'}))

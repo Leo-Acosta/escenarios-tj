@@ -37,6 +37,12 @@ class Handler(BaseHTTPRequestHandler):
         if not self.allowed():
             return self.send(403, {'error': 'Host no autorizado.'})
         url = urlsplit(self.path)
+        if url.path == '/api/payoff-sweep':
+            return self.send(200,payoff_sweep.history(DB))
+        if url.path == '/api/payoff-sweep/scenarios.csv':
+            try:record=payoff_sweep.get_record(DB,parse_qs(url.query)['id'][0])
+            except (KeyError,IndexError):return self.send(404,{'error':'Exploración guardada no encontrada.'})
+            return self.send(200,payoff_sweep.build_csv(record),'text/csv; charset=utf-8')
         if url.path == '/api/agent-comparisons/report.pdf':
             try:record=comparisons.get_record(DB,parse_qs(url.query)['id'][0])
             except (KeyError,IndexError):return self.send(404,{'error':'Comparación guardada no encontrada.'})
@@ -141,7 +147,12 @@ class Handler(BaseHTTPRequestHandler):
                 raise ValueError()
             payload = json.loads(self.rfile.read(length))
             if self.path == '/api/payoff-sweep':
-                return self.send(200,payoff_sweep.run(payload))
+                if payload.get('save') is True and payload.get('reviewed') is not True:raise ValueError('Confirmá la revisión para guardar.')
+                result=payoff_sweep.run(payload)
+                if payload.get('save') is True:
+                    if not payload.get('assumptions'):raise ValueError('Registrá los supuestos antes de guardar.')
+                    result=payoff_sweep.save(DB,result)
+                return self.send(200,result)
             if self.path == '/api/agent-comparisons/replay':
                 try:return self.send(200,comparisons.replay(DB,payload))
                 except KeyError:return self.send(404,{'error':'Comparación no encontrada.'})
