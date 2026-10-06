@@ -1,0 +1,11 @@
+# Asistente de IA local en React
+
+La sección Asistente de IA local consulta disponibilidad y procedencia del modelo, permite habilitar/deshabilitar la configuración existente del núcleo, seleccionar un expediente, generar propuestas en segundo plano y consultar las últimas cinco. No instala modelos ni acepta endpoints arbitrarios. El modelo permitido y su identificador siguen controlados por Python.
+
+La generación envía el contexto guardado, no borradores de otra pantalla. Consulta periódica cancelable cada 2,5 segundos mientras existen trabajos en curso; al volver a la sección recupera su estado desde SQLite. Los fallos permiten reintentar desde actualización explícita. La aplicación al borrador requiere revisión y coincidencia de expediente/revisión, además de control de concurrencia en Python. Si el expediente cambió, el backend rechaza la aplicación; la propuesta queda consultable.
+
+Se muestran resumen, actores, estrategias, variables sugeridas, preguntas, hipótesis, límites, modelo y procedencia. Aplicar cambia nombres de actores/estrategias y conserva pagos existentes, con instrucción explícita de revisar su significado antes de calcular. Variables y preguntas no se convierten automáticamente en hechos ni datos medidos. Las versiones matemáticas existentes no se reescriben. La integración de IA para árboles sigue en la mesa previa y se trabajará por separado.
+
+Validación: 36 pruebas frontend y compilación TypeScript/Vite aprobadas; 10 pruebas del núcleo local_ai aprobadas. La base aislada qa-network-react.sqlite3, puerto 8769, contiene una propuesta simulada marcada SIMULACION QA · sin generación real: revisión 1, aplicación revisada a revisión 2 y bloqueo de reaplicación. Habilitación local comprobada contra el modelo Mistral instalado; la configuración principal no se cambió. Generación real verificada en el mismo entorno: trabajo 4de00f98-97d9-4472-ad95-f69e746b8050, mistral:latest, 191.93 segundos de generación. React pasó de En generación a Lista para revisar y mostró el contrato completo. No se aplicó automáticamente. Al volver a la sección recuperó el trabajo. Se restauró el modo guiado en la configuración de prueba.
+
+Fase 2 en curso. Informe ejecutivo unificado: fase 6. La asistencia no constituye validación predictiva.

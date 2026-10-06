@@ -24,3 +24,5 @@
 .network-entity-list,.network-relation-list{max-height:420px;overflow:auto;margin:18px 0}.network-entity-row{display:grid;grid-template-columns:2fr 1fr auto;align-items:center;gap:15px;padding:12px;border-bottom:1px solid #dce5ed}.network-relation-list>div{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:12px;border-bottom:1px solid #dce5ed}@media(max-width:800px){.network-entity-row{grid-template-columns:1fr}.network-relation-list>div{flex-wrap:wrap}}
 
 .network-relation-list>div{flex-wrap:wrap}.relation-evidence-editor{flex-basis:100%;padding:15px;background:#f3f7fa;border-radius:10px}.tree-detail .preserve{overflow-wrap:anywhere}
+
+.ai-lab button{margin:8px 12px 8px 0}.ai-lab details{margin:18px 0}.ai-lab .preserve{overflow-wrap:anywhere}.ai-lab .tree-review{display:flex;align-items:center;gap:12px;margin:20px 0}.ai-lab summary{cursor:pointer;font-weight:600}

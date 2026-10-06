@@ -1,0 +1,13 @@
+import {object} from './contracts.ts';
+const fail=():never=>{throw new Error('Respuesta incompatible de IA local.');};
+const str=(v:unknown)=>typeof v==='string'?v:fail();
+const bool=(v:unknown)=>typeof v==='boolean'?v:fail();
+const integer=(v:unknown)=>typeof v==='number'&&Number.isSafeInteger(v)&&v>0?v:fail();
+const list=<T,>(v:unknown,p:(v:unknown)=>T):T[]=>Array.isArray(v)?v.map(p):fail();
+const pair=(v:unknown)=>{const p=list(v,str);return p.length===2?p:fail();};
+export type AIStatus={config:{enabled:boolean;model:string};endpoint:string;connected:boolean;ready:boolean;message:string;models:{name:string;publisher:string;license:string;digest:string}[]};
+export function aiStatus(v:unknown):AIStatus{const o=object(v),c=object(o.config);const r={config:{enabled:bool(c.enabled),model:str(c.model)},endpoint:str(o.endpoint),connected:bool(o.connected),ready:bool(o.ready),message:str(o.message),models:list(o.models,v=>{const m=object(v);return {name:str(m.name),publisher:str(m.publisher),license:str(m.license),digest:str(m.digest)};})};if(r.ready&&(!r.connected||!r.config.enabled||!r.models.some(m=>m.name===r.config.model)))fail();return r;}
+export type AIJob={id:string;workflow_id:string;base_revision:number;created_at:string;state:'running'|'ready'|'failed';error:string|null;result:null|{proposal:{summary:string;actors:string[];strategies:string[][];variables:{name:string;reason:string}[];questions:string[];assumptions:string[];limitations:string[]};metadata:{model:string;publisher:string;license:string;digest:string;context_limited:boolean}}};
+export function aiJob(v:unknown):AIJob{const o=object(v);if(!['running','ready','failed'].includes(o.state as string))fail();const r:AIJob={id:str(o.id),workflow_id:str(o.workflow_id),base_revision:integer(o.base_revision),created_at:str(o.created_at),state:o.state as AIJob['state'],error:o.error===null?null:str(o.error),result:null};if(r.state==='ready'){const result=object(o.result),p=object(result.proposal),m=object(result.metadata),strategies=list(p.strategies,pair);if(strategies.length!==2)fail();r.result={proposal:{summary:str(p.summary),actors:pair(p.actors),strategies,variables:list(p.variables,x=>{const z=object(x);return {name:str(z.name),reason:str(z.reason)};}),questions:list(p.questions,str),assumptions:list(p.assumptions,str),limitations:list(p.limitations,str)},metadata:{model:str(m.model),publisher:str(m.publisher),license:str(m.license),digest:str(m.digest),context_limited:bool(m.context_limited)}};}return r;}
+export const aiJobs=(v:unknown)=>list(v,aiJob);
+export function applicable(job:AIJob,caseId:string,revision:number){return job.state==='ready'&&job.workflow_id===caseId&&job.base_revision===revision;}

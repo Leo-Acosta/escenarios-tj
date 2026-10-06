@@ -1,0 +1,10 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {aiStatus,aiJob,applicable} from './ai-contract.ts';
+const status={config:{enabled:false,model:'mistral:latest'},endpoint:'http://127.0.0.1:11434',connected:false,ready:false,message:'Desconectado',models:[]};
+const job={id:'j1',workflow_id:'case',base_revision:2,created_at:'2026-10-06',state:'running',error:null,result:null};
+const result={proposal:{summary:'Hipótesis',actors:['A','B'],strategies:[['1','2'],['1','2']],variables:[{name:'Costo',reason:'Pendiente'}],questions:['Dato?'],assumptions:['Hipótesis'],limitations:['Sin validación']},metadata:{model:'mistral:latest',publisher:'Mistral AI',license:'Apache-2.0',digest:'test',context_limited:true}};
+test('estado desconectado válido y disponibilidad inconsistente rechazada',()=>{assert.deepEqual(aiStatus(status),status);assert.throws(()=>aiStatus({...status,ready:true}));assert.throws(()=>aiStatus({...status,config:{...status.config,enabled:'true'}}));});
+test('consulta trabajos pendientes y fallidos sin convertirlos en propuestas',()=>{assert.equal(aiJob(job).result,null);assert.equal(aiJob({...job,state:'failed',error:'Desconectado'}).error,'Desconectado');assert.throws(()=>aiJob({...job,state:'unknown'}));});
+test('propuesta lista conserva límites y exige mismo expediente y revisión',()=>{const parsed=aiJob({...job,state:'ready',result});assert.deepEqual(parsed.result,result);assert.equal(applicable(parsed,'case',2),true);assert.equal(applicable(parsed,'case',3),false);assert.equal(applicable(parsed,'other',2),false);assert.equal(applicable(aiJob(job),'case',2),false);});
+test('rechaza propuestas incompletas y revisiones inválidas',()=>{assert.throws(()=>aiJob({...job,state:'ready',result:null}));assert.throws(()=>aiJob({...job,base_revision:0}));assert.throws(()=>aiJob({...job,state:'ready',result:{...result,proposal:{...result.proposal,actors:['A']}}}));});
