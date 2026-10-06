@@ -178,6 +178,7 @@ class Handler(BaseHTTPRequestHandler):
             if self.path == '/api/library/compare':
                 try:return self.send(200,version_diff.compare(DB,payload))
                 except KeyError:return self.send(404,{'error':'Versión no encontrada.'})
+                except ValueError as error:return self.send(400,{'error':str(error)})
             if self.path == '/api/payoff-sweep':
                 if payload.get('save') is True and payload.get('reviewed') is not True:raise ValueError('Confirmá la revisión para guardar.')
                 result=payoff_sweep.run(payload)

@@ -76,6 +76,7 @@ class ApiTests(unittest.TestCase):
         p['comparable_scales']=False
         with self.assertRaises(HTTPError) as error:urlopen(request())
         self.assertEqual(error.exception.code,400)
+        self.assertIn('escalas',json.loads(error.exception.read())['error'])
 
     def test_comparison_report_requires_saved_record(self):
         from test_comparisons import payload
