@@ -1,5 +1,7 @@
 export type WorkflowSummary={id:string;title:string;stage:string;revision:number;updated_at:string};
-export type Workflow={id:string;title:string;description:string;versions:{version:number;created_at:string}[]};
+export type DraftModel={title:string;actors:string[];strategies:string[][];a:(number|null)[][];b:(number|null)[][];p:number|null;q:number|null};
+export type Evidence={title:string;reference:string;claim:string};
+export type Workflow={id:string;title:string;description:string;revision:number;assumptions:string;model:DraftModel|null;evidence:Evidence[];answers:Record<string,string>;question:{key:string;text:string}|null;versions:{version:number;created_at:string}[]};
 export type Model={title:string;actors:string[];strategies:string[][];a:number[][];b:number[][];p:number;q:number};
 export type Result={model:Model;pure:number[][];mixed:{p:number;q:number}|null;values_a:number[];values_b:number[];best_a:number[];limitations:string[];context?:{assumptions:string;description:string;version:number}};
 export type LibraryItem={type:string;label:string;id:string;title:string;actors:string[];created_at:string};
@@ -10,7 +12,10 @@ const num=(v:unknown):number=>typeof v==='number'&&Number.isFinite(v)?v:fail();
 function list<T>(v:unknown,parse:(x:unknown)=>T):T[]{return Array.isArray(v)?v.map(parse):fail();}
 function pair<T>(v:unknown,parse:(x:unknown)=>T):T[]{const a=list(v,parse);return a.length===2?a:fail();}
 export function workflows(v:unknown):WorkflowSummary[]{return list(v,x=>{const o=object(x);return {id:str(o.id),title:str(o.title),stage:str(o.stage),revision:num(o.revision),updated_at:str(o.updated_at)};});}
-export function workflow(v:unknown):Workflow{const o=object(v);return {id:str(o.id),title:str(o.title),description:str(o.description),versions:list(o.versions,x=>{const z=object(x);return {version:num(z.version),created_at:str(z.created_at)};})};}
+export function workflow(v:unknown):Workflow{const o=object(v),answers=object(o.answers);let model:DraftModel|null=null;
+ if(o.model!==null){const m=object(o.model),nullable=(x:unknown)=>x===null?null:num(x);model={title:str(m.title),actors:pair(m.actors,str),strategies:pair(m.strategies,x=>pair(x,str)),a:pair(m.a,x=>pair(x,nullable)),b:pair(m.b,x=>pair(x,nullable)),p:nullable(m.p),q:nullable(m.q)};}
+ const q=o.question===null?null:object(o.question);
+ return {id:str(o.id),title:str(o.title),description:str(o.description),revision:num(o.revision),assumptions:str(o.assumptions),model,evidence:list(o.evidence,x=>{const e=object(x);return {title:str(e.title),reference:str(e.reference),claim:str(e.claim)};}),answers:Object.fromEntries(Object.entries(answers).map(([k,x])=>[k,str(x)])),question:q?{key:str(q.key),text:str(q.text)}:null,versions:list(o.versions,x=>{const z=object(x);return {version:num(z.version),created_at:str(z.created_at)};})};}
 export function result(v:unknown):Result{
  const o=object(v),m=object(o.model);const probability=(x:unknown)=>{const n=num(x);return n>=0&&n<=1?n:fail();};
  const index=(x:unknown)=>{const n=num(x);return n===0||n===1?n:fail();};
@@ -21,3 +26,5 @@ export function result(v:unknown):Result{
 }
 export function library(v:unknown):{total:number;items:LibraryItem[]}{const o=object(v);return {total:num(o.total),items:list(o.items,x=>{const r=object(x);return {type:str(r.type),label:str(r.label),id:str(r.id),title:str(r.title),actors:pair(r.actors,str),created_at:str(r.created_at)};})};}
 export async function get<T>(url:string,parse:(x:unknown)=>T,signal:AbortSignal):Promise<T>{const response=await fetch(url,{signal});const data:unknown=await response.json();if(!response.ok){const o=object(data);throw new Error(typeof o.error==='string'?o.error:'No se pudo completar la consulta.');}return parse(data);}
+export class ApiError extends Error{status:number;constructor(message:string,status:number){super(message);this.status=status;}}
+export async function operate(payload:unknown):Promise<Workflow>{const response=await fetch('/api/workflows',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const value:unknown=await response.json();if(!response.ok){const o=object(value);throw new ApiError(typeof o.error==='string'?o.error:'No se pudo guardar el expediente.',response.status);}return workflow(value);}
