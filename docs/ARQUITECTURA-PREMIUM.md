@@ -44,4 +44,4 @@ Versiones fijadas y dependencias transitivas registradas en `package-lock.json`.
 7–8. Ampliación matemática y evaluación predictiva con datos observados.
 9–10. Distribución Windows y validación integral de calidad y rendimiento.
 
-La fase 1 incorporó la consulta. La fase 2 está en curso: agregó edición, cálculo y navegación del expediente por Preparación, Modelo, Fundamentos y Revisión. La navegación integral, los gráficos y los demás requisitos premium siguen en desarrollo. Ver `NAVEGACION-ETAPAS-VERIFICACION.md` para el estado y las comprobaciones de este incremento.
+La fase 1 incorporó la consulta. La fase 2 está en curso: agregó edición, cálculo, navegación por etapas e historial de versiones dentro del expediente. La navegación integral, los gráficos y los demás requisitos premium siguen en desarrollo. Ver `NAVEGACION-ETAPAS-VERIFICACION.md` y `HISTORIAL-REACT-VERIFICACION.md` para las comprobaciones de estos incrementos.
