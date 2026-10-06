@@ -48,3 +48,5 @@ Versiones fijadas y dependencias transitivas registradas en `package-lock.json`.
 La fase 1 incorporó la consulta. La fase 2 está en curso: agregó edición, cálculo, navegación por etapas e historial de versiones dentro del expediente. La navegación integral, los gráficos y los demás requisitos premium siguen en desarrollo. Ver `NAVEGACION-ETAPAS-VERIFICACION.md` y `HISTORIAL-REACT-VERIFICACION.md` para las comprobaciones de estos incrementos.
 
 El laboratorio React consulta árboles conservados con React Flow, selección de nodos, rutas y planes completos. La fase 2 sigue en curso; este incremento inicia la base visual de árboles de la fase 4, sin completar esa fase. Ver `ARBOLES-REACT-VERIFICACION.md`.
+
+La fase 2 incorpora también creación y edición de árboles como nuevas versiones desde React, con revisión obligatoria y guardado a través del núcleo Python. Los borradores de árboles aún no se autoguardan.
