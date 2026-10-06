@@ -58,3 +58,5 @@ La fase 2 integra agentes, comparaciones e incentivos con expedientes en React. 
 La sensibilidad Monte Carlo de árboles ya se configura, guarda y consulta desde React. Sus primeras 20 muestras alimentan el mismo diagrama interactivo con pagos y rutas conservadas por Python. Ver MONTE-CARLO-REACT-VERIFICACION.md; fase 2 en curso e informe unificado pendiente en fase 6.
 
 La reproducción de agentes permite recorrer automáticamente rondas conservadas, con pausa, velocidad y navegación por teclado. Ver REPRODUCCION-AGENTES-REACT.md. Fase 2 en curso.
+
+React incorpora consulta de la red global guardada, búsqueda, filtros y detalle de entidades y vínculos. Todavía sin edición, versiones ni asociación a expedientes. Ver REDES-REACT-VERIFICACION.md.
