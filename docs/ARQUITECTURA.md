@@ -148,3 +148,7 @@ comparisons.py ejecuta las seis políticas del motor repeated-agents-v1 contra l
 ## Informe del comparador
 
 comparison_report.py genera PDF desde una versión inmutable obtenida mediante comparisons.get_record. GET /api/agent-comparisons/report.pdf?id devuelve PDF, 404 para UUID ausente y 503 si falta ReportLab. summaries agrupa filas para A y columnas para B. Cada mapa de calor utiliza la escala propia del actor; los rangos son entre medias por rival.
+
+## Barrido de incentivos
+
+POST /api/payoff-sweep ejecuta payoff_sweep.run: valida rango y pago, copia la matriz y reutiliza analyze_case para 101 valores. Devuelve utilidades y mejores respuestas por actor, equilibrios puros y mixto interior, y cambios de estructura entre muestras. payoff-sweep.js presenta SVG, selector por actor, deslizador y detalle sin modificar caseEditor. No almacena resultados.

@@ -10,7 +10,7 @@ from .graph import save_graph, load_graph
 from .intake import prepare
 from .case_model import analyze_case,save_case,list_cases
 from .workflow import operate,get_workflow,list_workflows,get_version,Conflict,NotFound
-from . import local_ai,ai_jobs,sequential,simulation,agents,comparisons
+from . import local_ai,ai_jobs,sequential,simulation,agents,comparisons,payoff_sweep
 
 ROOT = Path(__file__).resolve().parent.parent
 DB = ROOT / 'data' / 'escenarios.sqlite3'
@@ -121,6 +121,7 @@ class Handler(BaseHTTPRequestHandler):
         files['/workflow.js']=('workflow.js','text/javascript; charset=utf-8')
         files['/sequential-ai.js']=('sequential-ai.js','text/javascript; charset=utf-8')
         files['/comparisons.js']=('comparisons.js','text/javascript; charset=utf-8')
+        files['/payoff-sweep.js']=('payoff-sweep.js','text/javascript; charset=utf-8')
         files['/agents.js']=('agents.js','text/javascript; charset=utf-8')
         files['/sequential.js']=('sequential.js','text/javascript; charset=utf-8')
         files['/ai.js']=('ai.js','text/javascript; charset=utf-8')
@@ -132,13 +133,15 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         if not self.allowed() or self.headers.get('Origin') not in (f'http://127.0.0.1:{self.server.server_port}', f'http://localhost:{self.server.server_port}'):
             return self.send(403, {'error': 'Origen no autorizado.'})
-        if self.path not in ('/api/snapshots','/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/config','/api/ai/jobs','/api/sequential','/api/sequential/ai-jobs','/api/sequential/ai-apply','/api/agents','/api/agent-comparisons','/api/agent-comparisons/replay'):
+        if self.path not in ('/api/snapshots','/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/config','/api/ai/jobs','/api/sequential','/api/sequential/ai-jobs','/api/sequential/ai-apply','/api/agents','/api/payoff-sweep','/api/agent-comparisons','/api/agent-comparisons/replay'):
             return self.send(404, {'error': 'Recurso inexistente.'})
         try:
             length = int(self.headers.get('Content-Length', 0))
-            if not 0 < length <= (100000 if self.path in ('/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/config','/api/ai/jobs','/api/sequential','/api/sequential/ai-jobs','/api/sequential/ai-apply','/api/agents','/api/agent-comparisons','/api/agent-comparisons/replay') else 2048):
+            if not 0 < length <= (100000 if self.path in ('/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/config','/api/ai/jobs','/api/sequential','/api/sequential/ai-jobs','/api/sequential/ai-apply','/api/agents','/api/payoff-sweep','/api/agent-comparisons','/api/agent-comparisons/replay') else 2048):
                 raise ValueError()
             payload = json.loads(self.rfile.read(length))
+            if self.path == '/api/payoff-sweep':
+                return self.send(200,payoff_sweep.run(payload))
             if self.path == '/api/agent-comparisons/replay':
                 try:return self.send(200,comparisons.replay(DB,payload))
                 except KeyError:return self.send(404,{'error':'Comparación no encontrada.'})

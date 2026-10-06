@@ -76,3 +76,7 @@ La prueba real es un caso ilustrativo; no demuestra precisión general ni valida
 ## PDF del comparador
 
 74 pruebas aprobadas. Verificado: cuatro páginas, UUID y semillas conservados, resumen de B por columnas, pagos negativos y escala uniforme, título con marcado literal y supuestos largos paginados. API verifica firma PDF, tipo MIME y 404. En navegador se recuperó la comparación guardada y se comprobó el enlace de descarga con su UUID. Ejemplo output/pdf/informe-comparador.pdf renderizado con Poppler: cuatro páginas inspeccionadas sin recortes ni solapamientos. Pendientes: calibración predictiva y empaquetado Windows.
+
+## Explorador de incentivos
+
+78 pruebas aprobadas. Nuevos casos: transición de equilibrio con empate incluido, copia de entrada intacta, orientación de utilidad B, índices y rangos inválidos, respuesta API y scripts estáticos. Interfaz Municipio/Vecinos: pago A del resultado 1/2 variado de 0 a 2, empate en muestra 51 con dos equilibrios, muestra 101 con equilibrio A1/B2, selector B y cursor al extremo comprobados. SVG y detalle inspeccionados. Barrido muestreado; guardado y exportación propios pendientes.

@@ -48,6 +48,16 @@ class ApiTests(unittest.TestCase):
         with self.assertRaises(HTTPError) as error:urlopen(self.base+'/api/agent-comparisons/report.pdf?id=missing')
         self.assertEqual(error.exception.code,404)
 
+    def test_payoff_sweep_endpoint_and_static_script(self):
+        from test_payoff_sweep import payload
+        p=payload()
+        with urlopen(Request(self.base+'/api/payoff-sweep',data=json.dumps(p).encode(),headers={'Origin':self.base,'Content-Type':'application/json'})) as response:
+            result=json.load(response)
+        self.assertEqual(len(result['points']),101)
+        self.assertEqual(result['points'][50]['pure'],[[0,1],[1,1]])
+        with urlopen(self.base+'/payoff-sweep.js') as response:self.assertIn(b'sweep-position',response.read())
+        with urlopen(self.base+'/comparisons.js') as response:self.assertIn(b'comparison-actor',response.read())
+
     def test_disallowed_host_and_static_path(self):
         with self.assertRaises(HTTPError) as error:
             urlopen(Request(self.base+'/',headers={'Host':'outside.example'}))

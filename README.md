@@ -103,3 +103,7 @@ La mesa estratégica incluye una matriz interactiva de 36 combinaciones. Permite
 ## Informe ejecutivo de comparaciones
 
 Cada comparación guardada ofrece Descargar informe ejecutivo PDF. El documento vectorial conserva UUID, matriz, semillas, medias y dispersión por actor, rango frente a seis rivales y supuestos. No presupone probabilidades de las políticas rivales. Requiere ReportLab, igual que los demás informes.
+
+## Explorador de pagos y equilibrios
+
+En la mesa estratégica, elegí uno de los ocho pagos y un rango para explorar 101 valores. El gráfico muestra utilidades esperadas por estrategia de A o B; el deslizador y los botones de cambio permiten inspeccionar equilibrios, empates y mejores respuestas. El caso original y p/q permanecen constantes. Los intervalos entre muestras no son umbrales exactos. La exploración es temporal, sin persistencia ni PDF propio.
