@@ -164,3 +164,7 @@ sweep_report.py genera gráficos vectoriales y tablas desde payoff_sweeps, sin r
 ## Biblioteca unificada
 
 library.py consulta únicamente tablas existentes y reúne metadatos de seis tipos de versiones. GET /api/library permite q, type y offset; devuelve total y hasta 30 metadatos sin trazas completas. GET /api/library/item recupera una versión por tipo e identificador. No crea archivos ni modifica versiones. library.js muestra tarjetas, filtros, detalle de consulta y enlaces existentes. La implementación recorre los registros locales para buscar; con historiales muy grandes requerirá índices y consultas de metadatos optimizadas.
+
+## Contraste de matrices conservadas
+
+POST /api/library/compare recupera dos referencias case/workflow mediante library.get_record. version_diff.py valida identidad semántica y confirmación de escalas, recalcula ambos juegos y una matriz intermedia con pagos nuevos y p/q iniciales. Devuelve deltas y dos componentes aditivos por estrategia. version-diff.js mantiene selección base/candidata independiente de filtros y no modifica modelos. Los resultados se limpian al cambiar la selección.

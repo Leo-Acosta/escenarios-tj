@@ -119,3 +119,7 @@ Cada barrido guardado ofrece Descargar informe ejecutivo PDF junto al CSV. El in
 ## Centro de análisis guardados
 
 La vista Análisis guardados reúne seis tipos: matrices libres, versiones de expediente, árboles, agentes, comparaciones e incentivos. Busca por título, actor o identificador, filtra por tipo y pagina de a 30 versiones sobre todo el historial disponible. Consultar versión muestra el modelo y resumen sin modificar formularios. Ofrece PDF y CSV para los módulos que ya tienen exportación. Los accesos anteriores y expedientes en preparación permanecen en un desplegable.
+
+## Comparación entre versiones
+
+En el Centro de análisis, las tarjetas de matrices libres y versiones de expediente ofrecen Usar como base y Usar para comparar. Se requiere coincidencia de nombres y posiciones de actores/estrategias y confirmación de escalas equivalentes. El contraste muestra pagos y p/q modificados, utilidades antes/después, descomposición aritmética por pagos y probabilidades, equilibrios que aparecen/desaparecen y supuestos. La atribución cambia primero pagos y después probabilidades; no identifica efectos causales. La comparación es temporal, sin PDF ni persistencia propios.

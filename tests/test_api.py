@@ -45,6 +45,20 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(error.exception.code,404)
         with urlopen(self.base+'/library.js') as response:self.assertIn(b'Consultar versi',response.read())
 
+    def test_version_comparison_route(self):
+        from escenarios.case_model import analyze_case,save_case
+        from test_comparisons import MODEL
+        from escenarios import server
+        import copy
+        a=save_case(server.DB,analyze_case(MODEL));m=copy.deepcopy(MODEL);m['a'][0][1]=2
+        b=save_case(server.DB,analyze_case(m))
+        p={'baseline':{'type':'case','id':str(a)},'candidate':{'type':'case','id':str(b)},'comparable_scales':True}
+        def request():return Request(self.base+'/api/library/compare',data=json.dumps(p).encode(),headers={'Origin':self.base,'Content-Type':'application/json'})
+        with urlopen(request()) as response:self.assertEqual(json.load(response)['cells'][0]['delta'],2)
+        p['comparable_scales']=False
+        with self.assertRaises(HTTPError) as error:urlopen(request())
+        self.assertEqual(error.exception.code,400)
+
     def test_comparison_report_requires_saved_record(self):
         from test_comparisons import payload
         p=payload();p.update(save=True,reviewed=True)

@@ -92,3 +92,7 @@ La prueba real es un caso ilustrativo; no demuestra precisión general ni valida
 ## Centro de análisis
 
 90 pruebas aprobadas. Biblioteca vacía sin crear DB, búsqueda sin distinción de mayúsculas, filtros, consulta inmutable, metadatos sin payload, paginación de 32 versiones y consultas inválidas. API: lista, script, offset inválido y versión inexistente. Interfaz: 11 versiones de seis tipos; filtro incentivos y detalle con UUID y enlaces PDF/CSV; árbol con ruta Entrar/Acomodar; búsqueda Municipio sobre expediente devuelve tres versiones. Horario mostrado en America/Buenos_Aires. Mantiene vista de consulta sin alterar los formularios.
+
+## Comparación de versiones
+
+94 pruebas aprobadas. Verificados deltas, aparición y desaparición de equilibrios, suma de componentes, rechazo de escalas no confirmadas, referencia repetida y actores incompatibles. API: contraste válido y 400 sin confirmación. Navegador: versiones de expediente 1/2 con pagos iguales y q 50 %/0 %, deltas Municipio -1,5 y -2 atribuibles a p/q; equilibrio Competir/Competir conservado. Captura output/screenshots/comparacion-versiones.png. JavaScript validado con Node. Persistencia/PDF del contraste pendientes.
