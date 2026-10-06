@@ -37,6 +37,14 @@ class ApiTests(unittest.TestCase):
             urlopen(self.base+'/api/analysis?q=nan')
         self.assertEqual(error.exception.code,400)
 
+    def test_library_routes(self):
+        with urlopen(self.base+'/api/library') as response:self.assertIn('items',json.load(response))
+        with self.assertRaises(HTTPError) as error:urlopen(self.base+'/api/library?offset=-1')
+        self.assertEqual(error.exception.code,400)
+        with self.assertRaises(HTTPError) as error:urlopen(self.base+'/api/library/item?type=sweep&id=missing')
+        self.assertEqual(error.exception.code,404)
+        with urlopen(self.base+'/library.js') as response:self.assertIn(b'Consultar versi',response.read())
+
     def test_comparison_report_requires_saved_record(self):
         from test_comparisons import payload
         p=payload();p.update(save=True,reviewed=True)

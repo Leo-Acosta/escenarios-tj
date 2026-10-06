@@ -115,3 +115,7 @@ Los barridos revisados ahora se guardan en SQLite mediante Explorar y guardar ve
 ## PDF ejecutivo de incentivos
 
 Cada barrido guardado ofrece Descargar informe ejecutivo PDF junto al CSV. El informe vectorial conserva UUID, configuración, matriz, gráficos de utilidades separados por actor, extremos del rango, intervalos de cambio y supuestos. Requiere ReportLab. La extensión crece si los supuestos o etiquetas requieren más páginas.
+
+## Centro de análisis guardados
+
+La vista Análisis guardados reúne seis tipos: matrices libres, versiones de expediente, árboles, agentes, comparaciones e incentivos. Busca por título, actor o identificador, filtra por tipo y pagina de a 30 versiones sobre todo el historial disponible. Consultar versión muestra el modelo y resumen sin modificar formularios. Ofrece PDF y CSV para los módulos que ya tienen exportación. Los accesos anteriores y expedientes en preparación permanecen en un desplegable.

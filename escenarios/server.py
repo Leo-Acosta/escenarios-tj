@@ -10,7 +10,7 @@ from .graph import save_graph, load_graph
 from .intake import prepare
 from .case_model import analyze_case,save_case,list_cases
 from .workflow import operate,get_workflow,list_workflows,get_version,Conflict,NotFound
-from . import local_ai,ai_jobs,sequential,simulation,agents,comparisons,payoff_sweep
+from . import local_ai,ai_jobs,sequential,simulation,agents,comparisons,payoff_sweep,library
 
 ROOT = Path(__file__).resolve().parent.parent
 DB = ROOT / 'data' / 'escenarios.sqlite3'
@@ -37,6 +37,13 @@ class Handler(BaseHTTPRequestHandler):
         if not self.allowed():
             return self.send(403, {'error': 'Host no autorizado.'})
         url = urlsplit(self.path)
+        if url.path in ('/api/library','/api/library/item'):
+            args=parse_qs(url.query)
+            try:
+                if url.path.endswith('/item'):return self.send(200,library.get_record(DB,args['type'][0],args['id'][0]))
+                return self.send(200,library.search(DB,args.get('q',[''])[0],args.get('type',[''])[0],int(args.get('offset',['0'])[0])))
+            except (KeyError,IndexError):return self.send(404,{'error':'Versión no encontrada.'})
+            except ValueError:return self.send(400,{'error':'Consulta de biblioteca inválida.'})
         if url.path == '/api/payoff-sweep':
             return self.send(200,payoff_sweep.history(DB))
         if url.path in ('/api/payoff-sweep/scenarios.csv','/api/payoff-sweep/report.pdf'):
@@ -132,6 +139,7 @@ class Handler(BaseHTTPRequestHandler):
         files['/sequential-ai.js']=('sequential-ai.js','text/javascript; charset=utf-8')
         files['/comparisons.js']=('comparisons.js','text/javascript; charset=utf-8')
         files['/payoff-sweep.js']=('payoff-sweep.js','text/javascript; charset=utf-8')
+        files['/library.js']=('library.js','text/javascript; charset=utf-8')
         files['/agents.js']=('agents.js','text/javascript; charset=utf-8')
         files['/sequential.js']=('sequential.js','text/javascript; charset=utf-8')
         files['/ai.js']=('ai.js','text/javascript; charset=utf-8')

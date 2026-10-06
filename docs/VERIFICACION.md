@@ -88,3 +88,7 @@ La prueba real es un caso ilustrativo; no demuestra precisión general ni valida
 ## PDF del explorador de incentivos
 
 85 pruebas aprobadas. PDF verificado con UUID, rango, transiciones y empate; utilidades negativas y constantes; título literal y paginación de supuestos largos. API: firma PDF, tipo MIME y UUID inexistente. output/pdf/informe-incentivos.pdf generado desde versión guardada y renderizado con Poppler: cuatro páginas inspeccionadas sin recortes ni solapamientos. JavaScript validado con Node. Exportación disponible junto al CSV en el resultado guardado. Calibración predictiva, empaquetado y juegos de más actores siguen pendientes.
+
+## Centro de análisis
+
+90 pruebas aprobadas. Biblioteca vacía sin crear DB, búsqueda sin distinción de mayúsculas, filtros, consulta inmutable, metadatos sin payload, paginación de 32 versiones y consultas inválidas. API: lista, script, offset inválido y versión inexistente. Interfaz: 11 versiones de seis tipos; filtro incentivos y detalle con UUID y enlaces PDF/CSV; árbol con ruta Entrar/Acomodar; búsqueda Municipio sobre expediente devuelve tres versiones. Horario mostrado en America/Buenos_Aires. Mantiene vista de consulta sin alterar los formularios.

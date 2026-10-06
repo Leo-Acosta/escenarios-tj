@@ -160,3 +160,7 @@ payoff_sweeps conserva JSON inmutable por UUID. POST /api/payoff-sweep recalcula
 ## Informe de sensibilidad de incentivos
 
 sweep_report.py genera gráficos vectoriales y tablas desde payoff_sweeps, sin recalcular ni leer el formulario. GET /api/payoff-sweep/report.pdf?id responde PDF, 404 para versiones inexistentes y 503 sin ReportLab. Los gráficos usan escalas por actor y p/q originales; los intervalos describen cambios muestreados y preservan empates.
+
+## Biblioteca unificada
+
+library.py consulta únicamente tablas existentes y reúne metadatos de seis tipos de versiones. GET /api/library permite q, type y offset; devuelve total y hasta 30 metadatos sin trazas completas. GET /api/library/item recupera una versión por tipo e identificador. No crea archivos ni modifica versiones. library.js muestra tarjetas, filtros, detalle de consulta y enlaces existentes. La implementación recorre los registros locales para buscar; con historiales muy grandes requerirá índices y consultas de metadatos optimizadas.
