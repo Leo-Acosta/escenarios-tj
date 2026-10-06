@@ -54,3 +54,5 @@ La fase 2 incorpora también creación y edición de árboles como nuevas versio
 Los árboles pueden vincularse a expedientes con referencia histórica (ID, título, revisión) dentro de su payload JSON. GET /api/sequential?workflow_id=ID filtra antes del límite de 30 registros. La asociación se valida en Python y conserva la compatibilidad con árboles independientes. No constituye un informe ejecutivo unificado ni una derivación automática desde la matriz.
 
 La fase 2 integra agentes, comparaciones e incentivos con expedientes en React. POST /api/laboratories recupera la matriz desde una versión calculada y conserva su referencia; GET /api/laboratories filtra por módulo y expediente. Ver LABORATORIOS-REACT-VERIFICACION.md. El informe ejecutivo unificado sigue pendiente en fase 6.
+
+La sensibilidad Monte Carlo de árboles ya se configura, guarda y consulta desde React. Sus primeras 20 muestras alimentan el mismo diagrama interactivo con pagos y rutas conservadas por Python. Ver MONTE-CARLO-REACT-VERIFICACION.md; fase 2 en curso e informe unificado pendiente en fase 6.
