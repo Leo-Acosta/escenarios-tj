@@ -72,4 +72,3 @@ La prueba real es un caso ilustrativo; no demuestra precisión general ni valida
 ## Comparador de políticas
 
 69 pruebas aprobadas. Nuevos casos: 36 pares contrastados con ejecuciones individuales, orientación de pagos, dispersión con una repetición, límites y tipos inválidos, matriz inmutable, reproducción de semilla e índices inválidos. Interfaz: comparación revisada guardada, selector A/B, combinación Azar/Frecuencia y semilla 44 reproducida con medias A=0,66/B=2,86; recuperación tras recarga comprobada. Las pruebas SQLite necesitaron ejecución fuera del sandbox por restricciones de directorios temporales. Exportación propia del comparador y validación predictiva quedan pendientes.
-
