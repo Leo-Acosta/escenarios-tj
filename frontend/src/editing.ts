@@ -1,4 +1,9 @@
-import type {DraftModel} from './contracts';
+import type {DraftModel,Evidence} from './contracts';
+export function validateEvidence(evidence:Evidence[]):string|null{
+ if(evidence.length>20)return 'Se admiten hasta veinte fuentes por expediente.';
+ for(let i=0;i<evidence.length;i++){const e=evidence[i];if(!e.title.trim()||!e.reference.trim()||!e.claim.trim())return `Completá el título, la referencia y la afirmación de la fuente ${i+1}, o quitá esa fuente.`;}
+ return null;
+}
 export function emptyModel(title:string):DraftModel{return {title,actors:['',''],strategies:[['',''],['','']],a:[[null,null],[null,null]],b:[[null,null],[null,null]],p:.5,q:.5};}
 export function validateCalculation(model:DraftModel,assumptions:string,reviewed:boolean):string|null{
  if(!model.title.trim()||model.actors.some(x=>!x.trim())||model.strategies.some(row=>row.some(x=>!x.trim())))return 'Completá el título, los actores y las estrategias.';
