@@ -95,3 +95,8 @@ El gráfico muestra pagos acumulados. El control de ronda revela intención, acc
 ### Exportar corridas de agentes
 
 En una corrida guardada o recuperada aparecen **Descargar PDF ejecutivo** y **Exportar todas las rondas (CSV)**. El PDF incluye resumen, matriz, evolución vectorial, supuestos y una muestra de las primeras/últimas diez rondas sin duplicados. El CSV (UTF-8 con BOM y separador punto y coma) incluye todas las rondas, dos filas por ronda: actor, política, intención, acción ejecutada, pago, acumulado, motivo y memoria previa. Los índices 1/2 corresponden a las alternativas del actor. Las exportaciones usan la corrida inmutable, sin volver a simular. El PDF requiere ReportLab; CSV no requiere dependencias externas.
+
+## Comparador de políticas
+
+La mesa estratégica incluye una matriz interactiva de 36 combinaciones. Permite 1–100 rondas, 1–10 semillas consecutivas y error de ejecución. Muestra utilidad por actor, media y desviación poblacional entre semillas. Las comparaciones revisadas se guardan en SQLite con la matriz original; cada repetición puede reproducirse en el explorador de agentes. Las simulaciones dependen de los supuestos y no están calibradas como predicciones reales.
+

@@ -140,3 +140,8 @@ GET/POST `/api/agents` lista, simula y guarda corridas inmutables en `agent_runs
 ## Exportación de corridas de agentes
 
 `agents.get_run` recupera por UUID sin limitarse a las veinte corridas visibles. GET `/api/agents/report.pdf?id=UUID` genera el informe con `agent_report.py`; `/api/agents/rounds.csv?id=UUID` exporta todas las rondas con `csv.writer`. No se recalculan decisiones. El PDF usa gráficos vectoriales, tablas repetidas y texto escapado; las muestras son primeras y últimas diez rondas, sin duplicados. El CSV identifica corrida/motor y conserva intenciones, acciones, razones y conteos de memoria previos. Los campos de texto que podrían ejecutarse como fórmulas en una planilla se prefijan con apóstrofo; los pagos negativos permanecen numéricos.
+
+## Comparación de conductas
+
+comparisons.py ejecuta las seis políticas del motor repeated-agents-v1 contra las seis políticas rivales usando semillas comunes y memoria reiniciada. Conserva medias por repetición y estadísticas separadas por actor. agent_comparisons almacena versiones inmutables; replay valida índices y versión del motor y reproduce el escenario congelado. comparisons.js presenta la matriz interactiva y abre las rondas en agentViewer sin modificar el caso principal.
+
