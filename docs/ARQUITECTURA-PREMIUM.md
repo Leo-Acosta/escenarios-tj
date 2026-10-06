@@ -60,3 +60,5 @@ La sensibilidad Monte Carlo de árboles ya se configura, guarda y consulta desde
 La reproducción de agentes permite recorrer automáticamente rondas conservadas, con pausa, velocidad y navegación por teclado. Ver REPRODUCCION-AGENTES-REACT.md. Fase 2 en curso.
 
 React incorpora consulta de la red global guardada, búsqueda, filtros y detalle de entidades y vínculos. Todavía sin edición, versiones ni asociación a expedientes. Ver REDES-REACT-VERIFICACION.md.
+
+Las redes ahora se conservan como versiones con expediente opcional y contexto histórico (ID, título, revisión). El editor global previo no se modifica; sus cambios no alteran las copias guardadas. Ver VERSIONES-REDES-REACT.md.

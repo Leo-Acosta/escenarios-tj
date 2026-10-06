@@ -7,7 +7,7 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 from .core import Parameters, analyze
 from .storage import save_snapshot, list_snapshots
-from .graph import save_graph, load_graph
+from .graph import save_graph, load_graph, save_version as save_graph_version, version_history as graph_history
 from .intake import prepare
 from .case_model import analyze_case,save_case,list_cases
 from .workflow import operate,get_workflow,list_workflows,get_version,Conflict,NotFound
@@ -135,6 +135,10 @@ class Handler(BaseHTTPRequestHandler):
                 return self.send(400,{'error':'Referencia de expediente inválida.'})
         if url.path == '/api/cases':
             return self.send(200, list_cases(DB))
+        if url.path == '/api/graph/versions':
+            try:return self.send(200,graph_history(DB,parse_qs(url.query).get('workflow_id',[''])[0]))
+            except NotFound as error:return self.send(404,{'error':str(error)})
+            except ValueError as error:return self.send(400,{'error':str(error)})
         if url.path == '/api/graph':
             return self.send(200, {'graph': load_graph(DB)})
         if url.path in ('/api/analysis', '/api/report.pdf'):
@@ -179,11 +183,11 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         if not self.allowed() or self.headers.get('Origin') not in (f'http://127.0.0.1:{self.server.server_port}', f'http://localhost:{self.server.server_port}'):
             return self.send(403, {'error': 'Origen no autorizado.'})
-        if self.path not in ('/api/laboratories','/api/snapshots','/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/config','/api/ai/jobs','/api/sequential','/api/sequential/ai-jobs','/api/sequential/ai-apply','/api/agents','/api/library/compare','/api/payoff-sweep','/api/agent-comparisons','/api/agent-comparisons/replay'):
+        if self.path not in ('/api/graph/versions','/api/laboratories','/api/snapshots','/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/config','/api/ai/jobs','/api/sequential','/api/sequential/ai-jobs','/api/sequential/ai-apply','/api/agents','/api/library/compare','/api/payoff-sweep','/api/agent-comparisons','/api/agent-comparisons/replay'):
             return self.send(404, {'error': 'Recurso inexistente.'})
         try:
             length = int(self.headers.get('Content-Length', 0))
-            if not 0 < length <= (100000 if self.path in ('/api/laboratories','/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/config','/api/ai/jobs','/api/sequential','/api/sequential/ai-jobs','/api/sequential/ai-apply','/api/agents','/api/library/compare','/api/payoff-sweep','/api/agent-comparisons','/api/agent-comparisons/replay') else 2048):
+            if not 0 < length <= (100000 if self.path in ('/api/graph/versions','/api/laboratories','/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/config','/api/ai/jobs','/api/sequential','/api/sequential/ai-jobs','/api/sequential/ai-apply','/api/agents','/api/library/compare','/api/payoff-sweep','/api/agent-comparisons','/api/agent-comparisons/replay') else 2048):
                 raise ValueError()
             payload = json.loads(self.rfile.read(length))
             if self.path == '/api/library/compare':
@@ -260,6 +264,10 @@ class Handler(BaseHTTPRequestHandler):
                     return self.send(400, {'error':'Revisá la descripción o la respuesta del modelo.'})
                 except Exception:
                     return self.send(502, {'error':'No se pudo obtener el borrador. Revisá la conexión y configuración del modelo.'})
+            if self.path == '/api/graph/versions':
+                try:return self.send(201,save_graph_version(DB,payload))
+                except NotFound as error:return self.send(404,{'error':str(error)})
+                except (ValueError,TypeError,KeyError):return self.send(400,{'error':'Revisá el título, fundamento y contenido de la red.'})
             if self.path == '/api/graph':
                 return self.send(200, {'graph':save_graph(DB,payload)})
             result = analyze(Parameters(float(payload['cooperation']), float(payload['cost'])))

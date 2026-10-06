@@ -11,6 +11,18 @@ from escenarios.server import Handler
 
 
 class ApiTests(unittest.TestCase):
+    def test_network_version_routes_preserve_reviewed_graph(self):
+        def post(route,payload):
+            with urlopen(Request(self.base+route,data=json.dumps(payload).encode(),headers={'Content-Type':'application/json','Origin':self.base})) as response:return json.load(response)
+        case=post('/api/workflows',{'action':'create','title':'Red vinculada','description':'Contexto de relaciones hipotéticas.'})
+        payload={'title':'Mapa conservado','assumptions':'Sin calibración causal.','reviewed':True,'workflow_id':case['id'],'graph':{'nodes':[{'id':0,'name':'Institución','type':0}],'edges':[]}}
+        saved=post('/api/graph/versions',payload)
+        with urlopen(self.base+'/api/graph/versions?workflow_id='+case['id']) as response:self.assertEqual(json.load(response),[saved])
+        with self.assertRaises(HTTPError) as error:post('/api/graph/versions',{**payload,'reviewed':False})
+        self.assertEqual(error.exception.code,400)
+        with self.assertRaises(HTTPError) as error:post('/api/graph/versions',{**payload,'workflow_id':'missing'})
+        self.assertEqual(error.exception.code,404)
+
     def test_laboratories_routes_use_saved_case_version(self):
         from test_laboratories import prepare_case,OPTIONS
         from escenarios import server

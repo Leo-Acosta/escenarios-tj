@@ -1,7 +1,7 @@
 import tempfile
 import unittest
 from pathlib import Path
-from escenarios.graph import save_graph,load_graph,validate_graph
+from escenarios.graph import save_graph,load_graph,validate_graph,save_version,version_history
 
 
 class GraphTests(unittest.TestCase):
@@ -19,3 +19,31 @@ class GraphTests(unittest.TestCase):
                       {'nodes':[{'id':0,'name':42,'type':1}],'edges':[]},
                       {'nodes':[{'id':0,'name':'A','type':1}],'edges':[{'a':0,'b':4,'type':'Influencia'}]}]:
             with self.assertRaises(ValueError):validate_graph(graph)
+
+    def test_versions_keep_full_graph_and_frozen_case(self):
+        from escenarios.workflow import operate
+        graph={'nodes':[{'id':0,'name':'Actor','type':1}],'edges':[]}
+        with tempfile.TemporaryDirectory() as directory:
+            path=Path(directory)/'versions.db'
+            case=operate(path,{'action':'create','title':'Caso inicial','description':'Contexto histórico de prueba.'})
+            payload={'title':'Red inicial','assumptions':'Relaciones hipotéticas.','reviewed':True,'graph':graph,'workflow_id':case['id']}
+            first=save_version(path,payload)
+            second=save_version(path,{**payload,'title':'Red posterior','graph':{'nodes':[{'id':0,'name':'Otro actor','type':1}],'edges':[]}})
+            save_graph(path,second['graph'])
+            self.assertEqual(version_history(path,case['id']),[second,first])
+            self.assertEqual(first['graph'],graph)
+            self.assertEqual(first['workflow']['revision'],case['revision'])
+            independent=save_version(path,{**payload,'workflow_id':''})
+            self.assertNotIn('workflow',independent)
+            self.assertNotIn(independent,version_history(path,case['id']))
+
+    def test_versions_require_review_and_valid_context(self):
+        from escenarios.workflow import NotFound
+        with tempfile.TemporaryDirectory() as directory:
+            path=Path(directory)/'versions.db'
+            payload={'title':'Red','assumptions':'Supuestos','reviewed':True,'graph':{'nodes':[{'id':0,'name':'A','type':1}],'edges':[]}}
+            self.assertEqual(version_history(path),[])
+            for patch in ({'reviewed':False},{'title':''},{'assumptions':''}):
+                with self.assertRaises(ValueError):save_version(path,{**payload,**patch})
+            with self.assertRaises(NotFound):save_version(path,{**payload,'workflow_id':'missing'})
+            self.assertEqual(version_history(path),[])
