@@ -84,3 +84,7 @@ La prueba real es un caso ilustrativo; no demuestra precisión general ni valida
 ## Versiones y CSV de incentivos
 
 82 pruebas aprobadas. Verificados guardado inmutable de matriz y puntos, UUID inexistente, CSV de 101 filas con empate y pagos negativos, neutralización de fórmulas, supuestos inválidos y revisión requerida por API. Interfaz: guardado UUID 36c1f81a-241c-496d-9da8-0eb85eb4724d, recuperación tras recarga y empate A1/B2 más A2/B2 en muestra 51 comprobados. CSV de ejemplo output/escenarios-incentivos.csv. Captura de pantalla del navegador no disponible en esta verificación.
+
+## PDF del explorador de incentivos
+
+85 pruebas aprobadas. PDF verificado con UUID, rango, transiciones y empate; utilidades negativas y constantes; título literal y paginación de supuestos largos. API: firma PDF, tipo MIME y UUID inexistente. output/pdf/informe-incentivos.pdf generado desde versión guardada y renderizado con Poppler: cuatro páginas inspeccionadas sin recortes ni solapamientos. JavaScript validado con Node. Exportación disponible junto al CSV en el resultado guardado. Calibración predictiva, empaquetado y juegos de más actores siguen pendientes.

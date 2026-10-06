@@ -156,3 +156,7 @@ POST /api/payoff-sweep ejecuta payoff_sweep.run: valida rango y pago, copia la m
 ## Persistencia de incentivos
 
 payoff_sweeps conserva JSON inmutable por UUID. POST /api/payoff-sweep recalcula desde la matriz, exige revisión y supuestos al guardar. GET devuelve las últimas 20 versiones; GET /api/payoff-sweep/scenarios.csv?id exporta una versión guardada o 404. El CSV UTF-8 con BOM y separador punto y coma contiene 101 filas, identifica alternativas desde 1 y neutraliza fórmulas en texto sin modificar números negativos.
+
+## Informe de sensibilidad de incentivos
+
+sweep_report.py genera gráficos vectoriales y tablas desde payoff_sweeps, sin recalcular ni leer el formulario. GET /api/payoff-sweep/report.pdf?id responde PDF, 404 para versiones inexistentes y 503 sin ReportLab. Los gráficos usan escalas por actor y p/q originales; los intervalos describen cambios muestreados y preservan empates.

@@ -39,10 +39,14 @@ class Handler(BaseHTTPRequestHandler):
         url = urlsplit(self.path)
         if url.path == '/api/payoff-sweep':
             return self.send(200,payoff_sweep.history(DB))
-        if url.path == '/api/payoff-sweep/scenarios.csv':
+        if url.path in ('/api/payoff-sweep/scenarios.csv','/api/payoff-sweep/report.pdf'):
             try:record=payoff_sweep.get_record(DB,parse_qs(url.query)['id'][0])
             except (KeyError,IndexError):return self.send(404,{'error':'Exploración guardada no encontrada.'})
-            return self.send(200,payoff_sweep.build_csv(record),'text/csv; charset=utf-8')
+            if url.path.endswith('.csv'):return self.send(200,payoff_sweep.build_csv(record),'text/csv; charset=utf-8')
+            try:
+                from .sweep_report import build_pdf
+            except ImportError:return self.send(503,{'error':'ReportLab no está disponible para exportar PDF.'})
+            return self.send(200,build_pdf(record),'application/pdf')
         if url.path == '/api/agent-comparisons/report.pdf':
             try:record=comparisons.get_record(DB,parse_qs(url.query)['id'][0])
             except (KeyError,IndexError):return self.send(404,{'error':'Comparación guardada no encontrada.'})

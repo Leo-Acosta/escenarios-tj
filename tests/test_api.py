@@ -69,6 +69,10 @@ class ApiTests(unittest.TestCase):
         with urlopen(self.base+'/api/payoff-sweep') as response:self.assertEqual(json.load(response)[0]['id'],saved['id'])
         with urlopen(self.base+'/api/payoff-sweep/scenarios.csv?id='+saved['id']) as response:
             self.assertIn('text/csv',response.headers['Content-Type']);self.assertIn(saved['id'].encode(),response.read())
+        with urlopen(self.base+'/api/payoff-sweep/report.pdf?id='+saved['id']) as response:
+            self.assertEqual(response.headers['Content-Type'],'application/pdf');self.assertTrue(response.read().startswith(b'%PDF'))
+        with self.assertRaises(HTTPError) as missing_pdf:urlopen(self.base+'/api/payoff-sweep/report.pdf?id=missing')
+        self.assertEqual(missing_pdf.exception.code,404)
         with self.assertRaises(HTTPError) as error:urlopen(self.base+'/api/payoff-sweep/scenarios.csv?id=missing')
         self.assertEqual(error.exception.code,404)
 

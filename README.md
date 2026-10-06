@@ -111,3 +111,7 @@ En la mesa estratégica, elegí uno de los ocho pagos y un rango para explorar 1
 ## Versiones del explorador de incentivos
 
 Los barridos revisados ahora se guardan en SQLite mediante Explorar y guardar versión, con UUID, fecha, motor, matriz original, rango y supuestos. El historial permite recuperar los 101 escenarios sin modificar el caso principal. Cada versión ofrece CSV con utilidades, mejores respuestas, equilibrios y probabilidades del mixto interior. La exportación PDF propia del barrido sigue pendiente.
+
+## PDF ejecutivo de incentivos
+
+Cada barrido guardado ofrece Descargar informe ejecutivo PDF junto al CSV. El informe vectorial conserva UUID, configuración, matriz, gráficos de utilidades separados por actor, extremos del rango, intervalos de cambio y supuestos. Requiere ReportLab. La extensión crece si los supuestos o etiquetas requieren más páginas.
