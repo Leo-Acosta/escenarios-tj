@@ -1,0 +1,8 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {copyNetwork,removeEntity,addRelation,reviewedNetwork} from './network-editing.ts';
+const graph={nodes:[{id:0,name:'A',type:0},{id:1,name:'B',type:1},{id:2,name:'C',type:2}],edges:[{id:0,a:0,b:1,type:'Cooperación'},{id:1,a:0,b:2,type:'Influencia'},{id:2,a:1,b:2,type:'Participación'}]};
+test('quitar entidad elimina incidentes y remapea referencias sin tocar origen',()=>{const result=removeEntity(graph,1);assert.deepEqual(result.nodes.map(n=>[n.id,n.name]),[[0,'A'],[1,'C']]);assert.deepEqual(result.edges,[{id:0,a:0,b:1,type:'Influencia'}]);assert.equal(graph.nodes.length,3);assert.equal(graph.edges.length,3);assert.throws(()=>removeEntity({nodes:[graph.nodes[0]],edges:[]},0));});
+test('la copia editable no comparte entidades ni vínculos con la versión',()=>{const copy=copyNetwork(graph);copy.nodes[0].name='Editada';copy.edges[0].type='Influencia';assert.equal(graph.nodes[0].name,'A');assert.equal(graph.edges[0].type,'Cooperación');});
+test('rechaza duplicados invertidos y relaciones inválidas',()=>{assert.throws(()=>addRelation(graph,1,0,'Cooperación'));assert.throws(()=>addRelation(graph,0,0,'Influencia'));assert.throws(()=>addRelation(graph,0,4,'Influencia'));assert.equal(addRelation(graph,0,1,'Participación').edges.length,4);});
+test('guardar exige revisión, nombres y fundamento válidos',()=>{assert.throws(()=>reviewedNetwork(graph,'Red','Supuestos',false));assert.throws(()=>reviewedNetwork(graph,'Red',' ',true));assert.throws(()=>reviewedNetwork({...graph,nodes:graph.nodes.map(n=>({...n,name:''}))},'Red','Supuestos',true));assert.equal(reviewedNetwork(graph,' Red ',' Supuestos ',true).title,'Red');});

@@ -62,3 +62,5 @@ La reproducción de agentes permite recorrer automáticamente rondas conservadas
 React incorpora consulta de la red global guardada, búsqueda, filtros y detalle de entidades y vínculos. Todavía sin edición, versiones ni asociación a expedientes. Ver REDES-REACT-VERIFICACION.md.
 
 Las redes ahora se conservan como versiones con expediente opcional y contexto histórico (ID, título, revisión). El editor global previo no se modifica; sus cambios no alteran las copias guardadas. Ver VERSIONES-REDES-REACT.md.
+
+El editor React de redes crea borradores o copias, edita entidades y relaciones con vista previa y guarda otra versión. Ver EDITOR-REDES-REACT.md. Fase 2 en curso.

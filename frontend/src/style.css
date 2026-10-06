@@ -20,3 +20,5 @@
 .agent-replay{padding:20px;border:1px solid #cbdedb;border-radius:14px;background:linear-gradient(120deg,#f0f8f5,#f4f7fc);margin:20px 0}.agent-replay .title-row{margin:0}.replay-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.replay-controls label{min-width:180px}.agent-replay [role="status"]{font-size:12px;color:#526574}@media print{.replay-controls,.agent-replay input,.agent-replay [role="status"]{display:none}}
 
 .network-lab input{width:100%;padding:12px;border:1px solid #cbd8e2;border-radius:8px;font:inherit}.network-lab .tree-detail button{display:block;margin:10px 0;width:100%;text-align:left}.network-lab select{margin-bottom:15px}
+
+.network-entity-list,.network-relation-list{max-height:420px;overflow:auto;margin:18px 0}.network-entity-row{display:grid;grid-template-columns:2fr 1fr auto;align-items:center;gap:15px;padding:12px;border-bottom:1px solid #dce5ed}.network-relation-list>div{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:12px;border-bottom:1px solid #dce5ed}@media(max-width:800px){.network-entity-row{grid-template-columns:1fr}.network-relation-list>div{flex-wrap:wrap}}
