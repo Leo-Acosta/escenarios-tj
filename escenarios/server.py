@@ -1,6 +1,7 @@
 """Servidor local. La UI nunca calcula pagos: consulta el núcleo Python."""
 import argparse
 import json
+import mimetypes
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
@@ -37,6 +38,21 @@ class Handler(BaseHTTPRequestHandler):
         if not self.allowed():
             return self.send(403, {'error': 'Host no autorizado.'})
         url = urlsplit(self.path)
+        if url.path == '/app':
+            self.send_response(302)
+            self.send_header('Location', '/app/')
+            self.end_headers()
+            return
+        if url.path.startswith('/app/'):
+            # Resolve and check containment before serving any compiled asset.
+            dist = (ROOT / 'frontend' / 'dist').resolve()
+            relative = url.path[len('/app/'):] or 'index.html'
+            target = (dist / relative).resolve()
+            if not target.is_relative_to(dist) or not target.is_file():
+                return self.send(404, {'error': 'Interfaz o recurso no disponible. Ejecutá npm ci y npm run build en frontend.'})
+            mime = mimetypes.guess_type(target.name)[0] or 'application/octet-stream'
+            if target.suffix == '.js': mime = 'text/javascript'
+            return self.send(200, target.read_bytes(), mime)
         if url.path in ('/api/library','/api/library/item'):
             args=parse_qs(url.query)
             try:

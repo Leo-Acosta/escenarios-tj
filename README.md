@@ -2,7 +2,9 @@
 
 Proyecto para construir un laboratorio de escenarios multiagente en Python, con interfaz y documentación en español y almacenamiento local.
 
-Estado: primera entrega funcional del coordinador guiado. Incluye expedientes persistentes con conversación, fuentes, supuestos revisados, versiones de cálculo, gráficos propios e informe ejecutivo imprimible. Conserva matrices libres y el ejemplo institucional.
+Estado: laboratorio funcional en Python y primera fase de migración a React + TypeScript. Incluye expedientes persistentes, versiones, matrices, árboles secuenciales, simulaciones y documentos. La nueva interfaz de consulta está en `/app/`; la mesa estratégica existente permanece en `/`. No es todavía una entrega premium completa.
+
+Para construir la nueva interfaz: ejecutar `npm ci`, `npm test` y `npm run build` dentro de `frontend`, y luego iniciar el servidor Python. Ver [arquitectura y fases](docs/ARQUITECTURA-PREMIUM.md).
 
 ## Ejecutar
 

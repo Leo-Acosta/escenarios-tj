@@ -45,6 +45,24 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(error.exception.code,404)
         with urlopen(self.base+'/library.js') as response:self.assertIn(b'Consultar versi',response.read())
 
+    def test_premium_assets_containment_and_missing_build(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder)
+            dist=root/'frontend'/'dist'
+            dist.mkdir(parents=True)
+            (dist/'index.html').write_text('<html lang="es">React</html>',encoding='utf-8')
+            (dist/'bundle.js').write_text('export {};',encoding='utf-8')
+            (root/'secret.txt').write_text('private',encoding='utf-8')
+            with patch('escenarios.server.ROOT',root):
+                with urlopen(self.base+'/app/') as response:self.assertIn(b'React',response.read())
+                with urlopen(self.base+'/app/bundle.js') as response:self.assertEqual(response.headers['Content-Type'],'text/javascript')
+                for path in ('/app/../../secret.txt','/app/missing.js'):
+                    with self.assertRaises(HTTPError) as error:urlopen(self.base+path)
+                    self.assertEqual(error.exception.code,404)
+                (dist/'index.html').unlink()
+                with self.assertRaises(HTTPError) as error:urlopen(self.base+'/app/')
+                self.assertEqual(error.exception.code,404)
+
     def test_version_comparison_route(self):
         from escenarios.case_model import analyze_case,save_case
         from test_comparisons import MODEL

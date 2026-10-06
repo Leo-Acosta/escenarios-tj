@@ -6,3 +6,5 @@ data/
 *.pyc
 .tools/
 work/
+frontend/node_modules/
+frontend/dist/
