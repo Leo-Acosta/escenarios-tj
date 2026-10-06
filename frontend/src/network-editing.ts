@@ -1,5 +1,5 @@
 import {network,type Network} from './network-contract.ts';
-export function copyNetwork(graph:Network):Network{return {nodes:graph.nodes.map(n=>({...n})),edges:graph.edges.map(e=>({...e}))};}
+export function copyNetwork(graph:Network):Network{return {nodes:graph.nodes.map(n=>({...n})),edges:graph.edges.map(e=>({...e,...(e.evidence?{evidence:{...e.evidence}}:{})}))};}
 export function removeEntity(graph:Network,id:number):Network{
  if(graph.nodes.length<2)throw new Error('La red debe conservar al menos una entidad.');
  if(!graph.nodes.some(n=>n.id===id))throw new Error('Entidad inexistente.');

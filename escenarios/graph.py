@@ -20,7 +20,18 @@ def validate_graph(payload):
         if not isinstance(edge,dict):raise ValueError('Relación inválida.')
         if type(edge['a']) is not int or type(edge['b']) is not int or not 0<=edge['a']<len(clean) or not 0<=edge['b']<len(clean) or edge['a']==edge['b'] or edge['type'] not in ('Influencia','Cooperación','Participación'):
             raise ValueError('Relación inválida.')
-        links.append(dict(id=index,a=edge['a'],b=edge['b'],type=edge['type']))
+        link=dict(id=index,a=edge['a'],b=edge['b'],type=edge['type'])
+        if 'evidence' in edge:
+            evidence=edge['evidence']
+            if not isinstance(evidence,dict):raise ValueError('Evidencia inválida.')
+            clean_evidence={}
+            for key,limit in (('source',160),('reference',500),('note',1200)):
+                value=evidence.get(key)
+                if not isinstance(value,str) or not 1<=len(value.strip())<=limit:
+                    raise ValueError('Completá fuente, referencia y nota de la evidencia.')
+                clean_evidence[key]=value.strip()
+            link['evidence']=clean_evidence
+        links.append(link)
     return dict(nodes=clean,edges=links)
 
 

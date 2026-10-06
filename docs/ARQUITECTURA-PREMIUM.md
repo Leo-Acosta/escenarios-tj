@@ -64,3 +64,5 @@ React incorpora consulta de la red global guardada, búsqueda, filtros y detalle
 Las redes ahora se conservan como versiones con expediente opcional y contexto histórico (ID, título, revisión). El editor global previo no se modifica; sus cambios no alteran las copias guardadas. Ver VERSIONES-REDES-REACT.md.
 
 El editor React de redes crea borradores o copias, edita entidades y relaciones con vista previa y guarda otra versión. Ver EDITOR-REDES-REACT.md. Fase 2 en curso.
+
+Las relaciones conservan evidencia opcional (fuente, referencia y nota) en cada versión. React permite editarla y consultarla; Python valida campos y mantiene compatibilidad histórica. Ver EVIDENCIA-REDES-REACT.md.

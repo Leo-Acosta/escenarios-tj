@@ -47,3 +47,16 @@ class GraphTests(unittest.TestCase):
                 with self.assertRaises(ValueError):save_version(path,{**payload,**patch})
             with self.assertRaises(NotFound):save_version(path,{**payload,'workflow_id':'missing'})
             self.assertEqual(version_history(path),[])
+
+    def test_evidence_is_preserved_and_invalid_evidence_rejected(self):
+        graph={'nodes':[{'id':0,'name':'A','type':1},{'id':1,'name':'B','type':0}], 'edges':[{'a':0,'b':1,'type':'Cooperación','evidence':{'source':' Acta ','reference':' Folio 12 ','note':' Acuerdo hipotético. '}}]}
+        with tempfile.TemporaryDirectory() as directory:
+            path=Path(directory)/'evidence.db'
+            first=save_version(path,{'title':'Red','assumptions':'Hipótesis','reviewed':True,'graph':graph})
+            self.assertEqual(first['graph']['edges'][0]['evidence']['source'],'Acta')
+            graph['edges'][0]['evidence']['source']='Nueva fuente'
+            save_version(path,{'title':'Otra red','assumptions':'Hipótesis','reviewed':True,'graph':graph})
+            self.assertEqual(version_history(path)[1],first)
+            for invalid in (None,{}, {'source':'Acta','reference':'','note':'Nota'}, {'source':'A'*161,'reference':'R','note':'N'}):
+                graph['edges'][0]['evidence']=invalid
+                with self.assertRaises(ValueError):validate_graph(graph)
