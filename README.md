@@ -99,3 +99,7 @@ En una corrida guardada o recuperada aparecen **Descargar PDF ejecutivo** y **Ex
 ## Comparador de políticas
 
 La mesa estratégica incluye una matriz interactiva de 36 combinaciones. Permite 1–100 rondas, 1–10 semillas consecutivas y error de ejecución. Muestra utilidad por actor, media y desviación poblacional entre semillas. Las comparaciones revisadas se guardan en SQLite con la matriz original; cada repetición puede reproducirse en el explorador de agentes. Las simulaciones dependen de los supuestos y no están calibradas como predicciones reales.
+
+## Informe ejecutivo de comparaciones
+
+Cada comparación guardada ofrece Descargar informe ejecutivo PDF. El documento vectorial conserva UUID, matriz, semillas, medias y dispersión por actor, rango frente a seis rivales y supuestos. No presupone probabilidades de las políticas rivales. Requiere ReportLab, igual que los demás informes.

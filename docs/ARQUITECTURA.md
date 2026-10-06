@@ -144,3 +144,7 @@ GET/POST `/api/agents` lista, simula y guarda corridas inmutables en `agent_runs
 ## Comparación de conductas
 
 comparisons.py ejecuta las seis políticas del motor repeated-agents-v1 contra las seis políticas rivales usando semillas comunes y memoria reiniciada. Conserva medias por repetición y estadísticas separadas por actor. agent_comparisons almacena versiones inmutables; replay valida índices y versión del motor y reproduce el escenario congelado. comparisons.js presenta la matriz interactiva y abre las rondas en agentViewer sin modificar el caso principal.
+
+## Informe del comparador
+
+comparison_report.py genera PDF desde una versión inmutable obtenida mediante comparisons.get_record. GET /api/agent-comparisons/report.pdf?id devuelve PDF, 404 para UUID ausente y 503 si falta ReportLab. summaries agrupa filas para A y columnas para B. Cada mapa de calor utiliza la escala propia del actor; los rangos son entre medias por rival.

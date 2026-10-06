@@ -52,6 +52,13 @@ def history(path):
     with closing(connection(path)) as db:return [json.loads(row[0]) for row in db.execute('SELECT payload FROM agent_comparisons ORDER BY rowid DESC LIMIT 20')]
 
 
+def get_record(path, identity):
+    with closing(connection(path)) as db:
+        row=db.execute('SELECT payload FROM agent_comparisons WHERE id=?',(identity,)).fetchone()
+    if row is None:raise KeyError('Comparación inexistente.')
+    return json.loads(row[0])
+
+
 def replay(path,payload):
     with closing(connection(path)) as db:row=db.execute('SELECT payload FROM agent_comparisons WHERE id=?',(payload['id'],)).fetchone()
     if row is None:raise KeyError('Comparación inexistente.')

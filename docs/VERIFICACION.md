@@ -72,3 +72,7 @@ La prueba real es un caso ilustrativo; no demuestra precisión general ni valida
 ## Comparador de políticas
 
 69 pruebas aprobadas. Nuevos casos: 36 pares contrastados con ejecuciones individuales, orientación de pagos, dispersión con una repetición, límites y tipos inválidos, matriz inmutable, reproducción de semilla e índices inválidos. Interfaz: comparación revisada guardada, selector A/B, combinación Azar/Frecuencia y semilla 44 reproducida con medias A=0,66/B=2,86; recuperación tras recarga comprobada. Las pruebas SQLite necesitaron ejecución fuera del sandbox por restricciones de directorios temporales. Exportación propia del comparador y validación predictiva quedan pendientes.
+
+## PDF del comparador
+
+74 pruebas aprobadas. Verificado: cuatro páginas, UUID y semillas conservados, resumen de B por columnas, pagos negativos y escala uniforme, título con marcado literal y supuestos largos paginados. API verifica firma PDF, tipo MIME y 404. En navegador se recuperó la comparación guardada y se comprobó el enlace de descarga con su UUID. Ejemplo output/pdf/informe-comparador.pdf renderizado con Poppler: cuatro páginas inspeccionadas sin recortes ni solapamientos. Pendientes: calibración predictiva y empaquetado Windows.

@@ -37,6 +37,13 @@ class Handler(BaseHTTPRequestHandler):
         if not self.allowed():
             return self.send(403, {'error': 'Host no autorizado.'})
         url = urlsplit(self.path)
+        if url.path == '/api/agent-comparisons/report.pdf':
+            try:record=comparisons.get_record(DB,parse_qs(url.query)['id'][0])
+            except (KeyError,IndexError):return self.send(404,{'error':'Comparación guardada no encontrada.'})
+            try:
+                from .comparison_report import build_pdf
+            except ImportError:return self.send(503,{'error':'ReportLab no está disponible para exportar PDF.'})
+            return self.send(200,build_pdf(record),'application/pdf')
         if url.path == '/api/sequential/report.pdf':
             try:
                 identity=parse_qs(url.query)['id'][0]

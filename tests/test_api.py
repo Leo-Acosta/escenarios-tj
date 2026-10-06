@@ -37,6 +37,17 @@ class ApiTests(unittest.TestCase):
             urlopen(self.base+'/api/analysis?q=nan')
         self.assertEqual(error.exception.code,400)
 
+    def test_comparison_report_requires_saved_record(self):
+        from test_comparisons import payload
+        p=payload();p.update(save=True,reviewed=True)
+        with urlopen(Request(self.base+'/api/agent-comparisons',data=json.dumps(p).encode(),headers={'Origin':self.base,'Content-Type':'application/json'})) as response:
+            saved=json.load(response)
+        with urlopen(self.base+'/api/agent-comparisons/report.pdf?id='+saved['id']) as response:
+            self.assertEqual(response.headers['Content-Type'],'application/pdf')
+            self.assertTrue(response.read().startswith(b'%PDF'))
+        with self.assertRaises(HTTPError) as error:urlopen(self.base+'/api/agent-comparisons/report.pdf?id=missing')
+        self.assertEqual(error.exception.code,404)
+
     def test_disallowed_host_and_static_path(self):
         with self.assertRaises(HTTPError) as error:
             urlopen(Request(self.base+'/',headers={'Host':'outside.example'}))
