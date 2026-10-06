@@ -125,3 +125,5 @@ La vista Análisis guardados reúne seis tipos: matrices libres, versiones de ex
 ## Comparación entre versiones
 
 En el Centro de análisis, las tarjetas de matrices libres y versiones de expediente ofrecen Usar como base y Usar para comparar. Se requiere coincidencia de nombres y posiciones de actores/estrategias y confirmación de escalas equivalentes. El contraste muestra pagos y p/q modificados, utilidades antes/después, descomposición aritmética por pagos y probabilidades, equilibrios que aparecen/desaparecen y supuestos. La atribución cambia primero pagos y después probabilidades; no identifica efectos causales. La comparación es temporal, sin PDF ni persistencia propios.
+
+En `/app/`, Laboratorios del expediente permite ejecutar agentes, comparar políticas y explorar incentivos desde una versión calculada. Los análisis guardan su fuente y pueden filtrarse por expediente; incluye gráficos interactivos y PDF individuales. Ver [verificación](docs/LABORATORIOS-REACT-VERIFICACION.md). El informe ejecutivo unificado corresponde a la fase 6.

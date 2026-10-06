@@ -11,6 +11,18 @@ from escenarios.server import Handler
 
 
 class ApiTests(unittest.TestCase):
+    def test_laboratories_routes_use_saved_case_version(self):
+        from test_laboratories import prepare_case,OPTIONS
+        from escenarios import server
+        case=prepare_case(server.DB)
+        for kind in OPTIONS:
+            payload={'kind':kind,'workflow_id':case['id'],'version':1,'options':OPTIONS[kind],'assumptions':'Supuestos de prueba revisados. '+('Contexto. '*300),'reviewed':True}
+            with urlopen(Request(self.base+'/api/laboratories',data=json.dumps(payload).encode(),headers={'Content-Type':'application/json','Origin':self.base})) as response:record=json.load(response)
+            self.assertEqual(record['workflow']['version'],1)
+            with urlopen(self.base+'/api/laboratories?kind='+kind+'&workflow_id='+case['id']) as response:self.assertEqual([r['id'] for r in json.load(response)],[record['id']])
+        with self.assertRaises(HTTPError) as error:urlopen(self.base+'/api/laboratories?kind=unknown')
+        self.assertEqual(error.exception.code,400)
+
     def test_sequential_case_link_and_filter(self):
         from test_sequential import MODEL
         def post(route,payload):

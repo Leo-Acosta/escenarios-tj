@@ -12,6 +12,7 @@ from .intake import prepare
 from .case_model import analyze_case,save_case,list_cases
 from .workflow import operate,get_workflow,list_workflows,get_version,Conflict,NotFound
 from . import local_ai,ai_jobs,sequential,simulation,agents,comparisons,payoff_sweep,library,version_diff
+from . import laboratories
 
 ROOT = Path(__file__).resolve().parent.parent
 DB = ROOT / 'data' / 'escenarios.sqlite3'
@@ -38,6 +39,11 @@ class Handler(BaseHTTPRequestHandler):
         if not self.allowed():
             return self.send(403, {'error': 'Host no autorizado.'})
         url = urlsplit(self.path)
+        if url.path == '/api/laboratories':
+            args=parse_qs(url.query)
+            try:return self.send(200,laboratories.history(DB,args.get('kind',[''])[0],args.get('workflow_id',[''])[0]))
+            except NotFound as error:return self.send(404,{'error':str(error)})
+            except ValueError as error:return self.send(400,{'error':str(error)})
         if url.path == '/app':
             self.send_response(302)
             self.send_header('Location', '/app/')
@@ -173,17 +179,21 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         if not self.allowed() or self.headers.get('Origin') not in (f'http://127.0.0.1:{self.server.server_port}', f'http://localhost:{self.server.server_port}'):
             return self.send(403, {'error': 'Origen no autorizado.'})
-        if self.path not in ('/api/snapshots','/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/config','/api/ai/jobs','/api/sequential','/api/sequential/ai-jobs','/api/sequential/ai-apply','/api/agents','/api/library/compare','/api/payoff-sweep','/api/agent-comparisons','/api/agent-comparisons/replay'):
+        if self.path not in ('/api/laboratories','/api/snapshots','/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/config','/api/ai/jobs','/api/sequential','/api/sequential/ai-jobs','/api/sequential/ai-apply','/api/agents','/api/library/compare','/api/payoff-sweep','/api/agent-comparisons','/api/agent-comparisons/replay'):
             return self.send(404, {'error': 'Recurso inexistente.'})
         try:
             length = int(self.headers.get('Content-Length', 0))
-            if not 0 < length <= (100000 if self.path in ('/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/config','/api/ai/jobs','/api/sequential','/api/sequential/ai-jobs','/api/sequential/ai-apply','/api/agents','/api/library/compare','/api/payoff-sweep','/api/agent-comparisons','/api/agent-comparisons/replay') else 2048):
+            if not 0 < length <= (100000 if self.path in ('/api/laboratories','/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/config','/api/ai/jobs','/api/sequential','/api/sequential/ai-jobs','/api/sequential/ai-apply','/api/agents','/api/library/compare','/api/payoff-sweep','/api/agent-comparisons','/api/agent-comparisons/replay') else 2048):
                 raise ValueError()
             payload = json.loads(self.rfile.read(length))
             if self.path == '/api/library/compare':
                 try:return self.send(200,version_diff.compare(DB,payload))
                 except KeyError:return self.send(404,{'error':'Versión no encontrada.'})
                 except ValueError as error:return self.send(400,{'error':str(error)})
+            if self.path == '/api/laboratories':
+                try:return self.send(200,laboratories.save_from_version(DB,payload))
+                except NotFound as error:return self.send(404,{'error':str(error)})
+                except (ValueError,TypeError,KeyError) as error:return self.send(400,{'error':str(error) if isinstance(error,ValueError) else 'Configuración incompleta del laboratorio.'})
             if self.path == '/api/payoff-sweep':
                 if payload.get('save') is True and payload.get('reviewed') is not True:raise ValueError('Confirmá la revisión para guardar.')
                 result=payoff_sweep.run(payload)

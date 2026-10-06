@@ -1,0 +1,7 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {laboratory,records} from './laboratory-contract.ts';
+const base={id:'run',created_at:'2026-10-06',model:{title:'Caso',actors:['A','B'],strategies:[['A1','A2'],['B1','B2']],a:[[3,0],[5,1]],b:[[3,5],[0,1]],p:.5,q:.6},options:{seed:42},assumptions:'Hipotético',limits:['Sin validación predictiva.']};
+test('keeps Python round outcomes and frozen version context',()=>{const r=laboratory({...base,workflow:{id:'case',title:'Caso original',version:2},rounds:[{round:1,actions:[0,1],payments:[0,5],totals:[0,5],reasons:['Copiar','Responder']}]},'agents');assert.equal(r.workflow?.version,2);assert.deepEqual(r.rounds?.[0].totals,[0,5]);assert.deepEqual(records([],'agents'),[]);});
+test('reads policy dispersion and incentive samples without recalculation',()=>{const c=laboratory({...base,cells:[{i:0,j:1,policies:['mirror','adaptive'],statistics:[{mean:1,std:2,min:-1,max:3},{mean:5,std:0,min:5,max:5}]}]},'comparison');assert.equal(c.cells?.[0].statistics[0].std,2);const s=laboratory({...base,points:[{value:7,values_a:[2,3],values_b:[4,5],pure:[[1,1]]}]},'sweep');assert.deepEqual(s.points?.[0].pure,[[1,1]]);});
+test('rejects incompatible shapes and nonfinite results',()=>{assert.throws(()=>laboratory({...base,rounds:[{round:1,actions:[0,2],payments:[0,1],totals:[0,1],reasons:['A','B']}]},'agents'));assert.throws(()=>laboratory({...base,points:[{value:Infinity,values_a:[1,2],values_b:[1,2],pure:[]}]},'sweep'));assert.throws(()=>laboratory({...base,cells:[]},'comparison'));});

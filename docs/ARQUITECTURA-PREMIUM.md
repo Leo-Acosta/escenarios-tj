@@ -52,3 +52,5 @@ El laboratorio React consulta árboles conservados con React Flow, selección de
 La fase 2 incorpora también creación y edición de árboles como nuevas versiones desde React, con revisión obligatoria y guardado a través del núcleo Python. Los borradores de árboles aún no se autoguardan.
 
 Los árboles pueden vincularse a expedientes con referencia histórica (ID, título, revisión) dentro de su payload JSON. GET /api/sequential?workflow_id=ID filtra antes del límite de 30 registros. La asociación se valida en Python y conserva la compatibilidad con árboles independientes. No constituye un informe ejecutivo unificado ni una derivación automática desde la matriz.
+
+La fase 2 integra agentes, comparaciones e incentivos con expedientes en React. POST /api/laboratories recupera la matriz desde una versión calculada y conserva su referencia; GET /api/laboratories filtra por módulo y expediente. Ver LABORATORIOS-REACT-VERIFICACION.md. El informe ejecutivo unificado sigue pendiente en fase 6.
