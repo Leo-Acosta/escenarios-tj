@@ -27,6 +27,7 @@ Abrir `http://127.0.0.1:8766/app/`. La instalación inicial requiere el registro
 
 | Paquete | Versión | Licencia | Uso |
 |---|---|---|---|
+| @xyflow/react | 12.12.0 | MIT | Laboratorio interactivo de árboles |
 | React / React DOM | 19.3.0 | MIT | Interfaz |
 | Vite | 8.3.3 | MIT | Compilación |
 | TypeScript | 7.0.2 | Apache-2.0 | Contratos y tipado |
@@ -45,3 +46,5 @@ Versiones fijadas y dependencias transitivas registradas en `package-lock.json`.
 9–10. Distribución Windows y validación integral de calidad y rendimiento.
 
 La fase 1 incorporó la consulta. La fase 2 está en curso: agregó edición, cálculo, navegación por etapas e historial de versiones dentro del expediente. La navegación integral, los gráficos y los demás requisitos premium siguen en desarrollo. Ver `NAVEGACION-ETAPAS-VERIFICACION.md` y `HISTORIAL-REACT-VERIFICACION.md` para las comprobaciones de estos incrementos.
+
+El laboratorio React consulta árboles conservados con React Flow, selección de nodos, rutas y planes completos. La fase 2 sigue en curso; este incremento inicia la base visual de árboles de la fase 4, sin completar esa fase. Ver `ARBOLES-REACT-VERIFICACION.md`.
