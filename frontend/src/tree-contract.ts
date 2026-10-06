@@ -1,12 +1,12 @@
 import {object} from './contracts.ts';
-export type TreeRecord={id:string;calculated_at:string;method:string;limits:string[];model:{title:string;actors:string[];actions:string[][];payoffs:number[][][];assumptions:string};responses:number[][];equilibria:{first:number;responses:number[];outcome:number[];payoffs:number[]}[]};
+export type TreeRecord={workflow?:{id:string;title:string;revision:number};id:string;calculated_at:string;method:string;limits:string[];model:{title:string;actors:string[];actions:string[][];payoffs:number[][][];assumptions:string};responses:number[][];equilibria:{first:number;responses:number[];outcome:number[];payoffs:number[]}[]};
 const fail=():never=>{throw new Error('El árbol recibido no cumple el contrato esperado.');};
 const str=(v:unknown):string=>typeof v==='string'?v:fail();
 const num=(v:unknown):number=>typeof v==='number'&&Number.isFinite(v)?v:fail();
 const index=(v:unknown):number=>v===0||v===1?v:fail();
 function list<T>(v:unknown,p:(x:unknown)=>T):T[]{return Array.isArray(v)?v.map(p):fail();}
 function sized<T>(v:unknown,n:number,p:(x:unknown)=>T):T[]{const a=list(v,p);return a.length===n?a:fail();}
-export function trees(v:unknown):TreeRecord[]{return list(v,x=>{const o=object(x),m=object(o.model);const equilibria=list(o.equilibria,x=>{const e=object(x);return {first:index(e.first),responses:sized(e.responses,2,index),outcome:sized(e.outcome,2,index),payoffs:sized(e.payoffs,2,num)};});if(!equilibria.length)fail();return {id:str(o.id),calculated_at:str(o.calculated_at),method:str(o.method),limits:list(o.limits,str),model:{title:str(m.title),actors:sized(m.actors,2,str),actions:sized(m.actions,3,x=>sized(x,2,str)),payoffs:sized(m.payoffs,2,x=>sized(x,2,y=>sized(y,2,num))),assumptions:str(m.assumptions)},responses:sized(o.responses,2,x=>list(x,index)),equilibria};});}
+export function trees(v:unknown):TreeRecord[]{return list(v,x=>{const o=object(x),m=object(o.model);const equilibria=list(o.equilibria,x=>{const e=object(x);return {first:index(e.first),responses:sized(e.responses,2,index),outcome:sized(e.outcome,2,index),payoffs:sized(e.payoffs,2,num)};});if(!equilibria.length)fail();return {...(o.workflow?{workflow:(()=>{const w=object(o.workflow);return {id:str(w.id),title:str(w.title),revision:num(w.revision)};})()}:{}),id:str(o.id),calculated_at:str(o.calculated_at),method:str(o.method),limits:list(o.limits,str),model:{title:str(m.title),actors:sized(m.actors,2,str),actions:sized(m.actions,3,x=>sized(x,2,str)),payoffs:sized(m.payoffs,2,x=>sized(x,2,y=>sized(y,2,num))),assumptions:str(m.assumptions)},responses:sized(o.responses,2,x=>list(x,index)),equilibria};});}
 // This adapter displays saved Python results; it never solves the game.
 export function treeGraph(t:TreeRecord,choice:number|null){
  const paths=choice===null?t.equilibria:[t.equilibria[choice]];

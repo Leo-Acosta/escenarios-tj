@@ -11,6 +11,19 @@ from escenarios.server import Handler
 
 
 class ApiTests(unittest.TestCase):
+    def test_sequential_case_link_and_filter(self):
+        from test_sequential import MODEL
+        def post(route,payload):
+            with urlopen(Request(self.base+route,data=json.dumps(payload).encode(),headers={'Content-Type':'application/json','Origin':self.base})) as response:return json.load(response)
+        case=post('/api/workflows',{'action':'create','title':'Expediente de árbol','description':'Contexto para un árbol vinculado.'})
+        saved=post('/api/sequential',{**MODEL,'save':True,'reviewed':True,'workflow_id':case['id']})
+        self.assertEqual(saved['workflow']['title'],case['title'])
+        with urlopen(self.base+'/api/sequential?workflow_id='+case['id']) as response:self.assertEqual([x['id'] for x in json.load(response)],[saved['id']])
+        with self.assertRaises(HTTPError) as error:post('/api/sequential',{**MODEL,'save':True,'reviewed':True,'workflow_id':'missing'})
+        self.assertEqual(error.exception.code,404)
+        with self.assertRaises(HTTPError) as error:urlopen(self.base+'/api/sequential?workflow_id=missing')
+        self.assertEqual(error.exception.code,404)
+
     @classmethod
     def setUpClass(cls):
         cls.directory = tempfile.TemporaryDirectory()

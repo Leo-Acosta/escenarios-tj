@@ -19,3 +19,13 @@ El laboratorio permite crear árboles vacíos o copiar el modelo de una versión
 Validación del incremento: 16 pruebas frontend, 5 secuenciales y 13 API aprobadas; compilación correcta. En navegador, sobre data/qa-react-tree-editor.sqlite3 y puerto 8767, se rechazó un pago vacío y se comprobó que corregirlo desactiva guardar hasta renovar la revisión. El guardado produjo dos UUID distintos; el pago original quedó en 2 y la versión nueva en 4. La base principal no recibió escrituras de prueba.
 
 Fase 2 en curso: creación, revisión, cálculo y consulta de árboles incorporados a React. Pendientes la integración con expedientes y otros laboratorios, y los demás gráficos de fase 4.
+
+## Árboles vinculados a expedientes
+
+Desde el Centro de análisis, Árboles de este expediente abre el laboratorio filtrado. El selector permite volver a todos los árboles, incluidos los históricos sin vínculo. El editor ofrece expediente vinculado o sin expediente. Python valida su existencia y guarda una referencia congelada con ID, título y revisión. La consulta filtrada aplica el límite de 30 después de filtrar, por lo que encuentra versiones anteriores a los últimos 30 árboles globales. No se altera el esquema SQLite ni se reasignan registros anteriores.
+
+El botón Abrir expediente vinculado vuelve a su editor actual; la referencia histórica se distingue de ese estado actual. Esta relación identifica el caso, pero no implica que el árbol se derive automáticamente de una versión de su matriz. El PDF existente continúa mostrando el informe individual del árbol; la referencia al expediente y el informe unificado aún no se han incorporado al PDF.
+
+Validación: 17 pruebas frontend, 7 del motor secuencial y 14 API aprobadas, compilación correcta. Pruebas cubren expediente inexistente, compatibilidad histórica, filtrado previo al límite y conservación de la revisión al cambiar el caso. En navegador sobre base aislada se verificaron navegación de ida y vuelta, guardado vinculado y visualización de dos versiones del caso. La base principal no recibió escrituras de prueba. Captura: output/screenshots/arbol-expediente-vinculado.png.
+
+Fase 2 en curso: primer vínculo entre laboratorio y expediente. Pendientes la integración de los restantes laboratorios y el informe unificado de fase 6.

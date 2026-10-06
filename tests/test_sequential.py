@@ -29,3 +29,27 @@ class SequentialTests(unittest.TestCase):
             rows=history(path)
             self.assertEqual(rows[1]['model']['title'],'Entrada')
             self.assertNotEqual(first['id'],second['id'])
+
+    def test_case_link_is_validated_and_frozen(self):
+        from escenarios.workflow import operate,NotFound
+        with tempfile.TemporaryDirectory() as directory:
+            path=Path(directory)/'db.sqlite3'
+            case=operate(path,{'action':'create','title':'Caso vinculado','description':'Descripción del caso estratégico.'})
+            linked=save(path,analyze(MODEL),case['id'])
+            save(path,analyze(MODEL))
+            self.assertEqual(history(path,case['id']),[linked])
+            self.assertEqual(linked['workflow'],{'id':case['id'],'title':case['title'],'revision':1})
+            operate(path,{'action':'message','id':case['id'],'revision':1,'text':'Nuevo objetivo del expediente.'})
+            self.assertEqual(history(path,case['id'])[0]['workflow']['revision'],1)
+            with self.assertRaises(NotFound):save(path,analyze(MODEL),'missing')
+            self.assertEqual(len(history(path)),2)
+
+    def test_case_filter_precedes_thirty_record_limit(self):
+        from escenarios.workflow import operate
+        with tempfile.TemporaryDirectory() as directory:
+            path=Path(directory)/'db.sqlite3'
+            case=operate(path,{'action':'create','title':'Caso antiguo','description':'Descripción de un caso estratégico.'})
+            linked=save(path,analyze(MODEL),case['id'])
+            for _ in range(31):save(path,analyze(MODEL))
+            self.assertNotIn(linked,history(path))
+            self.assertEqual(history(path,case['id']),[linked])

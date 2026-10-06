@@ -50,3 +50,5 @@ La fase 1 incorporó la consulta. La fase 2 está en curso: agregó edición, c�
 El laboratorio React consulta árboles conservados con React Flow, selección de nodos, rutas y planes completos. La fase 2 sigue en curso; este incremento inicia la base visual de árboles de la fase 4, sin completar esa fase. Ver `ARBOLES-REACT-VERIFICACION.md`.
 
 La fase 2 incorpora también creación y edición de árboles como nuevas versiones desde React, con revisión obligatoria y guardado a través del núcleo Python. Los borradores de árboles aún no se autoguardan.
+
+Los árboles pueden vincularse a expedientes con referencia histórica (ID, título, revisión) dentro de su payload JSON. GET /api/sequential?workflow_id=ID filtra antes del límite de 30 registros. La asociación se valida en Python y conserva la compatibilidad con árboles independientes. No constituye un informe ejecutivo unificado ni una derivación automática desde la matriz.

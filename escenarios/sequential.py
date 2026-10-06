@@ -49,15 +49,21 @@ def connect(path):
     return db
 
 
-def save(path,result):
+def save(path,result,workflow_id=None):
     record={**result,'id':str(uuid4())}
+    if workflow_id is not None and workflow_id != '':
+        from .workflow import get_workflow
+        case=get_workflow(path,workflow_id)
+        record['workflow']={k:case[k] for k in ('id','title','revision')}
     with closing(connect(path)) as db,db:
         db.execute('INSERT INTO sequential_versions VALUES (?,?)',(record['id'],json.dumps(record,ensure_ascii=False,allow_nan=False)))
     return record
 
 
-def history(path):
+def history(path,workflow_id=None):
     with closing(connect(path)) as db:
+        if workflow_id:
+            return [json.loads(row[0]) for row in db.execute("SELECT payload FROM sequential_versions WHERE json_extract(payload,'$.workflow.id')=? ORDER BY rowid DESC LIMIT 30",(workflow_id,))]
         return [json.loads(row[0]) for row in db.execute('SELECT payload FROM sequential_versions ORDER BY rowid DESC LIMIT 30')]
 
 

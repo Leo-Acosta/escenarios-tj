@@ -99,7 +99,12 @@ class Handler(BaseHTTPRequestHandler):
         if url.path == '/api/agents':
             return self.send(200,agents.history(DB))
         if url.path == '/api/sequential':
-            return self.send(200,sequential.history(DB))
+            identity=parse_qs(url.query).get('workflow_id',[''])[0]
+            if identity:
+                try:get_workflow(DB,identity)
+                except NotFound as error:return self.send(404,{'error':str(error)})
+                except ValueError as error:return self.send(400,{'error':str(error)})
+            return self.send(200,sequential.history(DB,identity))
         if url.path == '/api/ai/status':
             return self.send(200,local_ai.status(DB))
         if url.path == '/api/ai/jobs':
@@ -212,7 +217,8 @@ class Handler(BaseHTTPRequestHandler):
                 if payload.get('simulation') is not None:result['simulation']=simulation.simulate(result['model'],payload['simulation'])
                 if payload.get('save') is True:
                     if payload.get('reviewed') is not True:raise ValueError('Confirmá la revisión antes de guardar.')
-                    result=sequential.save(DB,result)
+                    try:result=sequential.save(DB,result,payload.get('workflow_id'))
+                    except NotFound as error:return self.send(404,{'error':str(error)})
                 return self.send(200,result)
             if self.path in ('/api/ai/config','/api/ai/jobs'):
                 try:
