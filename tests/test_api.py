@@ -11,6 +11,27 @@ from escenarios.server import Handler
 
 
 class ApiTests(unittest.TestCase):
+    def test_prediction_routes_preserve_forecasts_and_reject_unobserved_evaluation(self):
+        from datetime import datetime,timezone,timedelta
+        def post(route,payload):
+            with urlopen(Request(self.base+route,data=json.dumps(payload).encode(),headers={'Content-Type':'application/json','Origin':self.base})) as response:return json.load(response)
+        payload={'event':'api-prospectivo','target':'Respuesta documentada','deadline':(datetime.now(timezone.utc)+timedelta(days=1)).isoformat(),
+            'candidate_probability':.6,'baseline_probability':.5,'candidate_ref':'api-v1','baseline_ref':'regla-v1'}
+        saved=post('/api/predictions/forecast',payload)
+        with urlopen(self.base+'/api/predictions') as response:self.assertIn(saved,json.load(response)['events'])
+        for route,data in [('/api/predictions/forecast',payload),('/api/predictions/evaluate',payload),('/api/predictions/observe',{'event':payload['event'],'outcome':1,'source':'Prueba'})]:
+            with self.assertRaises(HTTPError) as error:post(route,data)
+            self.assertEqual(error.exception.code,400)
+        with self.assertRaises(HTTPError) as error:urlopen(self.base+'/api/predictions/replay?id=missing')
+        self.assertEqual(error.exception.code,400)
+
+    def test_review_rejects_stale_case_revision(self):
+        def post(route,payload):
+            with urlopen(Request(self.base+route,data=json.dumps(payload).encode(),headers={'Content-Type':'application/json','Origin':self.base})) as response:return json.load(response)
+        saved=post('/api/workflows',{'action':'create','title':'Revisión agentes','description':'Contexto hipotético para revisar con agentes.'})
+        with self.assertRaises(HTTPError) as error:post('/api/ai/reviews',{'id':saved['id'],'revision':saved['revision']+1})
+        self.assertEqual(error.exception.code,409)
+
     def test_network_version_routes_preserve_reviewed_graph(self):
         def post(route,payload):
             with urlopen(Request(self.base+route,data=json.dumps(payload).encode(),headers={'Content-Type':'application/json','Origin':self.base})) as response:return json.load(response)

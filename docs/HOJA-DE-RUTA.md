@@ -12,7 +12,7 @@ Estado al 7 de octubre de 2026. Arquitectura local: núcleo Python, SQLite e int
 | 4 · Gráficos avanzados | Árboles, redes, vectores y sensibilidad enlazados a versiones, con filtros y exportación | Base de árboles/redes/reproducción implementada; ampliación pendiente |
 | 5 · Continuidad de datos | Autoguardado de borradores, respaldo, restauración y migraciones | Versiones y protección de descarte implementadas; autoguardado y recuperación pendientes |
 | 6 · Informe ejecutivo unificado | Un documento que reúna matriz y laboratorios desde referencias congeladas | PDF individuales disponibles; unificación pendiente |
-| 7–8 · Motor y evaluación | Ampliación matemática y contrastación contra datos observados | Pendiente; sin promesa de predicción validada |
+| 7–8 · Motor y evaluación | Ampliación matemática y contrastación contra datos observados | Primer bloque de analista/crítico local, controles Python y evaluación prospectiva implementado; agentes de decisión, optimizador y validación empírica pendientes |
 | 9–10 · Distribución y calidad | Instalación Windows, funcionamiento offline, rendimiento y validación integral | Pendiente |
 
 ## Próximo bloque funcional

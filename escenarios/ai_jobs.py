@@ -67,9 +67,14 @@ def start(path,payload):
 def worker(path,workflow,value):
     global RUNNING
     try:
-        value['result']=(local_ai.propose_tree(path,workflow) if value.get('kind')=='sequential' else local_ai.propose(path,workflow));value['state']='ready'
+        if value.get('kind')=='review':
+            from .review_agents import run
+            value['result']=run(path,workflow)
+        else:value['result']=(local_ai.propose_tree(path,workflow) if value.get('kind')=='sequential' else local_ai.propose(path,workflow))
+        value['state']='ready'
     except local_ai.AIError as error:
         value['state']='failed';value['error']=str(error)
+        if hasattr(error,'trace'):value['failure_trace']=error.trace
     except Exception:
         value['state']='failed';value['error']='No se pudo generar la propuesta. El modo guiado sigue disponible.'
     finally:
@@ -121,3 +126,19 @@ def apply_tree(path,payload):
     if job['base_fingerprint']!=fingerprint(snapshot):raise Conflict('El árbol o su descripción cambió. Generá una propuesta nueva.')
     model=snapshot['model'];proposal=provenance['proposal'];model['actors']=proposal['actors'];model['actions']=proposal['actions']
     return {'model':model,'ai_proposal':provenance}
+
+
+def start_review(path,payload):
+    global RUNNING
+    workflow=get_workflow(path,payload['id'])
+    if type(payload.get('revision')) is not int or workflow['revision']!=payload['revision']:raise Conflict('El expediente cambió; recargalo antes de revisar.')
+    with LOCK:
+        if RUNNING:raise Conflict('Ya hay una generación local en curso.')
+        RUNNING=True
+    value={'id':str(uuid4()),'workflow_id':'review:'+workflow['id'],'kind':'review','base_revision':workflow['revision'],'input_snapshot':workflow,'created_at':now(),'state':'running','result':None,'error':None}
+    try:
+        store(path,value);threading.Thread(target=worker,args=(path,workflow,value),daemon=True).start()
+    except Exception:
+        with LOCK:RUNNING=False
+        raise
+    return value
