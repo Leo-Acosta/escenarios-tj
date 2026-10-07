@@ -1,5 +1,11 @@
 # Interfaz experimental · blanco y oliva
 
+## Paleta vigente: blanco y azul marino
+
+Por solicitud del usuario, la identidad vigente reemplaza oliva por azul marino (`#19365a`), blanco y azules suaves. Se aplica tanto al Centro React `/app/` como a la Mesa estratégica original `/`, incluyendo conversación, controles, etapas y navegación. Las etiquetas y trazos principales del observatorio acompañan la nueva paleta. Las exportaciones PDF conservan su diseño independiente.
+
+Verificación de esta modificación: compilación TypeScript/Vite y 61 pruebas frontend correctas. En la Mesa estratégica, los estilos computados muestran fondo `rgb(243,246,250)`, acento `#19365a` y mensajes del analista `rgb(232,240,250)`. El expediente y conversación existentes se recuperan de SQLite. Al intentar calcular sin revisión, la aplicación bloquea la operación con «Confirmá la revisión de pagos y supuestos antes de calcular». No se guardaron versiones ni se ejecutó inferencia para comprobar la paleta. La inspección visual completa y los límites ya documentados siguen pendientes.
+
 ## Segunda composición visual
 
 La revisión del 7 de octubre incorpora una portada estratégica con mapa de navegación SVG y accesos a árboles, redes, simulaciones y evaluación. Es navegación, no una red calculada del caso. Muestra el expediente y el número real de versiones calculadas, con una acción distinta cuando el modelo todavía está en preparación. La tipografía, espaciado, tarjetas y controles se ajustan en `premium.css`.
