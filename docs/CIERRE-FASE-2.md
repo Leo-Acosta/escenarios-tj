@@ -33,3 +33,11 @@ El editor permite consultar y recuperar los últimos cinco trabajos secuenciales
 Verificación: 43 pruebas frontend, compilación correcta y 4 pruebas Python de IA secuencial. En navegador/base aislada se recuperó el trabajo QA 80471b0b-b89b-493c-968c-a8d9ce27aca2 desde otra sesión del editor y se consultó su procedencia. No se solicitó otra generación ni se modificaron pagos. El seguimiento de trabajos usa el mismo mecanismo de consulta existente; no se certifica una nueva generación real en este avance.
 
 Para cerrar fase 2 aún deben completarse las pruebas de descarte y conflictos de formularios, pantalla estrecha e impresión paginada. La recuperación automática de borradores corresponde a fase 5.
+
+## Descarte de borradores · diálogo integrado
+
+La navegación principal y la apertura de expedientes vinculados usan un diálogo modal de la aplicación, con nombre/descripción accesibles y foco inicial en Seguir editando. Escape cancela la salida. Solo Descartar y continuar cambia la sección/contexto y retira la protección; pulsar la sección actual no descarta el borrador. Las versiones SQLite no se modifican.
+
+Verificación en navegador/base aislada: título de un nuevo expediente introducido, clic en la sección actual, intento de navegar a laboratorios, diálogo visible con foco en Seguir editando, cancelación con título conservado y posterior descarte explícito con llegada a laboratorios. Esta evidencia reemplaza la prueba inconclusa del diálogo nativo de navegación principal. Los diálogos internos de árboles/redes/laboratorios y el manejo visual de conflicto siguen requiriendo recorrido específico.
+
+El ajuste de viewport del navegador volvió a devolver un ancho efectivo de 749 px aunque se solicitó 390 px. No se certifica todavía el tamaño estrecho. Quedan pendientes pantalla estrecha e impresión paginada; fase 2 abierta.
