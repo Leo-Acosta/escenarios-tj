@@ -49,3 +49,11 @@ El ajuste de viewport del navegador volvió a devolver un ancho efectivo de 749 
 Evidencia del navegador sobre data/qa-phase2-dialogs.sqlite3: configuración de 17 rondas conservada al cancelar cambio a comparador y reiniciada a 50 tras confirmar; título Árbol local QA conservado al cancelar y borrador cerrado al confirmar; título Red local QA conservado al cancelar y edición cerrada al confirmar. Conflicto real: revisión 7 abierta, revisión 8 escrita en la base aislada, guardar desde el editor recibió 409. Título local conservado después de cancelar recarga; confirmación cargó Título cambiado en otra sesión QA y mostró revisión 8. La versión calculada original permaneció conservada. No se modificó la base principal.
 
 Validación: 43 pruebas frontend y compilación de producción correctas. Para cerrar fase 2 quedan dos verificaciones visuales: tamaño estrecho efectivo e impresión paginada. Los recorridos de descarte y conflicto ya cuentan con evidencia de navegador.
+
+## Pantalla estrecha comprobada y correcciones de impresión
+
+Para evitar el ajuste de viewport que no se aplicaba en el navegador integrado, se cargó la aplicación en un iframe local de prueba de 390 px. El documento interno tuvo 360 px útiles. Centro, editor y comparador conservaron scrollWidth de 360 px: sin desbordamiento horizontal de página. En el comparador, la tabla tuvo 770 px de contenido dentro de 281 px visibles; el desplazamiento se mantuvo dentro del contenedor. El marco fue un archivo temporal en dist, no una función publicada de la aplicación. No certifica todos los dispositivos.
+
+Impresión corregida: las etiquetas de planes de equilibrio vuelven a ser visibles; el árbol imprime si el gráfico muestra modelo base o una muestra Monte Carlo y aclara que las tablas conservan el modelo base. Se define A4 con márgenes de 15 mm, encabezados de tabla repetibles, títulos unidos al contenido siguiente y listas de red sin recorte por altura. Se mantienen alcance y procedencia.
+
+Validación: 43 pruebas frontend y compilación correctas. La inspección de CSS y la comprobación estrecha no sustituyen una prueba de impresión paginada. Falta esa verificación visual para cerrar fase 2; no se declara finalizada. El informe unificado de fase 6 permanece fuera de este bloque.
