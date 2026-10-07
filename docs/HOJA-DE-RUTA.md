@@ -29,3 +29,7 @@ Crear y editar expedientes guiados, calcular y consultar matrices 2×2, comparar
 ## Criterios que siguen abiertos
 
 La impresión HTML necesita revisión visual paginada en un navegador que permita observar su salida. El visor PDF depende del navegador y mantiene descarga alternativa. Los escenarios complejos requieren ampliar las dimensiones actuales y las transformaciones de variables; el diccionario básico está implementado, y la IA no reemplaza la validación del modelo. La edición protege borradores frente a descartes, pero todavía no los recupera automáticamente después de un cierre inesperado. No hay fecha ni porcentaje de terminación global medidos.
+
+## Interfaz experimental
+
+Primera implementación blanca y oliva en React/TypeScript, con modo inmersivo y contexto trazable. Ver [alcance y verificación](INTERFAZ-EXPERIMENTAL.md). Este cambio visual no cierra la ampliación funcional de fase 4; revisión visual mediante captura pendiente por limitación del navegador.
