@@ -129,3 +129,21 @@ En el Centro de análisis, las tarjetas de matrices libres y versiones de expedi
 En `/app/`, Laboratorios del expediente permite ejecutar agentes, comparar políticas y explorar incentivos desde una versión calculada. Los análisis guardan su fuente y pueden filtrarse por expediente; incluye gráficos interactivos y PDF individuales. Ver [verificación](docs/LABORATORIOS-REACT-VERIFICACION.md). El informe ejecutivo unificado corresponde a la fase 6.
 
 El laboratorio React de árboles incluye sensibilidad Monte Carlo opcional, con configuración conservada, frecuencias de decisiones y consulta interactiva de hasta 20 muestras guardadas. Ver [verificación Monte Carlo](docs/MONTE-CARLO-REACT-VERIFICACION.md).
+
+### Comprobación de Ollama en este equipo
+
+En React, abrir **Asistente de IA local**. La configuración habilitada usa `mistral:latest` y el servicio local `http://127.0.0.1:11434`. Un modelo instalado distinto o con otro digest no se habilita automáticamente. La IA propone nombres, alternativas, variables y preguntas; los cálculos siguen en Python y aplicar exige revisión.
+
+Comprobar disponibilidad desde la raíz del proyecto:
+
+```powershell
+python scripts/check_ollama.py
+```
+
+Comprobar además una generación real con un caso hipotético aislado:
+
+```powershell
+python scripts/check_ollama.py --generate
+```
+
+La generación de prueba no modifica expedientes ni descarga modelos. Puede tardar varios minutos. El comando devuelve código 0 al completar la comprobación y código 1 si el motor no está listo o la propuesta no cumple el contrato. La aplicación conserva el modo guiado cuando Ollama está desconectado.
