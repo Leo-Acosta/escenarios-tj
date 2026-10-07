@@ -36,12 +36,20 @@ La herramienta de respaldo exige un destino nuevo; recuperación genera otro nom
 
 ## Verificación
 
-171 pruebas Python aprobadas. Las pruebas automatizadas cubren respaldo con WAL activo, migración idempotente con copia previa, rechazo de esquemas futuros/corrupción/objetos inesperados, recuperación sin alterar original, lectura idéntica de versiones congeladas y controles HTTP de origen y confirmación. Frontend: 64 pruebas, incluidos borradores incompletos, expedientes cruzados, formato futuro, corrupción y fallo de cuota.
+171 pruebas Python aprobadas. Las pruebas automatizadas cubren respaldo con WAL activo, migración idempotente con copia previa, rechazo de esquemas futuros/corrupción/objetos inesperados, recuperación sin alterar original, lectura idéntica de versiones congeladas y controles HTTP de origen y confirmación. Frontend: 67 pruebas, incluidos borradores incompletos, expedientes cruzados, formato futuro, corrupción y fallo de cuota.
 
 En navegador se comprobó crear un borrador sintético React sin crear expediente, salir/reabrir/recuperar sus campos y descartar su copia. En la Mesa estratégica se modificó el título de un expediente sintético, se reabrió en otra pestaña y se recuperó sin guardar SQLite; la confirmación nativa de limpieza encontró una limitación del navegador y no se confirmó el descarte final de esa copia de prueba. La interfaz de recuperación aceptó una base sintética de 36 KiB y creó una base separada, mostrando identificador, SHA256 e instrucciones de activación. La base activa siguió disponible. No se utilizó el caso EDESUR como fixture.
 
 La inspección visual mediante capturas sigue limitada por el navegador; no se acredita revisión móvil ni salida física de impresión. Tampoco se provocó un cierre abrupto del sistema operativo: se verificaron las rutas de almacenamiento y reapertura.
 
-## Cierre pendiente
+## Extensión a laboratorios (7 de octubre de 2026)
 
-Extender copias de recuperación a los formularios independientes de los laboratorios, probar revisión concurrente entre pestañas y completar revisión visual. No se afirma cierre integral de fase 5 ni un porcentaje global. Después corresponde preparación de distribución y calidad Windows (9–10); fase 6 ya está implementada y no se repite. La validación empírica de fase 8 permanece pendiente de observaciones independientes.
+La interfaz React protege parámetros de simulaciones de políticas, barridos, variables, informes, árboles, redes editables, baterías, decisiones IA y formularios de evaluación. Cada copia se identifica por módulo y expediente más versión, fuente o protocolo/candidato según corresponda. El registro predictivo histórico es global y se identifica como tal. Las revisiones y los identificadores de inferencia autorizada se excluyen. Recuperar exige una acción explícita y vuelve a desmarcar la revisión; no envía solicitudes de cálculo. Se conservan campos incompletos para continuar editando, sin convertirlos en resultados válidos.
+
+La Mesa estratégica también protege parámetros de agentes, comparador, barrido y árbol. Estas copias se vinculan a expediente y revisión y se retiran manualmente desde su panel; no se eliminan automáticamente al simular. La red React conserva entidades y relaciones, además de sus fuentes editables. Los formularios de adición de nodos de la red ilustrativa de la Mesa no conservan por separado su campo de entrada: para trabajo propio se usa el editor React de redes.
+
+Se probó también en la Mesa recuperar 37 rondas en otra pestaña, con revisión desmarcada y sin resultados nuevos. Se probó en dos pestañas nuevas la recuperación de una variable sintética; se recuperó el nombre y el guardado permaneció deshabilitado, con historial sin nuevos diccionarios. Pruebas automáticas cubren separación de versiones, estructura de campos, copias corruptas y exclusión de revisiones anidadas. TypeScript y build Vite aprobados. Los 171 tests Python corresponden al bloque previo: este cambio no modifica el núcleo Python.
+
+## Estado y límites de cierre
+
+Implementación de continuidad ampliada a los laboratorios. La aceptación exhaustiva sigue abierta: falta recorrer cada formulario con recuperación y guardado, validar ventanas concurrentes con escrituras simultáneas y completar revisión móvil/impresión. Las notificaciones entre pestañas son preventivas; localStorage no ofrece una transacción entre ventanas y no garantiza ausencia de pérdida con escrituras simultáneas. Los respaldos SQLite siguen siendo la copia transportable. No se acredita cierre integral de calidad de fase 5 ni mejora predictiva real. Después corresponde distribución/calidad Windows (9–10); fase 6 no se repite y fase 8 sigue pendiente de observaciones independientes.
