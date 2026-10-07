@@ -4,7 +4,7 @@
 
 React y TypeScript en `frontend/` consumen la API local del servidor Python. Vite genera archivos estáticos en `frontend/dist/`, servidos por el mismo proceso en `/app/`. La interfaz previa permanece en `/`. SQLite y el motor matemático conservan sus esquemas y comportamiento; esta fase no requiere migración de datos.
 
-El Centro de análisis consulta expedientes, abre versiones inmutables y muestra pagos, equilibrios, utilidades esperadas, supuestos y límites recibidos del núcleo. La mesa del expediente permite crear casos, responder las cinco preguntas de preparación, editar el modelo y sus fuentes, guardar borradores y calcular nuevas versiones con revisión explícita. La biblioteca enlaza los PDF y CSV ya existentes. Las matrices de expediente pueden imprimirse desde el navegador; todavía no tienen un PDF ejecutivo propio. Los documentos de otros módulos pertenecen a sus versiones guardadas y no se vinculan automáticamente al expediente elegido.
+El Centro de análisis consulta expedientes, abre versiones inmutables y muestra pagos, equilibrios, utilidades esperadas, supuestos y límites recibidos del núcleo. La mesa del expediente permite crear casos, responder las cinco preguntas de preparación, editar el modelo y sus fuentes, guardar borradores y calcular nuevas versiones con revisión explícita. La biblioteca enlaza los PDF y CSV ya existentes. Las matrices de expediente pueden imprimirse desde el navegador y descargar un PDF individual de la versión seleccionada. Los documentos de otros módulos pertenecen a sus versiones guardadas y no se vinculan automáticamente al expediente elegido.
 
 Contratos TypeScript con validación en tiempo de ejecución: `/api/workflows`, `/api/workflows?id=…`, `/api/workflows?id=…&version=…` y `/api/library`. Solicitudes cancelables evitan que una respuesta tardía sustituya la selección actual. Hay estados de carga, vacío, error y reintento. No se calculan utilidades en JavaScript.
 
@@ -59,7 +59,7 @@ La sensibilidad Monte Carlo de árboles ya se configura, guarda y consulta desde
 
 La reproducción de agentes permite recorrer automáticamente rondas conservadas, con pausa, velocidad y navegación por teclado. Ver REPRODUCCION-AGENTES-REACT.md. Fase 2 en curso.
 
-React incorpora consulta de la red global guardada, búsqueda, filtros y detalle de entidades y vínculos. Todavía sin edición, versiones ni asociación a expedientes. Ver REDES-REACT-VERIFICACION.md.
+React incorpora consulta de la red global guardada, búsqueda, filtros y detalle de entidades y vínculos. La consulta se amplió posteriormente con edición, versiones y asociación a expedientes. Ver REDES-REACT-VERIFICACION.md.
 
 Las redes ahora se conservan como versiones con expediente opcional y contexto histórico (ID, título, revisión). El editor global previo no se modifica; sus cambios no alteran las copias guardadas. Ver VERSIONES-REDES-REACT.md.
 
@@ -69,4 +69,4 @@ Las relaciones conservan evidencia opcional (fuente, referencia y nota) en cada 
 
 El asistente de IA local React integra disponibilidad, configuración, propuestas de expediente en segundo plano y aplicación revisada al borrador, protegida por revisión histórica. Ver IA-LOCAL-REACT.md. La asistencia de árboles también está integrada en el editor React: ver IA-ARBOLES-REACT.md.
 
-Estado de cierre de fase 2: CIERRE-FASE-2.md. Pendientes dos bloques: reproducción detallada de comparaciones y revisión integral de flujos.
+Estado de cierre de fase 2: CIERRE-FASE-2.md. Reproducción de comparaciones y recorridos de borradores/conflictos verificados. Pendiente la comprobación de impresión paginada HTML; los PDF individuales cuentan con verificaciones propias. Plan completo actualizado: HOJA-DE-RUTA.md.

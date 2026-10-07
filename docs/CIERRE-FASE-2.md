@@ -65,3 +65,9 @@ El Centro de análisis descarga un PDF de la versión de matriz seleccionada med
 Muestra output/pdf/informe-matriz-conservada.pdf generada desde la versión 1 de la base aislada, cuyo borrador actual ya tenía otro título. Dos páginas A4 renderizadas e inspeccionadas: títulos, tablas, pies y numeración legibles, sin cortes ni superposiciones. En navegador se verificó el enlace a versión 3 del expediente principal. 43 pruebas frontend, compilación y 17 pruebas API correctas; la API rechaza referencias inválidas y expedientes inexistentes. Servidor local actualizado.
 
 Esta verificación acredita el PDF generado por Python, no la función Imprimir vista del navegador. El navegador integrado no expone una herramienta de exportación/captura de su impresión paginada. La fase 2 sigue abierta por esa comprobación específica; no debe confundirse la salida PDF individual ya verificada con la impresión HTML pendiente.
+
+## Vista previa de informes individuales
+
+El Centro de análisis, el laboratorio de árboles, los laboratorios de agentes/comparaciones/incentivos y la biblioteca ofrecen Vista previa PDF en un diálogo amplio. Conserva título y referencia del documento, permite descargar y cerrar o usar Escape; el iframe utiliza el visor PDF del navegador sin proveedores remotos ni dependencias nuevas. Si el navegador no puede mostrar PDF, la descarga sigue disponible. No reúne documentos ni genera un informe unificado.
+
+43 pruebas frontend y compilación correctas. Navegador: apertura de la matriz versión 3, URL del documento correcta y cierre con regreso al análisis comprobados. La captura de pantalla del visor no estuvo disponible; no se certifica su representación visual en el navegador integrado ni la impresión HTML. Fase 2 sigue abierta por esa comprobación pendiente. Ver HOJA-DE-RUTA.md para el siguiente orden de trabajo.
