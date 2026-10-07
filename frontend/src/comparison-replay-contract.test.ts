@@ -1,0 +1,11 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {comparisonReplay} from './comparison-replay-contract.ts';
+import {laboratory} from './laboratory-contract.ts';
+const model={title:'Caso',actors:['A','B'],strategies:[['A1','A2'],['B1','B2']],a:[[3,0],[5,1]],b:[[3,5],[0,1]],p:.5,q:.6};
+const cell={i:0,j:1,policies:['fixed0','fixed1'],statistics:[{mean:0,std:0,min:0,max:0},{mean:5,std:0,min:5,max:5}]};
+const record=laboratory({id:'comparison',created_at:'2026-10-07',model,options:{rounds:1,noise:0},seeds:[42,43],cells:[cell],assumptions:'Supuestos',limits:[]},'comparison');
+const response={id:null,created_at:'2026-10-07',engine:'repeated-agents-v1',model,options:{rounds:1,noise:0,seed:43,policies:cell.policies},comparison_source:{id:record.id,i:0,j:1,trial:1},rounds:[{round:1,actions:[0,1],payments:[0,5],totals:[0,5],reasons:['Fija A','Fija B']}],assumptions:'Supuestos',limits:[]};
+test('retains reconstructed Python outcomes with exact comparison reference',()=>{assert.deepEqual(comparisonReplay(response,record,cell,1).rounds,response.rounds);});
+test('rejects mismatched source, seed, policies and matrix',()=>{for(const patch of [{comparison_source:{...response.comparison_source,id:'other'}},{options:{...response.options,seed:42}},{options:{...response.options,policies:['random','random']}},{model:{...model,p:.7}}])assert.throws(()=>comparisonReplay({...response,...patch},record,cell,1));});
+test('rejects invalid round sequence and unavailable seed',()=>{assert.throws(()=>comparisonReplay({...response,rounds:[{...response.rounds[0],round:2}]},record,cell,1));assert.throws(()=>comparisonReplay(response,{...record,seeds:undefined},cell,1));});

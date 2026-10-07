@@ -1,6 +1,6 @@
 import React,{useEffect,useState} from 'react';
 
-export default function AgentReplay({index,count,onChange}:{index:number;count:number;onChange:(index:number)=>void}){
+export default function AgentReplay({index,count,onChange,description="Recorrido de las decisiones conservadas. La reproducción no ejecuta una nueva simulación."}:{index:number;count:number;onChange:(index:number)=>void;description?:string}){
  const [playing,setPlaying]=useState(false),[delay,setDelay]=useState(1000);
  useEffect(()=>{
   const pause=()=>setPlaying(false);
@@ -18,7 +18,7 @@ export default function AgentReplay({index,count,onChange}:{index:number;count:n
  function seek(next:number){setPlaying(false);onChange(next);}
  return <section className="agent-replay" aria-label="Reproducción de agentes">
   <div className="title-row"><h3>Reproducir la interacción</h3><span className="badge">Ronda {index+1} / {count}</span></div>
-  <p className="muted">Recorrido de las decisiones conservadas. La reproducción no ejecuta una nueva simulación.</p>
+  <p className="muted">{description}</p>
   <div className="replay-controls">
    <button className="secondary" onClick={()=>seek(0)} disabled={index===0&&!playing}>Volver al inicio</button>
    <button className="secondary" onClick={()=>seek(index-1)} disabled={index===0}>Ronda anterior</button>
