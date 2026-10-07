@@ -52,7 +52,20 @@ def content(record):
         k=s['kind'];r=s['record'];body=r.get('payload',r)
         title=LABELS[k]+' / '+s['id'][:8]
         c=chapter(title,[source_note(s)])
-        if k=='tree':
+        if k=='variables':
+            evidence_labels={'synthetic':'Sintético','assumed':'Supuesto','documented_declared':'Documentación declarada','pending':'Pendiente'}
+            type_labels={'number':'Número','category':'Categoría','boolean':'Booleano'}
+            def target_label(target):
+                model=body['matrix']['model']
+                if target=='context':return 'Contexto'
+                if target in ('p','q'):return 'Proporción de estrategia 1 de '+model['actors'][0 if target=='p' else 1]
+                return 'Pago '+model['actors'][0 if target[0]=='a' else 1]+': '+model['strategies'][0][int(target[2])]+' / '+model['strategies'][1][int(target[4])]
+            c['paragraphs']+=body['limits']
+            c['tables'].append(table(['Variable / tipo','Valor / unidad','Vínculo / intervalo','Evidencia'],
+                [[v['name']+' / '+type_labels[v['type']],('Sí' if v['value'] is True else 'No' if v['value'] is False else NUMERIC(v['value']))+' / '+v['unit'],
+                  target_label(v['target'])+' / '+(' a '.join(NUMERIC(x) for x in v['interval']) if v['interval'] is not None else 'Sin intervalo'),evidence_labels[v['evidence']]] for v in body['variables']]))
+            c['tables'].append(table(['Variable','Fuente declarada','Incertidumbre'],[[v['name'],v['source'],v['uncertainty']] for v in body['variables']]))
+        elif k=='tree':
             t=r['model'];c['paragraphs']+=['Modelo secuencial independiente, vinculado al expediente; no hereda automáticamente la matriz simultánea.',
                                          'Información perfecta: B observa la decisión de A. Supuestos: '+t['assumptions']]
             c['charts'].append({'type':'tree','title':'Árbol y pagos por desenlace','model':t})

@@ -5,15 +5,15 @@ import tempfile
 from contextlib import closing
 from pathlib import Path
 from uuid import uuid4
-from . import agents, comparisons, payoff_sweep, sequential, simulation, research, decision_agents as decisions
+from . import agents, comparisons, payoff_sweep, sequential, simulation, research, variables, decision_agents as decisions
 from .case_model import analyze_case
 from .workflow import get_version, get_workflow, now
 
 LABELS = {'matrix':'Matriz estratégica', 'tree':'Árbol decisorio', 'simulation':'Monte Carlo',
           'agents':'Agentes con memoria', 'comparison':'Comparación de políticas',
-          'sweep':'Sensibilidad de incentivos', 'decision':'Decisiones de IA local', 'benchmark':'Batería de agentes IA', 'evaluation':'Evaluación predictiva'}
+          'sweep':'Sensibilidad de incentivos', 'decision':'Decisiones de IA local', 'benchmark':'Batería de agentes IA', 'evaluation':'Evaluación predictiva', 'variables':'Variables y unidades'}
 TABLES = {'tree':'sequential_versions', 'agents':'agent_runs', 'comparison':'agent_comparisons',
-          'sweep':'payoff_sweeps', 'decision':'decision_comparisons', 'benchmark':'decision_benchmarks', 'evaluation':'research_records'}
+          'sweep':'payoff_sweeps', 'decision':'decision_comparisons', 'benchmark':'decision_benchmarks', 'evaluation':'research_records', 'variables':'variable_versions'}
 LIMITS = ['Documento exploratorio condicionado a modelos y supuestos; no garantiza predicciones ni éxito judicial.',
           'Los documentos y hechos son declarados por el analista; su autenticidad exige revisión externa.',
           'SHA-256 identifica contenido, no es una firma ni acredita veracidad.',
@@ -42,7 +42,7 @@ def _sources(path,kind):
 
 def scope(kind,record):
     if kind=='evaluation':return record['payload']['protocol']['payload']['workflow']
-    if kind in ('decision','benchmark'):return record['payload'].get('workflow',{})
+    if kind in ('decision','benchmark','variables'):return record['payload'].get('workflow',{})
     return record.get('workflow',{})
 
 def compatible(kind,record,workflow_id,version):
@@ -56,16 +56,18 @@ def catalog(path,workflow_id,version):
         for record in _sources(path,kind):
             if not compatible(kind,record,workflow_id,version):continue
             body=record.get('payload',record)
-            title=body.get('model',{}).get('title') or (body['candidate']['payload']['name'] if kind=='evaluation' else kind)
+            title=body.get('model',{}).get('title') or (body['candidate']['payload']['name'] if kind=='evaluation' else 'Diccionario de '+str(len(body['variables']))+' variables' if kind=='variables' else kind)
             items.append({'kind':kind,'id':record['id'],'title':title,'created_at':record.get('created_at',record.get('calculated_at','')),
                           'label':LABELS[kind],'simulation':bool(record.get('simulation')),
-                          'evidence':body['result']['evidence'] if kind=='evaluation' else 'simulation_only'})
+                          'evidence':body['result']['evidence'] if kind=='evaluation' else 'variables_declared' if kind=='variables' else 'simulation_only'})
     return {'workflow_id':workflow_id,'version':version,'matrix':matrix,'items':items[:200],
             'total':len(items),'limits':LIMITS}
 
 def verify_source(kind,record):
     """Recalcular con motores originales; las decisiones IA se leen de sus trazas."""
-    if kind=='matrix':
+    if kind=='variables':
+        variables.verify(record);return
+    elif kind=='matrix':
         fresh=analyze_case(record['model']);keys=('model','pure','mixed','values_a','values_b','best_a')
     elif kind=='tree':
         fresh=sequential.analyze(record['model']);keys=('model','responses','equilibria','method','limits')
@@ -123,6 +125,7 @@ def create(path,payload):
         if key[0] in ('agents','comparison','sweep') and record['model']!=matrix['model']:raise ValueError('La matriz del laboratorio no coincide con la versión seleccionada.')
         if key[0] in ('decision','benchmark') and record['payload']['model']!=matrix['model']:raise ValueError('La matriz de la IA no coincide con la versión seleccionada.')
         if key[0]=='evaluation' and record['payload']['protocol']['payload']['snapshot']['model']!=matrix['model']:raise ValueError('La matriz del protocolo no coincide con la seleccionada.')
+        if key[0]=='variables' and record['payload']['matrix']!=matrix:raise ValueError('La matriz del diccionario no coincide con la seleccionada.')
         verify_source(key[0],record)
         picked.append({'kind':key[0],'id':key[1],'sha256':decisions.fingerprint(record),'record':record})
     verify_source('matrix',matrix)

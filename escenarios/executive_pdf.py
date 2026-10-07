@@ -65,7 +65,7 @@ def build_pdf(record):
             rows=[[p(v,'small') for v in t['headers']]]+[[p(v,'small') for v in row] for row in t['rows']]
             n=len(t['headers']);sizes=[width/n]*n
             if c['title']=='Trazabilidad y límites' and n==3:sizes=[width*.2,width*.32,width*.48]
-            table=Table(rows,colWidths=sizes,repeatRows=1,hAlign='LEFT')
+            table=Table(rows,colWidths=sizes,repeatRows=1,hAlign='LEFT',splitInRow=1)
             table.setStyle(TableStyle([('BACKGROUND',(0,0),(-1,0),colors.HexColor(PALE)),('VALIGN',(0,0),(-1,-1),'TOP'),
                                       ('TOPPADDING',(0,0),(-1,-1),8),('BOTTOMPADDING',(0,0),(-1,-1),8),
                                       ('LINEBELOW',(0,0),(-1,-1),.4,colors.HexColor('#cbdce3'))]))

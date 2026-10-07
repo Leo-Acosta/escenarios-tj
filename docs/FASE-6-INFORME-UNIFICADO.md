@@ -34,6 +34,8 @@ SHA-256 permite detectar cambios de contenido; no es una firma ni protege frente
 
 ## Límites operativos y pendientes externos
 
+La fase 3 agrega **Variables y unidades** como fuente opcional del mismo expediente y versión. Los informes existentes mantienen sus referencias originales; no se incorpora un diccionario automáticamente. Ver [guía de fase 3](FASE-3-VARIABLES.md).
+
 Hasta 16 fuentes complementarias por informe; catálogo de hasta 200 fuentes e historial de 50 informes por expediente. Ampliar paginación para volúmenes mayores. Modelos con las dimensiones que soportan los laboratorios existentes; no se amplían por generar el documento. La reproducibilidad del PDF se verifica en el mismo entorno de fuentes y dependencias, no se promete identidad binaria entre sistemas operativos diferentes.
 
 Se cierra la **implementación funcional de fase 6** para el alcance indicado. La revisión visual de impresión HTML queda como limitación de verificación, no como prueba superada. La validación empírica de fase 8 continúa abierta: faltan observaciones reales independientes; el ejemplo sintético no acredita mejora predictiva ni éxito judicial. No se creó información nueva del caso EDESUR. Recuperación de borradores, variables y distribución Windows corresponden a otras fases.

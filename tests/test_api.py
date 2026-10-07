@@ -11,6 +11,42 @@ from escenarios.server import Handler
 
 
 class ApiTests(unittest.TestCase):
+    def test_variable_dictionary_accepts_hundred_variables_with_long_unicode_sources(self):
+        from escenarios import server
+        from test_laboratories import prepare_case
+        case=prepare_case(server.DB)
+        items=[{'name':'Variable '+str(i),'type':'number','value':i,'unit':'puntos','target':'context',
+                'source':'á'*1000,'uncertainty':'é'*1000,'interval':None,'evidence':'synthetic'} for i in range(100)]
+        payload={'workflow_id':case['id'],'version':1,'variables':items,'reviewed':True}
+        data=json.dumps(payload,ensure_ascii=False).encode()
+        self.assertGreater(len(data),100000)
+        with urlopen(Request(self.base+'/api/variables',data=data,headers={'Content-Type':'application/json','Origin':self.base})) as response:
+            self.assertEqual(len(json.load(response)['payload']['variables']),100)
+
+    def test_variable_dictionary_http_report_export_and_replay(self):
+        from escenarios import server
+        from test_laboratories import prepare_case
+        case=prepare_case(server.DB)
+        item={'name':'Probabilidad supuesta B','type':'number','value':.6,'unit':'proporción',
+              'source':'Ensayo sintético HTTP','uncertainty':'Supuesto exploratorio','interval':[.4,.8],'target':'q','evidence':'synthetic'}
+        payload={'workflow_id':case['id'],'version':1,'variables':[item],'reviewed':True}
+        def post(route,data,origin=None):return urlopen(Request(self.base+route,data=json.dumps(data).encode(),headers={'Content-Type':'application/json','Origin':origin or self.base}))
+        for data in [{**payload,'reviewed':False},{**payload,'variables':[{**item,'value':.7}]}]:
+            with self.assertRaises(HTTPError) as error:post('/api/variables',data)
+            self.assertEqual(error.exception.code,400)
+        with self.assertRaises(HTTPError) as error:post('/api/variables',payload,'https://untrusted.example')
+        self.assertEqual(error.exception.code,403)
+        with post('/api/variables',payload) as response:r=json.load(response);self.assertEqual(response.status,201)
+        with urlopen(self.base+'/api/variables/history?workflow_id='+case['id']+'&version=1') as response:self.assertEqual(json.load(response)[0]['id'],r['id'])
+        with urlopen(self.base+'/api/variables/export?id='+r['id']) as response:self.assertEqual(json.load(response),r)
+        with post('/api/executive',{'workflow_id':case['id'],'version':1,'title':'Variables HTTP',
+                  'sections':['variables'],'references':[{'kind':'variables','id':r['id']}],
+                  'evidence_mode':'synthetic','reviewed':True}) as response:report=json.load(response)
+        with patch('escenarios.local_ai.request',side_effect=AssertionError('No inferir')):
+            for route,identity in [('variables',r['id']),('executive',report['id'])]:
+                with urlopen(self.base+'/api/'+route+'/replay?id='+identity) as response:self.assertTrue(json.load(response)['reproduced'])
+        with urlopen(self.base+'/api/executive/html?id='+report['id']) as response:self.assertIn('Ensayo sintético HTTP',response.read().decode())
+
     def test_unified_executive_full_http_creation_export_preview_and_reproduction(self):
         from escenarios import server,executive
         from test_executive import prepared

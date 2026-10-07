@@ -130,6 +130,8 @@ En `/app/`, Laboratorios del expediente permite ejecutar agentes, comparar polí
 
 **Informe ejecutivo** reúne matriz, árboles/Monte Carlo, agentes, comparaciones, incentivos y evaluación predictiva desde copias congeladas. Elegir expediente, versión, secciones, fuentes y clasificación de evidencia; revisar y conservar. Incluye resumen, fuentes, supuestos y límites, historial, previsualización A4, impresión, PDF vectorial y JSON completo. Reproducción sin una nueva inferencia. ReportLab es necesario para PDF; HTML permanece disponible. Ver [cierre y guía de fase 6](docs/FASE-6-INFORME-UNIFICADO.md), incluidos límites de volumen y verificación visual.
 
+**Variables y unidades** permite conservar diccionarios por expediente y versión de matriz: números, categorías y booleanos con unidad, fuente, evidencia, incertidumbre e intervalo opcional. Vínculos con p/q o pagos verifican el valor congelado; no modifican matrices ni convierten unidades automáticamente. Incluye historial, exportación JSON y reproducción sin IA. En el informe ejecutivo, seleccionar **Variables y unidades** para incorporar un diccionario congelado al HTML/PDF. Ver [cierre y guía de fase 3](docs/FASE-3-VARIABLES.md).
+
 El laboratorio React de árboles incluye sensibilidad Monte Carlo opcional, con configuración conservada, frecuencias de decisiones y consulta interactiva de hasta 20 muestras guardadas. Ver [verificación Monte Carlo](docs/MONTE-CARLO-REACT-VERIFICACION.md).
 
 ### Comprobación de Ollama en este equipo

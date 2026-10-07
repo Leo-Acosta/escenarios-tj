@@ -8,7 +8,7 @@ Estado al 7 de octubre de 2026. Arquitectura local: núcleo Python, SQLite e int
 |---|---|---|
 | 1 · Base premium | API local y frontend React/TypeScript | Implementada |
 | 2 · Experiencia integral | Expedientes, laboratorios, navegación y versiones | Funciones integradas; falta comprobar impresión HTML paginada |
-| 3 · Variables y unidades | Diccionario de variables con unidad, tipo, fuente, incertidumbre y vínculo explícito con el modelo | En curso: validación Python y conservación congelada; API, interfaz e informe pendientes |
+| 3 · Variables y unidades | Diccionario de variables con unidad, tipo, fuente, incertidumbre y vínculo explícito con el modelo | Cerrada en alcance definido: API, editor React, historial, JSON, reproducción e informe ejecutivo |
 | 4 · Gráficos avanzados | Árboles, redes, vectores y sensibilidad enlazados a versiones, con filtros y exportación | Base de árboles/redes/reproducción implementada; ampliación pendiente |
 | 5 · Continuidad de datos | Autoguardado de borradores, respaldo, restauración y migraciones | Versiones y protección de descarte implementadas; autoguardado y recuperación pendientes |
 | 6 · Informe ejecutivo unificado | Un documento que reúna matriz y laboratorios desde referencias congeladas | Cerrada en alcance funcional: selección, historial, A4, PDF vectorial, JSON y reproducción; verificación visual de impresión HTML limitada |
@@ -18,9 +18,9 @@ Estado al 7 de octubre de 2026. Arquitectura local: núcleo Python, SQLite e int
 
 ## Próximo bloque funcional
 
-Fase activa: [3 · variables y unidades](FASE-3-VARIABLES.md). Se retoma la primera dependencia funcional pendiente; las fases 7–8 ya cuentan con infraestructura y no se repiten. La fase 6 queda formalmente cerrada en su alcance funcional por autorización del usuario, conservando sus límites de verificación documentados.
+[Fase 3 · variables y unidades](FASE-3-VARIABLES.md) cerrada en su alcance definido. La próxima ampliación funcional pendiente es fase 4: gráficos avanzados vinculados a variables y versiones. Las fases 7–8 ya cuentan con infraestructura y no se repiten. La fase 6 permanece cerrada en su alcance funcional, conservando sus límites de verificación documentados.
 
-El [cierre de implementación 7–8](CIERRE-FASES-7-8.md), la [guía de evaluación temporal](EVALUACION-TEMPORAL.md) y el [informe unificado de fase 6](FASE-6-INFORME-UNIFICADO.md) vinculan candidatos, métodos, decisiones y resultados observados. Lo siguiente para acreditar mejora es incorporar evidencia real bajo un protocolo independiente. Para EDESUR faltan facturas, consumo y respuestas documentadas; no se inventarán pagos ni probabilidades. Variables de fase 3, recuperación de fase 5 y revisión visual de impresión HTML siguen pendientes. No se necesitan mensajes de “continuá” por bloque para ejecutar una fase autorizada completa.
+El [cierre de implementación 7–8](CIERRE-FASES-7-8.md), la [guía de evaluación temporal](EVALUACION-TEMPORAL.md) y el [informe unificado de fase 6](FASE-6-INFORME-UNIFICADO.md) vinculan candidatos, métodos, decisiones y resultados observados. Lo siguiente para acreditar mejora es incorporar evidencia real bajo un protocolo independiente. Para EDESUR faltan facturas, consumo y respuestas documentadas; no se inventarán pagos ni probabilidades. Ampliación de gráficos de fase 4, recuperación de fase 5 y revisión visual de impresión HTML siguen pendientes. No se necesitan mensajes de “continuá” por bloque para ejecutar una fase autorizada completa.
 
 ## Qué ya puede usarse
 
@@ -28,4 +28,4 @@ Crear y editar expedientes guiados, calcular y consultar matrices 2×2, comparar
 
 ## Criterios que siguen abiertos
 
-La impresión HTML necesita revisión visual paginada en un navegador que permita observar su salida. El visor PDF depende del navegador y mantiene descarga alternativa. Los escenarios complejos requieren ampliar las dimensiones actuales y formalizar variables; la IA no reemplaza esa validación. La edición protege borradores frente a descartes, pero todavía no los recupera automáticamente después de un cierre inesperado. No hay fecha ni porcentaje de terminación medidos.
+La impresión HTML necesita revisión visual paginada en un navegador que permita observar su salida. El visor PDF depende del navegador y mantiene descarga alternativa. Los escenarios complejos requieren ampliar las dimensiones actuales y las transformaciones de variables; el diccionario básico está implementado, y la IA no reemplaza la validación del modelo. La edición protege borradores frente a descartes, pero todavía no los recupera automáticamente después de un cierre inesperado. No hay fecha ni porcentaje de terminación global medidos.

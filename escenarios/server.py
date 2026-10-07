@@ -12,7 +12,7 @@ from .intake import prepare
 from .case_model import analyze_case,save_case,list_cases
 from .workflow import operate,get_workflow,list_workflows,get_version,Conflict,NotFound
 from . import local_ai,ai_jobs,sequential,simulation,agents,comparisons,payoff_sweep,library,version_diff
-from . import laboratories,research,decision_agents,executive
+from . import laboratories,research,decision_agents,executive,variables
 
 ROOT = Path(__file__).resolve().parent.parent
 DB = ROOT / 'data' / 'escenarios.sqlite3'
@@ -39,6 +39,15 @@ class Handler(BaseHTTPRequestHandler):
         if not self.allowed():
             return self.send(403, {'error': 'Host no autorizado.'})
         url = urlsplit(self.path)
+        if url.path in ('/api/variables','/api/variables/history','/api/variables/export','/api/variables/replay'):
+            try:
+                args=parse_qs(url.query)
+                if url.path=='/api/variables/history':
+                    return self.send(200,variables.history(DB,args.get('workflow_id',[''])[0],int(args['version'][0]) if 'version' in args else None))
+                record=variables.read(DB,args.get('id',[''])[0])
+                return self.send(200,variables.verify(record) if url.path.endswith('/replay') else record)
+            except NotFound as error:return self.send(404,{'error':str(error)})
+            except (ValueError,KeyError,TypeError,AttributeError) as error:return self.send(400,{'error':str(error)})
         if url.path.startswith('/api/executive'):
             try:
                 args=parse_qs(url.query);identity=args.get('id',[''])[0]
@@ -232,13 +241,17 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         if not self.allowed() or self.headers.get('Origin') not in (f'http://127.0.0.1:{self.server.server_port}', f'http://localhost:{self.server.server_port}'):
             return self.send(403, {'error': 'Origen no autorizado.'})
-        if self.path not in ('/api/executive','/api/graph/versions','/api/laboratories','/api/snapshots','/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/reviews','/api/research','/api/ai/benchmark-jobs','/api/ai/research-advisor','/api/ai/decision-jobs','/api/ai/decision-optimizer','/api/predictions/forecast','/api/predictions/observe','/api/predictions/evaluate','/api/ai/config','/api/ai/jobs','/api/sequential','/api/sequential/ai-jobs','/api/sequential/ai-apply','/api/agents','/api/library/compare','/api/payoff-sweep','/api/agent-comparisons','/api/agent-comparisons/replay'):
+        if self.path not in ('/api/variables','/api/executive','/api/graph/versions','/api/laboratories','/api/snapshots','/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/reviews','/api/research','/api/ai/benchmark-jobs','/api/ai/research-advisor','/api/ai/decision-jobs','/api/ai/decision-optimizer','/api/predictions/forecast','/api/predictions/observe','/api/predictions/evaluate','/api/ai/config','/api/ai/jobs','/api/sequential','/api/sequential/ai-jobs','/api/sequential/ai-apply','/api/agents','/api/library/compare','/api/payoff-sweep','/api/agent-comparisons','/api/agent-comparisons/replay'):
             return self.send(404, {'error': 'Recurso inexistente.'})
         try:
             length = int(self.headers.get('Content-Length', 0))
-            if not 0 < length <= (100000 if self.path in ('/api/executive','/api/graph/versions','/api/laboratories','/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/reviews','/api/research','/api/ai/benchmark-jobs','/api/ai/research-advisor','/api/ai/decision-jobs','/api/ai/decision-optimizer','/api/predictions/forecast','/api/predictions/observe','/api/predictions/evaluate','/api/ai/config','/api/ai/jobs','/api/sequential','/api/sequential/ai-jobs','/api/sequential/ai-apply','/api/agents','/api/library/compare','/api/payoff-sweep','/api/agent-comparisons','/api/agent-comparisons/replay') else 2048):
+            if not 0 < length <= (1200000 if self.path=='/api/variables' else 100000 if self.path in ('/api/variables','/api/executive','/api/graph/versions','/api/laboratories','/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/reviews','/api/research','/api/ai/benchmark-jobs','/api/ai/research-advisor','/api/ai/decision-jobs','/api/ai/decision-optimizer','/api/predictions/forecast','/api/predictions/observe','/api/predictions/evaluate','/api/ai/config','/api/ai/jobs','/api/sequential','/api/sequential/ai-jobs','/api/sequential/ai-apply','/api/agents','/api/library/compare','/api/payoff-sweep','/api/agent-comparisons','/api/agent-comparisons/replay') else 2048):
                 raise ValueError()
             payload = json.loads(self.rfile.read(length))
+            if self.path=='/api/variables':
+                try:return self.send(201,variables.save(DB,payload))
+                except NotFound as error:return self.send(404,{'error':str(error)})
+                except (ValueError,KeyError,TypeError,AttributeError) as error:return self.send(400,{'error':str(error)})
             if self.path=='/api/executive':
                 try:return self.send(201,executive.create(DB,payload))
                 except NotFound as error:return self.send(404,{'error':str(error)})

@@ -1,5 +1,5 @@
 import {object,result,type Result} from './contracts.ts';
-export const sections={matrix:'Matriz estratégica',tree:'Árbol decisorio',simulation:'Monte Carlo',agents:'Agentes con memoria',comparison:'Comparación de políticas',sweep:'Sensibilidad de incentivos',decision:'Decisiones de IA local',benchmark:'Batería de agentes IA',evaluation:'Evaluación predictiva'};
+export const sections={matrix:'Matriz estratégica',tree:'Árbol decisorio',simulation:'Monte Carlo',agents:'Agentes con memoria',comparison:'Comparación de políticas',sweep:'Sensibilidad de incentivos',decision:'Decisiones de IA local',benchmark:'Batería de agentes IA',evaluation:'Evaluación predictiva',variables:'Variables y unidades'};
 export type Kind=keyof typeof sections;
 export type Mode='synthetic'|'declared';
 export type Source={kind:Exclude<Kind,'matrix'|'simulation'>;id:string;title:string;created_at:string;label:string;simulation:boolean;evidence:string};
