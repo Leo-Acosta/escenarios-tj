@@ -27,7 +27,7 @@ Fuentes oficiales consultadas el 7 de octubre de 2026:
 
 ## Pendiente
 
-Importación documentada y auditoría de evidencia; definición completa del caso real; integración React de decisiones IA y comparación; optimización con candidatos versionados y conjuntos de evaluación separados. El registro prospectivo solo indica si hace falta más evidencia o validación independiente. El [nuevo módulo de comparación y asesor IA](DECISIONES-IA-COMPARACION.md) ya funciona mediante Python, pero no promueve candidatos ni ajusta parámetros con datos observados. El formulario prospectivo aún necesita integrar recuperación de borradores.
+Definición y evidencia completa del caso real, autenticación externa de documentos y validación empírica independiente. Decisiones IA, comparación, candidatos versionados, calibración revisable y particiones temporales ya están integrados en React/Python. El [protocolo temporal](EVALUACION-TEMPORAL.md) separa desarrollo, validación y prueba; no promueve candidatos. Sigue pendiente recuperar automáticamente borradores tras un cierre inesperado.
 
 ## Verificación de este bloque
 
@@ -37,4 +37,4 @@ Prueba real con Mistral: la secuencia completa terminó en 142 segundos con semi
 
 El expediente real y sus revisiones permanecen en SQLite local; los datos económicos aportados no se publican en el repositorio. Ninguna estrategia se aplicó y ninguna mejora predictiva real se demostró.
 
-Este trabajo amplía las fases matemáticas y de validación empírica (7–8); no cierra esas fases ni el informe ejecutivo unificado de fase 6.
+Las cifras anteriores corresponden a bloques históricos. La [auditoría final 7–8](CIERRE-FASES-7-8.md) registra 147 pruebas Python, 52 frontend y recorrido real sintético completo. Fase 7 implementada; infraestructura de fase 8 terminada, validación empírica abierta. El informe ejecutivo unificado de fase 6 no está cerrado.

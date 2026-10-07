@@ -11,6 +11,63 @@ from escenarios.server import Handler
 
 
 class ApiTests(unittest.TestCase):
+    def test_benchmark_http_background_export_and_replay(self):
+        from escenarios import server,ai_jobs
+        from test_laboratories import prepare_case
+        case=prepare_case(server.DB);done=threading.Event();original=ai_jobs.worker
+        def worker(*args):
+            try:original(*args)
+            finally:done.set()
+        payload={'workflow_id':case['id'],'version':1,'conditions':[{'actor':0,'rounds':1,'seeds':[42,43],'baseline':'fixed0','opponent':'mirror','noise':0}], 'assumptions':'Batería sintética HTTP','reviewed':True}
+        with patch('escenarios.ai_jobs.worker',side_effect=worker),patch('escenarios.local_ai.status',return_value={'ready':True,'config':{'model':'mistral:latest'}}),patch('escenarios.local_ai.request',return_value={'done':True,'message':{'content':'{"action":1,"reason":"Ensayo sintético."}'}}):
+            with urlopen(Request(self.base+'/api/ai/benchmark-jobs',data=json.dumps(payload).encode(),headers={'Content-Type':'application/json','Origin':self.base})) as response:
+                job=json.load(response);self.assertEqual(response.status,202)
+            self.assertTrue(done.wait(5))
+        finished=ai_jobs.get_job(server.DB,job['id']);self.assertEqual(finished['state'],'ready')
+        record=finished['result'];self.assertEqual(len(record['payload']['trials']),2)
+        with patch('escenarios.local_ai.request',side_effect=AssertionError('No debe inferir')):
+            with urlopen(self.base+'/api/ai/benchmark-replay?id='+record['id']) as response:self.assertTrue(json.load(response)['reproduced'])
+        with urlopen(self.base+'/api/ai/benchmark-export?id='+record['id']) as response:self.assertEqual(json.load(response),record)
+
+    def test_research_api_complete_temporal_workflow_and_private_routes(self):
+        from escenarios import research,server,ai_jobs
+        from test_laboratories import prepare_case
+        from datetime import datetime,timezone,timedelta
+        case=prepare_case(server.DB);start=datetime(2027,2,1,tzinfo=timezone.utc);current=[start]
+        def post(data):
+            with urlopen(Request(self.base+'/api/research',data=json.dumps(data).encode(),headers={'Content-Type':'application/json','Origin':self.base})) as response:return json.load(response)
+        with patch('escenarios.research.clock',side_effect=lambda:current[0]):
+            protocol=post({'action':'protocol','workflow_id':case['id'],'version':1,'title':'API sintética','target':'Resultado binario de prueba','horizon_hours':48,'sources':'Sintéticas','independence':'Unidades independientes sintéticas','baseline_method':'Fija 0.5','assumptions':'No evidencia real','synthetic':True,'development_end':(start+timedelta(days=2)).isoformat(),'validation_end':(start+timedelta(days=4)).isoformat(),'test_end':(start+timedelta(days=6)).isoformat(),'reviewed':True})
+            candidate=post({'action':'candidate','protocol_id':protocol['id'],'name':'Original','method':'Probabilidad declarada','trained_through':start.isoformat(),'reviewed':True})
+            def forecast(unit):return post({'action':'forecast','protocol_id':protocol['id'],'candidate_id':candidate['id'],'unit_id':unit,'deadline':(current[0]+timedelta(hours=1)).isoformat(),'candidate_probability':.8,'baseline_probability':.5,'feature_cutoff':current[0].isoformat(),'features':[{'reference':'Información previa sintética','available_at':start.isoformat()}]})
+            def observe(event):return post({'action':'observe','event':event['event'],'outcome':1,'source':'Constatación sintética','observed_at':current[0].isoformat()})
+            for i in range(5):
+                event=forecast('dev-'+str(i));current[0]+=timedelta(hours=1);observe(event)
+            done=threading.Event();original=ai_jobs.worker
+            def worker(*args):
+                try:original(*args)
+                finally:done.set()
+            with patch('escenarios.ai_jobs.worker',side_effect=worker),patch('escenarios.local_ai.status',return_value={'ready':True,'config':{'model':'mistral:latest'}}),patch('escenarios.local_ai.request',return_value={'done':True,'message':{'content':'{"step":"propose_calibration","strength":2,"reason":"Ajuste acotado."}'}}):
+                with urlopen(Request(self.base+'/api/ai/research-advisor',data=json.dumps({'protocol_id':protocol['id'],'candidate_id':candidate['id']}).encode(),headers={'Content-Type':'application/json','Origin':self.base})) as response:job=json.load(response);self.assertEqual(response.status,202)
+                self.assertTrue(done.wait(5))
+            advice=ai_jobs.get_job(server.DB,job['id']);self.assertEqual(advice['state'],'ready')
+            calibrated=post({'action':'accept_advice','advice_id':advice['result']['id'],'name':'Ajuste','reviewed':True})
+            self.assertEqual(calibrated['payload']['version'],2)
+            candidate=calibrated;current[0]=start+timedelta(days=2,hours=1);event=forecast('validation');current[0]=start+timedelta(days=4);observe(event)
+            post({'action':'evaluate','protocol_id':protocol['id'],'candidate_id':candidate['id'],'partition':'validation'})
+            post({'action':'select','protocol_id':protocol['id'],'candidate_id':candidate['id'],'reason':'Selección predefinida','reviewed':True})
+            event=forecast('test');current[0]+=timedelta(hours=1)
+            with self.assertRaises(HTTPError) as error:observe(event)
+            self.assertEqual(error.exception.code,400)
+            current[0]=start+timedelta(days=6);observe(event)
+            final=post({'action':'evaluate','protocol_id':protocol['id'],'candidate_id':candidate['id'],'partition':'test'})
+            with urlopen(self.base+'/api/research?id='+protocol['id']) as response:self.assertEqual(json.load(response)['evaluations'][0]['id'],final['id'])
+            with urlopen(self.base+'/api/research/replay?id='+final['id']) as response:self.assertTrue(json.load(response)['reproduced'])
+            with urlopen(self.base+'/api/research/export?id='+final['id']) as response:self.assertEqual(json.load(response),final)
+            with urlopen(self.base+'/api/research/report?id='+final['id']) as response:self.assertIn('Prueba sintética',response.read().decode())
+            with self.assertRaises(HTTPError) as error:post({'action':'evaluate','protocol_id':protocol['id'],'candidate_id':candidate['id'],'partition':'test'})
+            self.assertEqual(error.exception.code,400)
+
     def test_decision_routes_bind_saved_version_and_export_replay(self):
         from escenarios import server,ai_jobs,decision_agents
         from test_laboratories import prepare_case

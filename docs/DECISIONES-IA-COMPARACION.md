@@ -61,4 +61,4 @@ Verificación del bloque integrado: 133 pruebas Python y 47 de contratos de inte
 
 ## Pendiente
 
-Informe ejecutivo unificado, protocolo de datos observados y optimización con conjuntos separados de entrenamiento y evaluación. La evaluación prospectiva binaria existente permanece separada; utilidad simulada no se transforma en Brier ni en evidencia de éxito judicial.
+El protocolo y la optimización con desarrollo/validación/prueba ya están implementados en **Evaluación y experimentos**. Ver [guía temporal](EVALUACION-TEMPORAL.md) y [auditoría final](CIERRE-FASES-7-8.md). La batería conserva comparaciones múltiples y fallos; el asesor de desarrollo propone calibración acotada con aceptación manual. Las funciones históricas descritas arriba permanecen disponibles. La utilidad simulada no se transforma en Brier ni en evidencia judicial. Pendientes: observaciones reales independientes, validación empírica e informe ejecutivo unificado.

@@ -67,7 +67,15 @@ def start(path,payload):
 def worker(path,workflow,value):
     global RUNNING
     try:
-        if value.get('kind') in ('decision','decision_optimizer'):
+        if value.get('kind')=='research_advisor':
+            from . import research
+            value['result']=research.advisor(path,workflow)
+        elif value.get('kind')=='decision_benchmark':
+            from . import decision_agents
+            def progress(p):
+                value['progress']=p;store(path,value)
+            value['result']=decision_agents.benchmark(path,workflow['config'],workflow['workflow'],identity=value['id'],progress=progress)
+        elif value.get('kind') in ('decision','decision_optimizer'):
             from . import decision_agents
             value['result']=(decision_agents.compare(path,workflow['config'],workflow_source=workflow['workflow']) if value['kind']=='decision' else decision_agents.optimize_process(path,workflow['comparison_id']))
         elif value.get('kind')=='review':
@@ -87,12 +95,12 @@ def worker(path,workflow,value):
             with LOCK:RUNNING=False
 
 
-def dispatch(path,snapshot,kind,scope,version):
+def dispatch(path,snapshot,kind,scope,version,namespace='decisions:'):
     global RUNNING
     with LOCK:
         if RUNNING:raise Conflict('Ya hay una generación local en curso.')
         RUNNING=True
-    value={'id':str(uuid4()),'workflow_id':'decisions:'+scope,'kind':kind,'base_version':version,
+    value={'id':str(uuid4()),'workflow_id':namespace+scope,'kind':kind,'base_version':version,
         'input_snapshot':snapshot,'created_at':now(),'state':'running','result':None,'error':None}
     try:
         store(path,value);threading.Thread(target=worker,args=(path,snapshot,value),daemon=True).start()
@@ -118,6 +126,24 @@ def start_decision_optimizer(path,payload):
     source=job['input_snapshot']['workflow']
     snapshot={'comparison_id':job['result']['id'],'source_job_id':job['id'],'workflow':source}
     return dispatch(path,snapshot,'decision_optimizer',source['id'],source['version'])
+
+
+def start_benchmark(path,payload):
+    from .decision_agents import benchmark_prepare
+    if type(payload.get('version')) is not int or payload['version']<1:raise ValueError('Versión calculada requerida.')
+    source=get_version(path,payload['workflow_id'],payload['version'])
+    config={'model':source['model'],'conditions':payload.get('conditions'),'assumptions':payload.get('assumptions'),'reviewed':payload.get('reviewed')}
+    benchmark_prepare(config)
+    context={'id':payload['workflow_id'],'title':source['model']['title'],'version':payload['version']}
+    return dispatch(path,{'config':config,'workflow':context},'decision_benchmark',context['id'],context['version'],'benchmarks:')
+
+
+def start_research_advisor(path,payload):
+    from . import research
+    with closing(research.connect(path)) as db:
+        p=research.read(db,payload['protocol_id'],'protocol');c=research.read(db,payload['candidate_id'],'candidate')
+    if c['payload']['protocol_id']!=p['id'] or research.clock()>=research.date(p['payload']['development_end']):raise ValueError('Candidato incompatible o desarrollo cerrado.')
+    return dispatch(path,{'protocol_id':p['id'],'candidate_id':c['id']},'research_advisor',p['id'],1,'protocols:')
 
 
 def tree_snapshot(payload):

@@ -53,6 +53,7 @@ def observe(path,payload):
         row=db.execute('SELECT payload FROM prediction_events WHERE id=?',(payload.get('event'),)).fetchone()
         if not row:raise ValueError('Registrá el pronóstico antes de observar el resultado.')
         record=json.loads(row[0])
+        if record.get('research'):raise ValueError('Usá el protocolo para observar este evento reservado.')
         if record['observation'] is not None:raise ValueError('El resultado ya está conservado; no se sobrescribe.')
         if datetime.fromisoformat(record['deadline'])>datetime.now(timezone.utc):raise ValueError('Esperá al plazo predefinido para registrar la observación.')
         record['observation']={'outcome':payload['outcome'],'source':source,'recorded_at':now(),'verification':'analyst_supplied'}
@@ -61,7 +62,7 @@ def observe(path,payload):
 
 
 def history(path):
-    with closing(connect(path)) as db:return [json.loads(r[0]) for r in db.execute('SELECT payload FROM prediction_events ORDER BY rowid DESC LIMIT 200')]
+    with closing(connect(path)) as db:return [v for r in db.execute('SELECT payload FROM prediction_events ORDER BY rowid DESC') if not (v:=json.loads(r[0])).get('research')][:200]
 
 
 def evaluate_rows(rows,seed=42):
@@ -93,7 +94,7 @@ def evaluate(path,payload):
     candidate=text(payload.get('candidate_ref'),500);baseline=text(payload.get('baseline_ref'),500)
     with closing(connect(path)) as db,db:
         rows=sorted([json.loads(r[0]) for r in db.execute('SELECT payload FROM prediction_events')],key=lambda r:r['event'])
-        rows=[r for r in rows if r['candidate_ref']==candidate and r['baseline_ref']==baseline and r['observation'] is not None]
+        rows=[r for r in rows if not r.get('research') and r['candidate_ref']==candidate and r['baseline_ref']==baseline and r['observation'] is not None]
         if len(rows)>2000:raise ValueError('Máximo 2000 observaciones por evaluación.')
         result=evaluate_rows(rows,payload.get('seed',42))
         dataset=json.dumps(rows,sort_keys=True,ensure_ascii=False,allow_nan=False)

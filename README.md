@@ -31,7 +31,7 @@ Pruebas:
 python -m unittest discover -s tests -v
 ```
 
-Los datos son ilustrativos. No es todavía un motor multiagente autónomo ni un sistema de predicción calibrado. La licencia de distribución del código propio queda pendiente de elección.
+Los ejemplos son ilustrativos. Hay agentes de decisión locales opcionales y calibración Python revisable, sin acreditación predictiva real ni promoción automática. La licencia de distribución del código propio queda pendiente de elección.
 
 - [Auditoría del repositorio de referencia](docs/AUDITORIA_MIRO_FISH.md)
 - [Diseño propuesto y etapas de implementación](docs/ARQUITECTURA.md)
@@ -151,3 +151,9 @@ La generación de prueba no modifica expedientes ni descarga modelos. Puede tard
 El laboratorio incorpora revisiones de analista y crítico y un registro prospectivo de predicciones contra una referencia. Consulte [Agentes y evaluación](docs/AGENTES-Y-EVALUACION.md) para contratos, reproducción de Brier, límites de evidencia y trabajo pendiente. Estas funciones no garantizan éxito judicial ni precisión predictiva.
 
 La comparación de agentes que deciden con Ollama y el asesor de experimentación están integrados en **Asistente de IA local** de React, además del comando Python. Incluyen trabajos en segundo plano, versiones calculadas, gráfico por ronda, registro JSON y reproducción sin inferencia. El asesor prepara experimentos que requieren revisión explícita antes de ejecutarse. Consulte [Decisiones IA y comparación reproducible](docs/DECISIONES-IA-COMPARACION.md).
+
+### Protocolos y evaluación temporal · fases 7–8
+
+En **Evaluación y experimentos**, registrar protocolos prospectivos, candidatos versionados, pronósticos con información previa y observaciones documentadas. Desarrollo, validación y prueba permanecen separados. El asesor local propone ajustes acotados; Python calibra tras revisión explícita. Las baterías conservan múltiples políticas, semillas, condiciones y fallos. Evaluaciones y decisiones se reproducen sin inferencia nueva, se exportan como JSON y ofrecen un resumen individual imprimible.
+
+Ver [guía operativa](docs/EVALUACION-TEMPORAL.md), [auditoría de cierre](docs/CIERRE-FASES-7-8.md) y [hoja de ruta](docs/HOJA-DE-RUTA.md). Implementación funcional terminada para el alcance binario/2×2; mejora predictiva real sin demostrar. Observaciones privadas y archivos QA permanecen fuera de Git. El informe unificado de fase 6 continúa pendiente.
