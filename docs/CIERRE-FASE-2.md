@@ -25,3 +25,11 @@ Impresión: se conservan avisos de alcance, contexto y procedencia; se ocultan a
 Evidencia: 42 pruebas frontend y compilación correctas; consulta del comparador en navegador con tabla desplazable y encabezado contextual. La prueba automatizada del diálogo de descarte fue inconclusa (el navegador agotó el tiempo de la interacción); no se considera aprobada. La comprobación de ancho no confirmó que el cambio a 390 px estuviera aplicado, por lo que tampoco certifica ese tamaño.
 
 Para terminar este bloque quedan: recorrido de conflictos y descarte/reanudación de formularios; comprobación efectiva de tamaños estrechos e impresión paginada; continuidad y procedencia de trabajos secuenciales de IA. La fase 2 permanece abierta.
+
+## Continuidad de IA secuencial · recuperación y procedencia
+
+El editor permite consultar y recuperar los últimos cinco trabajos secuenciales de la base local (no son exclusivos del árbol abierto). Recuperar vuelve a conectar el seguimiento de un trabajo en generación y muestra propuestas listas o errores conservados. No restaura automáticamente el borrador, su descripción ni sus pagos. Aplicar requiere revisión explícita y el modelo/descripción originales; Python mantiene la validación de huella de origen y rechaza cambios. La procedencia muestra trabajo, modelo, identificador, publicador y licencia cuando fueron registrados, sin inventar metadatos de históricos.
+
+Verificación: 43 pruebas frontend, compilación correcta y 4 pruebas Python de IA secuencial. En navegador/base aislada se recuperó el trabajo QA 80471b0b-b89b-493c-968c-a8d9ce27aca2 desde otra sesión del editor y se consultó su procedencia. No se solicitó otra generación ni se modificaron pagos. El seguimiento de trabajos usa el mismo mecanismo de consulta existente; no se certifica una nueva generación real en este avance.
+
+Para cerrar fase 2 aún deben completarse las pruebas de descarte y conflictos de formularios, pantalla estrecha e impresión paginada. La recuperación automática de borradores corresponde a fase 5.
