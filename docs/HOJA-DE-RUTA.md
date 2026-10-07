@@ -12,12 +12,12 @@ Estado al 7 de octubre de 2026. Arquitectura local: núcleo Python, SQLite e int
 | 4 · Gráficos avanzados | Árboles, redes, vectores y sensibilidad enlazados a versiones, con filtros y exportación | Base de árboles/redes/reproducción implementada; ampliación pendiente |
 | 5 · Continuidad de datos | Autoguardado de borradores, respaldo, restauración y migraciones | Versiones y protección de descarte implementadas; autoguardado y recuperación pendientes |
 | 6 · Informe ejecutivo unificado | Un documento que reúna matriz y laboratorios desde referencias congeladas | PDF individuales disponibles; unificación pendiente |
-| 7–8 · Motor y evaluación | Ampliación matemática y contrastación contra datos observados | Primer bloque de analista/crítico local, controles Python y evaluación prospectiva implementado; agentes de decisión, optimizador y validación empírica pendientes |
+| 7–8 · Motor y evaluación | Ampliación matemática y contrastación contra datos observados | Analista/crítico, controles Python y evaluación prospectiva implementados; comparación de decisiones IA y asesor de experimentos disponibles por CLI; integración React y validación empírica pendientes |
 | 9–10 · Distribución y calidad | Instalación Windows, funcionamiento offline, rendimiento y validación integral | Pendiente |
 
 ## Próximo bloque funcional
 
-El siguiente bloque de desarrollo será el registro de variables de fase 3: definir nombre, unidad, tipo y fuente; distinguir datos de supuestos; asociar variables a un expediente sin transformar automáticamente su descripción en pagos o probabilidades. Primero se diseña y valida el contrato Python/SQLite, luego su editor React y la referencia histórica en las versiones. La comprobación pendiente de impresión HTML seguirá registrada; empezar fase 3 no equivale a cerrar fase 2.
+Por la ampliación solicitada, la prioridad inmediata es integrar la comparación de agentes decisores y el asesor de experimentos en trabajos de segundo plano de React, con versiones congeladas y registros consultables. El registro de variables de fase 3 sigue pendiente: nombre, unidad, tipo, fuente y vínculo explícito con el modelo. La comprobación de impresión HTML también sigue abierta; ampliar fases 7–8 no equivale a cerrar las anteriores.
 
 ## Qué ya puede usarse
 

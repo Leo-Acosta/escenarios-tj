@@ -27,7 +27,7 @@ Fuentes oficiales consultadas el 7 de octubre de 2026:
 
 ## Pendiente
 
-Importación documentada y auditoría de evidencia; definición completa del caso real; agentes de decisión en simulaciones y comparación con políticas actuales; optimizador IA con candidatos versionados, evaluación separada y aprobación explícita para promoción. El mecanismo actual solo indica si hace falta más evidencia o validación independiente: no es todavía un optimizador IA. El nuevo formulario prospectivo aún necesita integrar recuperación de borradores.
+Importación documentada y auditoría de evidencia; definición completa del caso real; integración React de decisiones IA y comparación; optimización con candidatos versionados y conjuntos de evaluación separados. El registro prospectivo solo indica si hace falta más evidencia o validación independiente. El [nuevo módulo de comparación y asesor IA](DECISIONES-IA-COMPARACION.md) ya funciona mediante Python, pero no promueve candidatos ni ajusta parámetros con datos observados. El formulario prospectivo aún necesita integrar recuperación de borradores.
 
 ## Verificación de este bloque
 

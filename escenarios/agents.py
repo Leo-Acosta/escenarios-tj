@@ -5,6 +5,7 @@ import random
 import sqlite3
 from contextlib import closing
 from uuid import uuid4
+from copy import deepcopy
 from .case_model import validate
 from .workflow import now
 
@@ -26,28 +27,32 @@ def choose(policy,actor,model,history,rng):
     return (0 if values[0]>=values[1] else 1),f'Mejor respuesta a frecuencia rival de alternativa 1: {frequency:.4f}; prior 1/1. Empates: alternativa 1.'
 
 
-def run(payload):
+def run(payload,*,decision_provider=None,execution_seed=None):
     if not isinstance(payload,dict):raise ValueError('Configuración inválida.')
     model=validate(payload['model']);options=payload['options']
     if not isinstance(options,dict):raise ValueError('Configuración inválida.')
     n=options.get('rounds');seed=options.get('seed');noise=options.get('noise');policies=options.get('policies')
     if type(n) is not int or not 1<=n<=500:raise ValueError('Usá entre 1 y 500 rondas.')
     if type(seed) is not int or not 0<=seed<=4294967295:raise ValueError('Semilla entera válida requerida.')
+    if execution_seed is not None and (type(execution_seed) is not int or not 0<=execution_seed<=4294967295):raise ValueError('Semilla de ejecución inválida.')
     if type(noise) not in (int,float) or not math.isfinite(noise) or not 0<=noise<=1:raise ValueError('Error de ejecución entre 0 y 1.')
-    if not isinstance(policies,list) or len(policies)!=2 or any(p not in POLICIES for p in policies):raise ValueError('Elegí una política válida para cada actor.')
+    allowed=set(POLICIES)|({'local_ai'} if decision_provider is not None else set())
+    if not isinstance(policies,list) or len(policies)!=2 or any(p not in allowed for p in policies):raise ValueError('Elegí una política válida para cada actor.')
     rationale=payload.get('assumptions')
     if not isinstance(rationale,str) or not rationale.strip() or len(rationale)>6000:raise ValueError('Registrá el fundamento de las políticas y supuestos.')
     rng=[random.Random(seed*2),random.Random(seed*2+1)];rounds=[];totals=[0,0];counts=[[0,0],[0,0]]
+    execution_rng=([random.Random(execution_seed*2+i+8589934592) for i in range(2)] if execution_seed is not None else rng)
     for index in range(n):
-        decisions=[choose(policies[i],i,model,rounds,rng[i]) for i in range(2)]
+        decisions=[decision_provider(i,deepcopy(model),deepcopy(rounds)) if policies[i]=='local_ai' else choose(policies[i],i,model,rounds,rng[i]) for i in range(2)]
+        if any(not isinstance(d,(tuple,list)) or len(d)!=2 or type(d[0]) is not int or d[0] not in (0,1) or not isinstance(d[1],str) or not d[1].strip() for d in decisions):raise ValueError('El agente devolvió una decisión incompatible; corrida rechazada.')
         intended=[d[0] for d in decisions]
-        actual=[1-intended[i] if noise and rng[i].random()<noise else intended[i] for i in range(2)]
+        actual=[1-intended[i] if noise and execution_rng[i].random()<noise else intended[i] for i in range(2)]
         a,b=actual;payments=[model['a'][a][b],model['b'][a][b]]
         memory=[{'observed_rounds':len(rounds),'opponent_counts':list(counts[1-i])} for i in range(2)]
         totals=[totals[i]+payments[i] for i in range(2)]
         rounds.append({'round':index+1,'intended':intended,'actions':actual,'payments':payments,'totals':list(totals),'memory':memory,'reasons':[d[1] for d in decisions]})
         for i in range(2):counts[i][actual[i]]+=1
-    return {'id':None,'created_at':now(),'engine':'repeated-agents-v1','model':model,
+    result={'id':None,'created_at':now(),'engine':'repeated-agents-v1','model':model,
         'options':{'rounds':n,'seed':seed,'noise':noise,'policies':policies},'assumptions':rationale.strip(),
         'rounds':rounds,'totals':totals,'means':[v/n for v in totals],'action_counts':counts,
         'limits':['Decisiones simultáneas: cada agente usa solo rondas ya terminadas.',
@@ -57,6 +62,15 @@ def run(payload):
             'La política adaptativa usa frecuencias con prior 1/1 y elige alternativa 1 en empates.',
             'Memoria reiniciada en cada corrida. No se usan LLM ni herramientas externas para decidir.',
             'p y q del caso base no se usan: las conductas las generan las políticas. Sin descuento temporal.']}
+    if decision_provider is not None:
+        result['engine']='repeated-local-ai-v1'
+        result['limits']=[s for s in result['limits'] if 'No se usan LLM' not in s]
+        result['limits'].append('IA local elige una alternativa permitida; no acredita optimalidad ni predicción real.')
+    if execution_seed is not None:
+        result['options']['execution_seed']=execution_seed
+        if decision_provider is None:result['engine']='repeated-paired-noise-v1'
+        result['limits'].append('Perturbaciones de ejecución en flujo separado de las decisiones, con semilla conservada.')
+    return result
 
 
 def connection(path):

@@ -149,3 +149,5 @@ python scripts/check_ollama.py --generate
 La generación de prueba no modifica expedientes ni descarga modelos. Puede tardar varios minutos. El comando devuelve código 0 al completar la comprobación y código 1 si el motor no está listo o la propuesta no cumple el contrato. La aplicación conserva el modo guiado cuando Ollama está desconectado.
 
 El laboratorio incorpora revisiones de analista y crítico y un registro prospectivo de predicciones contra una referencia. Consulte [Agentes y evaluación](docs/AGENTES-Y-EVALUACION.md) para contratos, reproducción de Brier, límites de evidencia y trabajo pendiente. Estas funciones no garantizan éxito judicial ni precisión predictiva.
+
+La comparación de agentes que deciden con Ollama y el agente asesor de experimentación pueden ejecutarse desde Python: [Decisiones IA y comparación reproducible](docs/DECISIONES-IA-COMPARACION.md). Este bloque aún no está integrado en los botones React de laboratorios.
