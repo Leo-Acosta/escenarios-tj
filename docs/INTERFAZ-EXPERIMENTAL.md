@@ -1,5 +1,13 @@
 # Interfaz experimental · blanco y oliva
 
+## Segunda composición visual
+
+La revisión del 7 de octubre incorpora una portada estratégica con mapa de navegación SVG y accesos a árboles, redes, simulaciones y evaluación. Es navegación, no una red calculada del caso. Muestra el expediente y el número real de versiones calculadas, con una acción distinta cuando el modelo todavía está en preparación. La tipografía, espaciado, tarjetas y controles se ajustan en `premium.css`.
+
+El Centro de análisis abre el observatorio de gráficos por defecto y permite alternar a matriz/resultados sin cambiar el expediente. Se conservan la confirmación de descarte y los módulos existentes. Los controles de navegación gráfica respetan la preferencia de movimiento reducido; la portada no se imprime.
+
+Verificación: compilación correcta y 61 pruebas frontend aprobadas. En navegador se comprobaron la portada, el número de versiones, alternancia de vistas y apertura del laboratorio de redes desde el mapa. A 2529 píxeles de ancho, la página no presenta desbordamiento horizontal y los cuatro accesos tienen rectángulos separados. La captura sigue fallando, por lo que esto no acredita una inspección visual integral ni comprobación móvil. Los PDF mantienen su composición anterior.
+
 Implementada el 7 de octubre de 2026 en `/app/`, con React/TypeScript compilado a JavaScript. Python conserva los cálculos y SQLite los registros. No incorpora dependencias externas ni modifica matrices, evidencias o pronósticos.
 
 La superficie utiliza blanco, oliva militar y tonos suaves de salvia, una retícula de fondo, navegación numerada y una franja de contexto con expediente, versión seleccionada y validación empírica pendiente. El indicador orbital es decorativo, no representa una simulación ni un estado de conexión. El modo inmersivo oculta la navegación y amplía el área de trabajo; su botón permite restaurarla sin descartar el expediente o borradores.
