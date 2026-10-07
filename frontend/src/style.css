@@ -28,3 +28,9 @@
 .ai-lab button{margin:8px 12px 8px 0}.ai-lab details{margin:18px 0}.ai-lab .preserve{overflow-wrap:anywhere}.ai-lab .tree-review{display:flex;align-items:center;gap:12px;margin:20px 0}.ai-lab summary{cursor:pointer;font-weight:600}
 
 .tree-ai{padding:20px;margin:24px 0;border:1px solid #c8dbd7;border-radius:12px;background:#f1f8f5}.tree-ai h4{margin-bottom:8px}
+
+/* Tables scroll inside the workspace instead of expanding the page. */
+main,.panel,.tree-layout>*{min-width:0}.table-scroll{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain}.panel p,.lab-detail,.comparison-replay{overflow-wrap:anywhere}.table-scroll:focus-visible{outline:3px solid #e4a422;outline-offset:3px}
+.skip-link{position:absolute;left:16px;top:-80px;z-index:1000;background:white;padding:14px;border:2px solid var(--accent);border-radius:8px}.skip-link:focus{top:12px}h1:focus{outline:none}
+@media(max-width:650px){.panel{padding:18px}.selection label{min-width:0;flex-basis:100%}.policy-grid th{min-width:110px}.lab-results dl{grid-template-columns:1fr}.lab-results dd{margin-bottom:12px}.title-row .badge{white-space:normal}header{flex-wrap:wrap}}
+@media print{.skip-link,main button,.tree-actions,.simulation-samples{display:none!important}.notice{display:block;background:white;color:#17283b;border-left:2px solid #087f78}.table-scroll,.table-wrap{overflow:visible}.policy-grid{table-layout:fixed;font-size:8px}.policy-grid th{min-width:0;overflow-wrap:anywhere}.policy-grid th,.policy-grid td{padding:5px}.policy-grid button{display:block!important;color:black;border:0;padding:3px;font-size:9px}.panel{break-inside:auto}.lab-detail,.lab-plot,table tr{break-inside:avoid}.selection{display:none}.comparison-replay>label select{appearance:none;border:0;background:white}.agent-replay label{display:none}.agent-replay .badge{white-space:normal}a.button{display:none}}
