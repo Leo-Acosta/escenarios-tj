@@ -118,6 +118,11 @@ class Handler(BaseHTTPRequestHandler):
         if url.path == '/api/predictions':
             from . import prediction_eval
             return self.send(200,{'events':prediction_eval.history(DB),'evaluations':prediction_eval.evaluations(DB)})
+        if url.path in ('/api/ai/decision-replay','/api/ai/decision-export'):
+            from . import decision_agents
+            identity=parse_qs(url.query).get('id',[''])[0]
+            try:return self.send(200,(decision_agents.replay(DB,identity) if url.path.endswith('replay') else decision_agents.get_record(DB,identity)))
+            except (ValueError,KeyError,TypeError) as error:return self.send(400,{'error':str(error)})
         if url.path == '/api/ai/status':
             return self.send(200,local_ai.status(DB))
         if url.path == '/api/ai/jobs':
@@ -200,11 +205,11 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         if not self.allowed() or self.headers.get('Origin') not in (f'http://127.0.0.1:{self.server.server_port}', f'http://localhost:{self.server.server_port}'):
             return self.send(403, {'error': 'Origen no autorizado.'})
-        if self.path not in ('/api/graph/versions','/api/laboratories','/api/snapshots','/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/reviews','/api/predictions/forecast','/api/predictions/observe','/api/predictions/evaluate','/api/ai/config','/api/ai/jobs','/api/sequential','/api/sequential/ai-jobs','/api/sequential/ai-apply','/api/agents','/api/library/compare','/api/payoff-sweep','/api/agent-comparisons','/api/agent-comparisons/replay'):
+        if self.path not in ('/api/graph/versions','/api/laboratories','/api/snapshots','/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/reviews','/api/ai/decision-jobs','/api/ai/decision-optimizer','/api/predictions/forecast','/api/predictions/observe','/api/predictions/evaluate','/api/ai/config','/api/ai/jobs','/api/sequential','/api/sequential/ai-jobs','/api/sequential/ai-apply','/api/agents','/api/library/compare','/api/payoff-sweep','/api/agent-comparisons','/api/agent-comparisons/replay'):
             return self.send(404, {'error': 'Recurso inexistente.'})
         try:
             length = int(self.headers.get('Content-Length', 0))
-            if not 0 < length <= (100000 if self.path in ('/api/graph/versions','/api/laboratories','/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/reviews','/api/predictions/forecast','/api/predictions/observe','/api/predictions/evaluate','/api/ai/config','/api/ai/jobs','/api/sequential','/api/sequential/ai-jobs','/api/sequential/ai-apply','/api/agents','/api/library/compare','/api/payoff-sweep','/api/agent-comparisons','/api/agent-comparisons/replay') else 2048):
+            if not 0 < length <= (100000 if self.path in ('/api/graph/versions','/api/laboratories','/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/reviews','/api/ai/decision-jobs','/api/ai/decision-optimizer','/api/predictions/forecast','/api/predictions/observe','/api/predictions/evaluate','/api/ai/config','/api/ai/jobs','/api/sequential','/api/sequential/ai-jobs','/api/sequential/ai-apply','/api/agents','/api/library/compare','/api/payoff-sweep','/api/agent-comparisons','/api/agent-comparisons/replay') else 2048):
                 raise ValueError()
             payload = json.loads(self.rfile.read(length))
             if self.path.startswith('/api/predictions/'):
@@ -212,6 +217,11 @@ class Handler(BaseHTTPRequestHandler):
                 action={'forecast':prediction_eval.forecast,'observe':prediction_eval.observe,'evaluate':prediction_eval.evaluate}[self.path.rsplit('/',1)[1]]
                 try:return self.send(200,action(DB,payload))
                 except ValueError as error:return self.send(400,{'error':str(error)})
+            if self.path in ('/api/ai/decision-jobs','/api/ai/decision-optimizer'):
+                try:return self.send(202,(ai_jobs.start_decision(DB,payload) if self.path.endswith('jobs') else ai_jobs.start_decision_optimizer(DB,payload)))
+                except Conflict as error:return self.send(409,{'error':str(error)})
+                except NotFound as error:return self.send(404,{'error':str(error)})
+                except (ValueError,KeyError,TypeError) as error:return self.send(400,{'error':str(error)})
             if self.path == '/api/ai/reviews':
                 try:return self.send(202,ai_jobs.start_review(DB,payload))
                 except Conflict as error:return self.send(409,{'error':str(error)})

@@ -150,4 +150,4 @@ La generación de prueba no modifica expedientes ni descarga modelos. Puede tard
 
 El laboratorio incorpora revisiones de analista y crítico y un registro prospectivo de predicciones contra una referencia. Consulte [Agentes y evaluación](docs/AGENTES-Y-EVALUACION.md) para contratos, reproducción de Brier, límites de evidencia y trabajo pendiente. Estas funciones no garantizan éxito judicial ni precisión predictiva.
 
-La comparación de agentes que deciden con Ollama y el agente asesor de experimentación pueden ejecutarse desde Python: [Decisiones IA y comparación reproducible](docs/DECISIONES-IA-COMPARACION.md). Este bloque aún no está integrado en los botones React de laboratorios.
+La comparación de agentes que deciden con Ollama y el asesor de experimentación están integrados en **Asistente de IA local** de React, además del comando Python. Incluyen trabajos en segundo plano, versiones calculadas, gráfico por ronda, registro JSON y reproducción sin inferencia. El asesor prepara experimentos que requieren revisión explícita antes de ejecutarse. Consulte [Decisiones IA y comparación reproducible](docs/DECISIONES-IA-COMPARACION.md).

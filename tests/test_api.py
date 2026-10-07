@@ -11,6 +11,28 @@ from escenarios.server import Handler
 
 
 class ApiTests(unittest.TestCase):
+    def test_decision_routes_bind_saved_version_and_export_replay(self):
+        from escenarios import server,ai_jobs,decision_agents
+        from test_laboratories import prepare_case
+        from test_decision_jobs import ImmediateThread
+        case=prepare_case(server.DB)
+        payload={'workflow_id':case['id'],'version':1,'options':{'actor':0,'rounds':1,'seeds':[42],'baseline':'fixed0','opponent':'fixed0','noise':0},'assumptions':'Prueba sintética de API.','reviewed':True}
+        def post(route,data):
+            with urlopen(Request(self.base+route,data=json.dumps(data).encode(),headers={'Content-Type':'application/json','Origin':self.base})) as response:return response.status,json.load(response)
+        # Preparar el trabajo sin sustituir los hilos del servidor HTTP.
+        with patch('escenarios.ai_jobs.threading.Thread',ImmediateThread),patch('escenarios.local_ai.status',return_value={'ready':True,'config':{'model':'mistral:latest'}}),patch('escenarios.local_ai.request',return_value={'done':True,'message':{'content':'{"action":1,"reason":"Ensayo de API."}'}}):job=ai_jobs.start_decision(server.DB,payload)
+        with patch('escenarios.ai_jobs.start_decision',return_value=job) as start:
+            status,value=post('/api/ai/decision-jobs',payload)
+            self.assertEqual(status,202);self.assertEqual(value['id'],job['id']);self.assertEqual(start.call_args.args[1],payload)
+        for endpoint in ['decision-export','decision-replay']:
+            with urlopen(self.base+'/api/ai/'+endpoint+'?id='+job['result']['id']) as response:value=json.load(response)
+            self.assertEqual(value['sha256'],job['result']['sha256'])
+        with urlopen(self.base+'/api/ai/jobs?workflow=decisions:'+case['id']) as response:self.assertEqual(json.load(response)[0]['id'],job['id'])
+        with self.assertRaises(HTTPError) as error:post('/api/ai/decision-jobs',{**payload,'reviewed':False})
+        self.assertEqual(error.exception.code,400)
+        with self.assertRaises(HTTPError) as error:post('/api/ai/decision-optimizer',{'job_id':'missing'})
+        self.assertEqual(error.exception.code,404)
+
     def test_prediction_routes_preserve_forecasts_and_reject_unobserved_evaluation(self):
         from datetime import datetime,timezone,timedelta
         def post(route,payload):

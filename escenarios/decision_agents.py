@@ -80,7 +80,7 @@ def choose(path,actor,model,history,seed):
         trace['finished_at']=now();audit(path,trace)
 
 
-def compare(path,payload):
+def prepare(payload):
     if not isinstance(payload,dict) or not isinstance(payload.get('options'),dict):raise ValueError('Configuración de comparación inválida.')
     model=validate(payload['model']);o=payload['options'];actor=o.get('actor')
     n=o.get('rounds');seeds=o.get('seeds');baseline=o.get('baseline');opponent=o.get('opponent');noise=o.get('noise')
@@ -93,6 +93,12 @@ def compare(path,payload):
     if not isinstance(rationale,str) or not rationale.strip() or len(rationale)>6000:raise ValueError('Supuestos revisados requeridos.')
     if payload.get('reviewed') is not True:raise ValueError('Revisá la matriz y los supuestos antes de simular.')
     o={'actor':actor,'rounds':n,'seeds':list(seeds),'baseline':baseline,'opponent':opponent,'noise':noise}
+    return {'model':model,'options':o,'assumptions':rationale,'reviewed':True}
+
+
+def compare(path,payload,*,workflow_source=None):
+    config=prepare(payload);model=config['model'];o=config['options'];rationale=config['assumptions']
+    actor=o['actor'];n=o['rounds'];seeds=o['seeds'];baseline=o['baseline'];opponent=o['opponent'];noise=o['noise']
     trials=[]
     for seed in seeds:
         traces=[]
@@ -115,8 +121,17 @@ def compare(path,payload):
             'Reproducción usa decisiones conservadas; no vuelve a consultar Ollama.',
             'La IA solo elige índices válidos; coherencia semántica y optimalidad requieren revisión.',
             'p y q no determinan conductas; las frecuencias previas son supuestos.']}
+    if workflow_source is not None:result['workflow']=workflow_source
     record={'id':str(uuid4()),'created_at':now(),'payload':result,'sha256':fingerprint(result)}
     with closing(connect(path)) as db,db:db.execute('INSERT INTO decision_comparisons VALUES (?,?)',(record['id'],json.dumps(record,ensure_ascii=False,allow_nan=False)))
+    return record
+
+
+def get_record(path,identity):
+    with closing(connect(path)) as db:row=db.execute('SELECT payload FROM decision_comparisons WHERE id=?',(identity,)).fetchone()
+    if not row:raise ValueError('Comparación desconocida.')
+    record=json.loads(row[0])
+    if fingerprint(record['payload'])!=record['sha256']:raise ValueError('La comparación no coincide con su huella.')
     return record
 
 

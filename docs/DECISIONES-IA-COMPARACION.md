@@ -49,6 +49,16 @@ Prueba real de Ollama en un juego sintético de una ronda: candidato 5 puntos fr
 
 Nueve pruebas específicas comprueban rechazo de decisiones inválidas, auditoría de fallos e interrupciones, información previa, pagos protegidos, perturbaciones comunes, repetición sin red, detección de cambios y ausencia de promoción automática. La suite completa de 128 pruebas pasó con la implementación final.
 
-## Pendiente para la experiencia integrada
+## Panel React integrado
 
-Trabajo en segundo plano desde la interfaz React, consulta y exportación de estas comparaciones, vínculo con versiones congeladas del expediente e informe ejecutivo, protocolo de datos observados y optimización con conjuntos separados de entrenamiento y evaluación. Las funciones nuevas están disponibles mediante Python y el comando, todavía no en los botones existentes de laboratorios. La evaluación prospectiva binaria existente permanece separada; utilidad simulada no se transforma en Brier ni en evidencia de éxito judicial.
+En `/app/`, abrir **Asistente de IA local** y seleccionar un expediente. El panel **Agente de decisión · IA frente a políticas** permite elegir una versión calculada, actor, referencia, rival, rondas, semillas y error de ejecución. Revisar la matriz y completar supuestos habilita el inicio. La API toma la matriz guardada de esa versión e ignora una matriz enviada por el navegador. Expedientes sin versiones calculadas no habilitan simulaciones.
+
+El trabajo continúa en segundo plano. El historial conserva hasta veinte trabajos del expediente y muestra resultados, fallos y recomendaciones. El gráfico compara utilidad acumulada y el selector de ronda presenta acción pretendida, acción ejecutada, razón y pagos calculados por Python. Se puede verificar la reproducción y descargar el registro JSON con las respuestas originales. Los textos generados se conservan literalmente; el modelo puede devolver explicaciones en otro idioma.
+
+El asesor se solicita sobre una comparación terminada. **Cargar propuesta para revisar** copia su configuración al formulario, con la revisión desmarcada; no inicia una simulación. La navegación protege un formulario modificado, aunque todavía no recupera borradores tras un cierre inesperado.
+
+Verificación del bloque integrado: 133 pruebas Python y 47 de contratos de interfaz correctas, compilación de producción correcta. En una base de QA separada se ejecutó una comparación real desde React, se verificó su reproducción sin inferencia, se consultó una recomendación real y se cargó el borrador con dos rondas, semillas nuevas y ruido 0.1. La revisión quedó desmarcada y el inicio deshabilitado. Se comprobó el diálogo de descarte y la conservación del formulario al continuar editando. La captura de pantalla no estuvo disponible; se verificaron estados accesibles, no composición visual ni impresión paginada.
+
+## Pendiente
+
+Informe ejecutivo unificado, protocolo de datos observados y optimización con conjuntos separados de entrenamiento y evaluación. La evaluación prospectiva binaria existente permanece separada; utilidad simulada no se transforma en Brier ni en evidencia de éxito judicial.

@@ -5,7 +5,7 @@ import threading
 from contextlib import closing
 from uuid import uuid4
 from . import local_ai
-from .workflow import get_workflow,now,Conflict,NotFound
+from .workflow import get_workflow,get_version,now,Conflict,NotFound
 
 LOCK=threading.Lock()
 RUNNING=False
@@ -28,7 +28,7 @@ def get_job(path,identity):
 
 def list_jobs(path,workflow_id):
     with closing(connect(path)) as db:
-        return [json.loads(row[0]) for row in db.execute('SELECT payload FROM ai_jobs WHERE workflow_id=? ORDER BY rowid DESC LIMIT 5',(workflow_id,))]
+        return [json.loads(row[0]) for row in db.execute('SELECT payload FROM ai_jobs WHERE workflow_id=? ORDER BY rowid DESC LIMIT ?',(workflow_id,20 if workflow_id.startswith('decisions:') else 5))]
 
 
 def store(path,value):
@@ -67,7 +67,10 @@ def start(path,payload):
 def worker(path,workflow,value):
     global RUNNING
     try:
-        if value.get('kind')=='review':
+        if value.get('kind') in ('decision','decision_optimizer'):
+            from . import decision_agents
+            value['result']=(decision_agents.compare(path,workflow['config'],workflow_source=workflow['workflow']) if value['kind']=='decision' else decision_agents.optimize_process(path,workflow['comparison_id']))
+        elif value.get('kind')=='review':
             from .review_agents import run
             value['result']=run(path,workflow)
         else:value['result']=(local_ai.propose_tree(path,workflow) if value.get('kind')=='sequential' else local_ai.propose(path,workflow))
@@ -82,6 +85,39 @@ def worker(path,workflow,value):
         try:store(path,value)
         finally:
             with LOCK:RUNNING=False
+
+
+def dispatch(path,snapshot,kind,scope,version):
+    global RUNNING
+    with LOCK:
+        if RUNNING:raise Conflict('Ya hay una generación local en curso.')
+        RUNNING=True
+    value={'id':str(uuid4()),'workflow_id':'decisions:'+scope,'kind':kind,'base_version':version,
+        'input_snapshot':snapshot,'created_at':now(),'state':'running','result':None,'error':None}
+    try:
+        store(path,value);threading.Thread(target=worker,args=(path,snapshot,value),daemon=True).start()
+    except Exception:
+        with LOCK:RUNNING=False
+        raise
+    return value
+
+
+def start_decision(path,payload):
+    from .decision_agents import prepare
+    if not isinstance(payload,dict) or type(payload.get('version')) is not int or not 1<=payload['version']<=2147483647:raise ValueError('Versión calculada requerida.')
+    source=get_version(path,payload['workflow_id'],payload['version'])
+    config=prepare({'model':source['model'],'options':payload.get('options'),'assumptions':payload.get('assumptions'),'reviewed':payload.get('reviewed')})
+    context={'id':payload['workflow_id'],'title':source['model']['title'],'version':payload['version']}
+    snapshot={'config':config,'workflow':context,'source_context':source.get('context')}
+    return dispatch(path,snapshot,'decision',context['id'],context['version'])
+
+
+def start_decision_optimizer(path,payload):
+    job=get_job(path,payload['job_id'])
+    if job.get('kind')!='decision' or job['state']!='ready':raise ValueError('Seleccioná una comparación de decisiones terminada.')
+    source=job['input_snapshot']['workflow']
+    snapshot={'comparison_id':job['result']['id'],'source_job_id':job['id'],'workflow':source}
+    return dispatch(path,snapshot,'decision_optimizer',source['id'],source['version'])
 
 
 def tree_snapshot(payload):

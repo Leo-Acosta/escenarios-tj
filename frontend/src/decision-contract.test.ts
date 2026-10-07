@@ -1,0 +1,17 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {decisionJob} from './decision-contract.ts';
+const model={title:'Ensayo',actors:['A','B'],strategies:[['1','2'],['1','2']],a:[[3,0],[5,1]],b:[[3,5],[0,1]],p:.5,q:.5};
+const options={actor:0,rounds:1,seeds:[42],baseline:'fixed0',opponent:'fixed0',noise:0};
+const round={round:1,intended:[1,0],actions:[1,0],payments:[5,0],totals:[5,0],reasons:['Ensayo','Referencia']};
+const candidate={engine:'repeated-local-ai-v1',model,options:{rounds:1,seed:42,execution_seed:42,noise:0,policies:['local_ai','fixed0']},means:[5,0],rounds:[round]};
+const baseline={...candidate,engine:'repeated-paired-noise-v1',options:{...candidate.options,policies:['fixed0','fixed0']}};
+const trace={state:'accepted',input:{actor_index:0,completed_rounds:0},input_sha256:'a'.repeat(64),decision:{action:1,reason:'Ensayo'}};
+const comparison={id:'c',sha256:'b'.repeat(64),payload:{engine:'local-ai-policy-comparison-v1',evidence:'simulation_only',promotion_allowed:false,workflow:{id:'case',title:'Ensayo',version:1},model,options,trials:[{seed:42,candidate,baseline,utility_delta:2,decisions:[trace]}],mean_utility_delta:2,limits:['Sin datos observados'],assumptions:'Hipótesis'}};
+const job={id:'j',kind:'decision',workflow_id:'decisions:case',base_version:1,state:'ready',error:null,input_snapshot:{workflow:{id:'case',version:1}},result:comparison};
+test('conserva comparación con versión y decisiones',()=>{assert.equal(decisionJob(job).result?.id,'c');assert.equal(decisionJob({...job,state:'running',result:null}).result,null);});
+test('rechaza expediente, versión, motor y decisión incompatibles',()=>{for(const change of [{workflow_id:'decisions:other'},{base_version:2},{result:{...comparison,payload:{...comparison.payload,evidence:'observed'}}},{result:{...comparison,payload:{...comparison.payload,trials:[{...comparison.payload.trials[0],decisions:[{...trace,decision:{action:0,reason:'Ensayo'}}]}]}}}])assert.throws(()=>decisionJob({...job,...change}));});
+test('rechaza semillas duplicadas, ruido inválido y rondas truncadas',()=>{for(const change of [{seeds:[42,42]},{noise:NaN},{rounds:2},{actor:true}])assert.throws(()=>decisionJob({...job,result:{...comparison,payload:{...comparison.payload,options:{...options,...change}}}}));});
+const advice={id:'a',source_comparison:'c',suggestion:{next_step:'stress_test',opponent:'mirror',reason:'Evaluar rival'},experiment_draft:{model,options,assumptions:'Hipótesis',reviewed:false},limits:[],promotion_allowed:false,auto_execution:false};
+const optimizer={...job,kind:'decision_optimizer',input_snapshot:{...job.input_snapshot,source_job_id:'j'},result:advice};
+test('asesor conserva propuesta sin aprobación y rechaza promoción automática',()=>{assert.equal(decisionJob(optimizer).result?.id,'a');for(const change of [{auto_execution:true},{promotion_allowed:true},{experiment_draft:{...advice.experiment_draft,reviewed:true}}])assert.throws(()=>decisionJob({...optimizer,result:{...advice,...change}}));assert.throws(()=>decisionJob({...optimizer,input_snapshot:job.input_snapshot}));});
