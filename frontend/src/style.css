@@ -26,3 +26,5 @@
 .network-relation-list>div{flex-wrap:wrap}.relation-evidence-editor{flex-basis:100%;padding:15px;background:#f3f7fa;border-radius:10px}.tree-detail .preserve{overflow-wrap:anywhere}
 
 .ai-lab button{margin:8px 12px 8px 0}.ai-lab details{margin:18px 0}.ai-lab .preserve{overflow-wrap:anywhere}.ai-lab .tree-review{display:flex;align-items:center;gap:12px;margin:20px 0}.ai-lab summary{cursor:pointer;font-weight:600}
+
+.tree-ai{padding:20px;margin:24px 0;border:1px solid #c8dbd7;border-radius:12px;background:#f1f8f5}.tree-ai h4{margin-bottom:8px}

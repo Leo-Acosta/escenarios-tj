@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc --noEmit && vite build",
     "dev": "vite --host 127.0.0.1",
-    "test": "node --experimental-strip-types --test src/contracts.test.ts src/editing.test.ts src/comparison-contract.test.ts src/tree-contract.test.ts src/tree-editing.test.ts src/laboratory-contract.test.ts src/network-contract.test.ts src/network-editing.test.ts src/ai-contract.test.ts"
+    "test": "node --experimental-strip-types --test src/contracts.test.ts src/editing.test.ts src/comparison-contract.test.ts src/tree-contract.test.ts src/tree-editing.test.ts src/laboratory-contract.test.ts src/network-contract.test.ts src/network-editing.test.ts src/ai-contract.test.ts src/tree-ai-contract.test.ts"
   },
   "dependencies": {
     "@xyflow/react": "12.12.0",

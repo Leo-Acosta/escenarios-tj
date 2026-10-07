@@ -67,4 +67,6 @@ El editor React de redes crea borradores o copias, edita entidades y relaciones 
 
 Las relaciones conservan evidencia opcional (fuente, referencia y nota) en cada versión. React permite editarla y consultarla; Python valida campos y mantiene compatibilidad histórica. Ver EVIDENCIA-REDES-REACT.md.
 
-El asistente de IA local React integra disponibilidad, configuración, propuestas de expediente en segundo plano y aplicación revisada al borrador, protegida por revisión histórica. Ver IA-LOCAL-REACT.md. La IA de árboles sigue en la mesa previa.
+El asistente de IA local React integra disponibilidad, configuración, propuestas de expediente en segundo plano y aplicación revisada al borrador, protegida por revisión histórica. Ver IA-LOCAL-REACT.md. La asistencia de árboles también está integrada en el editor React: ver IA-ARBOLES-REACT.md.
+
+Estado de cierre de fase 2: CIERRE-FASE-2.md. Pendientes dos bloques: reproducción detallada de comparaciones y revisión integral de flujos.

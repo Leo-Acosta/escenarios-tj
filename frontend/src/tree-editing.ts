@@ -1,5 +1,5 @@
 import {trees,type TreeRecord} from './tree-contract.ts';
-export type TreeDraft={simulation?:{iterations:string;seed:string;radius:string};workflow_id?:string;title:string;actors:string[];actions:string[][];payoffs:string[][][];assumptions:string};
+export type TreeDraft={ai_job_id?:string;simulation?:{iterations:string;seed:string;radius:string};workflow_id?:string;title:string;actors:string[];actions:string[][];payoffs:string[][][];assumptions:string};
 export function draftTree(source?:TreeRecord):TreeDraft{return source?{...source.model,workflow_id:source.workflow?.id,actors:[...source.model.actors],actions:source.model.actions.map(r=>[...r]),payoffs:source.model.payoffs.map(r=>r.map(p=>p.map(String)))}:{title:'',actors:['',''],actions:[['',''],['',''],['','']],payoffs:Array.from({length:2},()=>Array.from({length:2},()=>['',''])),assumptions:''};}
 export function treePayload(d:TreeDraft,reviewed:boolean){
  if(!reviewed)throw new Error('Confirmá la revisión del modelo antes de guardar.');
