@@ -41,3 +41,11 @@ La navegación principal y la apertura de expedientes vinculados usan un diálog
 Verificación en navegador/base aislada: título de un nuevo expediente introducido, clic en la sección actual, intento de navegar a laboratorios, diálogo visible con foco en Seguir editando, cancelación con título conservado y posterior descarte explícito con llegada a laboratorios. Esta evidencia reemplaza la prueba inconclusa del diálogo nativo de navegación principal. Los diálogos internos de árboles/redes/laboratorios y el manejo visual de conflicto siguen requiriendo recorrido específico.
 
 El ajuste de viewport del navegador volvió a devolver un ancho efectivo de 749 px aunque se solicitó 390 px. No se certifica todavía el tamaño estrecho. Quedan pendientes pantalla estrecha e impresión paginada; fase 2 abierta.
+
+## Diálogos internos y conflicto · recorrido verificado
+
+Árboles, redes y cambios de expediente/tipo de laboratorio utilizan el diálogo integrado compartido. Pulsar el laboratorio ya seleccionado no reinicia la configuración. Cancelar mantiene los campos; confirmar ejecuta el cambio pendiente. La recarga tras conflicto de expediente pide confirmación específica antes de sustituir los campos locales por la revisión del servidor.
+
+Evidencia del navegador sobre data/qa-phase2-dialogs.sqlite3: configuración de 17 rondas conservada al cancelar cambio a comparador y reiniciada a 50 tras confirmar; título Árbol local QA conservado al cancelar y borrador cerrado al confirmar; título Red local QA conservado al cancelar y edición cerrada al confirmar. Conflicto real: revisión 7 abierta, revisión 8 escrita en la base aislada, guardar desde el editor recibió 409. Título local conservado después de cancelar recarga; confirmación cargó Título cambiado en otra sesión QA y mostró revisión 8. La versión calculada original permaneció conservada. No se modificó la base principal.
+
+Validación: 43 pruebas frontend y compilación de producción correctas. Para cerrar fase 2 quedan dos verificaciones visuales: tamaño estrecho efectivo e impresión paginada. Los recorridos de descarte y conflicto ya cuentan con evidencia de navegador.
