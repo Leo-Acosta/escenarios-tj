@@ -123,6 +123,16 @@ class Handler(BaseHTTPRequestHandler):
                 return self.send(404,{'error':str(error)})
             except (ValueError,TypeError):
                 return self.send(400,{'error':'Referencia de propuesta inválida.'})
+        if url.path == '/api/workflows/report.pdf':
+            try:
+                args=parse_qs(url.query)
+                record=get_version(DB,args.get('id',[''])[0],args.get('version',[''])[0])
+            except NotFound as error:return self.send(404,{'error':str(error)})
+            except (ValueError,TypeError):return self.send(400,{'error':'Referencia de versión inválida.'})
+            try:
+                from .workflow_report import build_pdf
+            except ImportError:return self.send(503,{'error':'ReportLab no está disponible para exportar PDF.'})
+            return self.send(200,build_pdf(record),'application/pdf')
         if url.path == '/api/workflows':
             try:
                 args=parse_qs(url.query)

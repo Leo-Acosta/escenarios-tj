@@ -173,6 +173,20 @@ class ApiTests(unittest.TestCase):
             data=json.load(response)
         self.assertEqual(data[0]['result']['recommendation'],'Cooperar')
 
+    def test_frozen_workflow_pdf_route(self):
+        from test_laboratories import prepare_case
+        from escenarios import server
+        case=prepare_case(server.DB)
+        route=self.base+'/api/workflows/report.pdf?id='+case['id']+'&version=1'
+        with urlopen(route) as response:
+            self.assertEqual(response.headers['Content-Type'],'application/pdf')
+            self.assertTrue(response.read().startswith(b'%PDF'))
+        for suffix,status in [('&version=invalid',400)]:
+            with self.assertRaises(HTTPError) as error:urlopen(self.base+'/api/workflows/report.pdf?id='+case['id']+suffix)
+            self.assertEqual(error.exception.code,status)
+        with self.assertRaises(HTTPError) as error:urlopen(self.base+'/api/workflows/report.pdf?id=missing&version=1')
+        self.assertEqual(error.exception.code,404)
+
     def test_workflow_creation_retrieval_and_revision_conflict(self):
         payload={'action':'create','title':'Caso API','description':'Una descripción suficiente del problema.'}
         headers={'Origin':self.base,'Content-Type':'application/json'}

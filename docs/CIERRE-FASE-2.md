@@ -57,3 +57,11 @@ Para evitar el ajuste de viewport que no se aplicaba en el navegador integrado, 
 Impresión corregida: las etiquetas de planes de equilibrio vuelven a ser visibles; el árbol imprime si el gráfico muestra modelo base o una muestra Monte Carlo y aclara que las tablas conservan el modelo base. Se define A4 con márgenes de 15 mm, encabezados de tabla repetibles, títulos unidos al contenido siguiente y listas de red sin recorte por altura. Se mantienen alcance y procedencia.
 
 Validación: 43 pruebas frontend y compilación correctas. La inspección de CSS y la comprobación estrecha no sustituyen una prueba de impresión paginada. Falta esa verificación visual para cerrar fase 2; no se declara finalizada. El informe unificado de fase 6 permanece fuera de este bloque.
+
+## PDF individual de matriz · paginación verificada
+
+El Centro de análisis descarga un PDF de la versión de matriz seleccionada mediante GET /api/workflows/report.pdf?id=...&version=.... Python lee get_version; no toma la matriz del borrador actual ni recalcula las utilidades. Incluye actores, matriz, probabilidades, utilidades, equilibrios, preparación, supuestos, fuentes aportadas y límites con referencia de versión. Es un informe individual; no reúne laboratorios ni sustituye el informe unificado de fase 6.
+
+Muestra output/pdf/informe-matriz-conservada.pdf generada desde la versión 1 de la base aislada, cuyo borrador actual ya tenía otro título. Dos páginas A4 renderizadas e inspeccionadas: títulos, tablas, pies y numeración legibles, sin cortes ni superposiciones. En navegador se verificó el enlace a versión 3 del expediente principal. 43 pruebas frontend, compilación y 17 pruebas API correctas; la API rechaza referencias inválidas y expedientes inexistentes. Servidor local actualizado.
+
+Esta verificación acredita el PDF generado por Python, no la función Imprimir vista del navegador. El navegador integrado no expone una herramienta de exportación/captura de su impresión paginada. La fase 2 sigue abierta por esa comprobación específica; no debe confundirse la salida PDF individual ya verificada con la impresión HTML pendiente.
