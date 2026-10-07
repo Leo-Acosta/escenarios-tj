@@ -11,6 +11,31 @@ from escenarios.server import Handler
 
 
 class ApiTests(unittest.TestCase):
+    def test_continuity_snapshot_recovery_and_origin_guard(self):
+        import base64
+        from escenarios import server,continuity
+        from test_laboratories import prepare_case
+        case=prepare_case(server.DB)
+        with urlopen(self.base+'/api/continuity/status') as response:
+            self.assertEqual(json.load(response)['integrity'],'ok')
+        with urlopen(self.base+'/api/continuity/backup') as response:
+            content=response.read()
+            self.assertEqual(response.headers['Content-Type'],'application/vnd.sqlite3')
+        def post(payload,origin=None):
+            return urlopen(Request(self.base+'/api/continuity/recover',data=json.dumps(payload).encode(),
+                headers={'Content-Type':'application/json','Origin':origin or self.base}))
+        payload={'content':base64.b64encode(content).decode(),'reviewed':True}
+        for data in [{**payload,'reviewed':False},{**payload,'content':'invalid base64'}]:
+            with self.assertRaises(HTTPError) as error:post(data)
+            self.assertEqual(error.exception.code,400)
+        with self.assertRaises(HTTPError) as error:post(payload,'https://untrusted.example')
+        self.assertEqual(error.exception.code,403)
+        with post(payload) as response:recovered=json.load(response)
+        self.assertFalse(recovered['active_database_changed'])
+        self.assertEqual(continuity.inspect(server.DB.parent/'recovered'/recovered['file'])['schema_version'],1)
+        with urlopen(self.base+'/api/workflows?id='+case['id']) as response:
+            self.assertEqual(json.load(response)['id'],case['id'])
+
     def test_variable_dictionary_accepts_hundred_variables_with_long_unicode_sources(self):
         from escenarios import server
         from test_laboratories import prepare_case

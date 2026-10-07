@@ -10,7 +10,7 @@ Estado al 7 de octubre de 2026. Arquitectura local: núcleo Python, SQLite e int
 | 2 · Experiencia integral | Expedientes, laboratorios, navegación y versiones | Funciones integradas; falta comprobar impresión HTML paginada |
 | 3 · Variables y unidades | Diccionario de variables con unidad, tipo, fuente, incertidumbre y vínculo explícito con el modelo | Cerrada en alcance definido: API, editor React, historial, JSON, reproducción e informe ejecutivo |
 | 4 · Gráficos avanzados | Árboles, redes, vectores y sensibilidad enlazados a versiones, con filtros y exportación | Árboles/redes existentes más vectores, sensibilidad Python, filtros, fuentes y exportaciones implementados; aceptación visual integral pendiente |
-| 5 · Continuidad de datos | Autoguardado de borradores, respaldo, restauración y migraciones | Versiones y protección de descarte implementadas; autoguardado y recuperación pendientes |
+| 5 · Continuidad de datos | Autoguardado de borradores, respaldo, restauración y migraciones | Borradores de expediente React/Mesa, respaldo SQLite, recuperación separada y esquema v1 implementados; autoguardado de laboratorios independientes pendiente |
 | 6 · Informe ejecutivo unificado | Un documento que reúna matriz y laboratorios desde referencias congeladas | Cerrada en alcance funcional: selección, historial, A4, PDF vectorial, JSON y reproducción; verificación visual de impresión HTML limitada |
 | 7 · Agentes y comparación | Decisiones auditadas, políticas explícitas y mejora controlada | Implementación cerrada para juegos 2×2; baterías, registros versionados, asesor y calibración revisable integrados |
 | 8 · Evaluación predictiva | Protocolo, particiones temporales y prueba independiente | Infraestructura y recorrido terminados; validación empírica abierta por falta de observaciones reales independientes |
@@ -28,9 +28,13 @@ Crear y editar expedientes guiados, calcular y consultar matrices 2×2, comparar
 
 ## Criterios que siguen abiertos
 
-La impresión HTML necesita revisión visual paginada en un navegador que permita observar su salida. El visor PDF depende del navegador y mantiene descarga alternativa. Los escenarios complejos requieren ampliar las dimensiones actuales y las transformaciones de variables; el diccionario básico está implementado, y la IA no reemplaza la validación del modelo. La edición protege borradores frente a descartes, pero todavía no los recupera automáticamente después de un cierre inesperado. No hay fecha ni porcentaje de terminación global medidos.
+La impresión HTML necesita revisión visual paginada en un navegador que permita observar su salida. El visor PDF depende del navegador y mantiene descarga alternativa. Los escenarios complejos requieren ampliar las dimensiones actuales y las transformaciones de variables; el diccionario básico está implementado, y la IA no reemplaza la validación del modelo. Los editores de expediente ofrecen recuperación de copias locales al reabrir. Los formularios independientes de los laboratorios aún no tienen autoguardado. No hay fecha ni porcentaje de terminación global medidos.
 
 ## Interfaz experimental
 
 Primera implementación blanca y oliva en React/TypeScript, con modo inmersivo y contexto trazable. Ver [alcance y verificación](INTERFAZ-EXPERIMENTAL.md). Este cambio visual no cierra la ampliación funcional de fase 4; revisión visual mediante captura pendiente por limitación del navegador.
 
+
+## Continuidad de datos · fase 5
+
+Ver [implementación, verificación y límites](FASE-5-CONTINUIDAD.md). Respaldo y restauración separada disponibles; falta completar recuperación en los formularios independientes de laboratorios para cerrar integralmente esta fase.

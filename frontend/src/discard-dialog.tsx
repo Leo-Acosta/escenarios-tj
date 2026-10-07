@@ -1,6 +1,6 @@
 import React,{useEffect,useRef} from 'react';
 
-export default function DiscardDialog({onStay,onDiscard,description='Si salís de esta sección, se descartará el borrador local. Las versiones guardadas permanecen disponibles.',action='Descartar y continuar'}:{onStay:()=>void;onDiscard:()=>void;description?:string;action?:string}){
+export default function DiscardDialog({onStay,onDiscard,description='Si salís de esta sección, se descartarán los campos del formulario. Las copias de recuperación disponibles se conservan. Las versiones guardadas permanecen disponibles.',action='Descartar y continuar'}:{onStay:()=>void;onDiscard:()=>void;description?:string;action?:string}){
  const dialog=useRef<HTMLDialogElement>(null);
  useEffect(()=>{const element=dialog.current!;element.showModal();return()=>element.close();},[]);
  return <dialog ref={dialog} className="discard-dialog" aria-labelledby="discard-title" aria-describedby="discard-description" onCancel={e=>{e.preventDefault();onStay();}}>
