@@ -1,55 +1,57 @@
 # Fase 5 · continuidad y recuperación
 
-Implementación del 7 de octubre de 2026. El núcleo de respaldo/restauración y la recuperación de borradores de expediente están operativos. La fase completa sigue abierta hasta ampliar la recuperación a los formularios independientes de todos los laboratorios.
+Cierre funcional: 7 de octubre de 2026. Implementación, pruebas de integración y recorrido de recuperación terminados. La validación empírica de fase 8 permanece abierta; este cierre no acredita mejores predicciones.
 
-## Qué protege
+## Borradores y concurrencia
 
-El editor React conserva una copia local de cada borrador de expediente, incluidos campos numéricos incompletos, fuentes parciales, supuestos, título/descripción de un expediente nuevo y respuesta guiada todavía no enviada. La Mesa estratégica original conserva modelo, fuentes, supuestos y campos pendientes de fuente/respuesta. Las copias se separan por expediente, interfaz y formato. Al reabrir se ofrecen, no se aplican automáticamente.
+El editor React conserva campos incompletos, pagos, fuentes parciales, título, descripción, supuestos y respuestas sin enviar. Los laboratorios conservan parámetros de agentes/comparación/barridos, variables, composición ejecutiva, árboles, redes, protocolos/candidatos, baterías, decisiones IA y pronósticos/observaciones. La Mesa estratégica protege el expediente y los cuatro formularios analíticos originales. La entrada auxiliar de nodos de su red ilustrativa no constituye un editor versionado: para redes propias se usa React.
 
-Recuperar vuelve a poner los datos en el formulario, elimina la confirmación de revisión y no modifica SQLite ni calcula. La interfaz advierte si la revisión del servidor cambió. Guardar sigue utilizando la revisión actual y los controles de conflicto existentes. Un cambio en otra pestaña ofrece la copia compartida antes de sobrescribirla; no se garantiza coordinación transaccional entre pestañas que escriban simultáneamente. Las copias del navegador no son versiones analíticas ni respaldo permanente: dependen del mismo origen/puerto, navegador y almacenamiento disponible. Se muestran errores de lectura, corrupción o cuota; no se afirma guardado cuando falla.
+Cada documento/pestaña escribe una variante separada. Las copias se identifican por interfaz, expediente y versión/fuente/protocolo según el módulo. El registro predictivo histórico es global y se identifica así. Dos pestañas pueden conservar sus últimas variantes sin sobrescribirse: el panel permite elegir la copia. Las claves antiguas siguen siendo compatibles. Guardar o eliminar una copia no elimina las variantes de otras pestañas; si el contenido seleccionado cambió, se rechaza su eliminación o recuperación. No se promete una transacción distribuida ni una fusión automática entre pestañas. Las copias incompatibles se conservan y las válidas del editor siguen disponibles.
 
-Las copias se limpian tras guardar correctamente en SQLite o mediante descarte explícito. Salir de un formulario descarta sus campos visibles, pero puede conservar su copia de recuperación. La revisión no se restaura como aceptada. Los formularios independientes de árboles, redes, variables, investigación, informe y parámetros de simulación mantienen su protección de descarte anterior; su autoguardado aún no está integrado.
+Recuperar requiere una acción explícita, devuelve los campos al formulario y desmarca la revisión. No modifica SQLite, calcula ni inicia inferencias. Cambiar de expediente o versión exige el control de descarte existente. El editor advierte si cambió la revisión del servidor; guardar continúa usando control de conflictos. Los contratos de recuperación tienen estructura estable y excluyen revisiones y autorizaciones de inferencia. Al crear un protocolo/candidato, los campos pendientes del contexto anterior no se aplican silenciosamente al nuevo.
 
-## Respaldo y restauración
+Las copias dependen del navegador, origen/puerto y almacenamiento disponible. No son versiones analíticas ni respaldo permanente. Se muestran errores de cuota y lectura. Las variantes abandonadas se retiran explícitamente: no hay caducidad que elimine trabajo sin consentimiento. Guardar en SQLite limpia la copia propia/consumida de React; los parámetros de la Mesa se limpian manualmente. Descartar campos visibles puede conservar su copia recuperable.
 
-Abrir **Respaldo y recuperación** desde `/app/` o el acceso de la Mesa estratégica. **Descargar respaldo** produce una instantánea SQLite usando la API de respaldo, incluyendo cambios confirmados en WAL. Incluye tablas de expedientes, versiones, redes, agentes, investigación, IA local e informes que existan en la base. No incluye formularios pendientes del navegador ni los archivos externos citados como fuentes.
+Si un módulo no puede cargarse tras actualizar la interfaz, un aviso visible permite reabrir la aplicación y recuperar sus copias. No se afirma que una copia exista si su almacenamiento falló.
 
-**Verificar y recuperar** acepta una copia de hasta 20 MiB y requiere revisión explícita. Comprueba integridad SQLite, versión de esquema, tablas/columnas permitidas, ausencia de objetos no admitidos y JSON de registros. Estas comprobaciones no validan veracidad de evidencias ni toda la coherencia semántica. Una copia compatible se recupera en `data/recovered/recuperada-UUID.sqlite3`, con SHA256 calculado. Nunca se sobrescribe ni se cambia la base activa desde la interfaz. Para usar la copia, detener el servidor y reiniciarlo con el comando que muestra la pantalla; conservar la base original permite volver a ella.
+## Respaldo, restauración y esquema
 
-```powershell
+En **Respaldo y recuperación**, descargar una instantánea SQLite consistente incluye cambios confirmados en WAL y todas las tablas existentes de expedientes, versiones, redes, agentes, investigación, IA e informes. No incluye archivos externos citados ni formularios del navegador.
+
+**Verificar y recuperar** requiere revisión y admite hasta 20 MiB. Verifica integridad SQLite, esquema, tablas/columnas, objetos permitidos y JSON, rechazando NaN/Infinity. Estos controles no verifican autenticidad documental ni toda la coherencia semántica. Recupera una base nueva en data/recovered/recuperada-UUID.sqlite3 con SHA-256; nunca sobrescribe ni activa automáticamente la base original. La pantalla entrega el comando para activarla después de detener el servidor:
+
+~~~powershell
 python -m escenarios.server --port 8766 --database "data/recovered/recuperada-UUID.sqlite3"
-```
+~~~
 
-La opción `--database` también permite una base nueva. No ejecutar simultáneamente varios servidores sobre la misma base para operaciones de recuperación. Los respaldos pueden contener datos privados y no se incorporan a Git.
+Esquema v1 mediante PRAGMA user_version. La transición 0→1 valida tablas, crea una copia consistente y manifiesto en data/migration-backups/ y registra la versión sin reescribir resultados. Es idempotente. Versiones futuras y esquemas desconocidos se rechazan. Las tablas opcionales siguen creándose cuando corresponde.
 
-## Esquema y herramientas
-
-Se registra la versión 1 mediante `PRAGMA user_version`. La transición 0→1 valida las tablas existentes, crea primero una copia consistente y su manifiesto SHA256 en `data/migration-backups/`, y registra la versión sin reescribir los registros analíticos. Es idempotente. Versiones futuras o esquemas desconocidos se rechazan: no se intenta degradarlos. Los módulos siguen creando sus tablas opcionales cuando corresponde. Esta migración inicial no amplía la estructura de los modelos.
-
-```powershell
+~~~powershell
 python -m escenarios.continuity inspect --source "data/escenarios.sqlite3"
 python -m escenarios.continuity backup --source "data/escenarios.sqlite3" --destination "mi-respaldo.sqlite3"
 python -m escenarios.continuity recover --source "mi-respaldo.sqlite3" --destination "data/recovered"
-```
+~~~
 
-La herramienta de respaldo exige un destino nuevo; recuperación genera otro nombre exclusivo. API: `GET /api/continuity/status`, `GET /api/continuity/backup`, `POST /api/continuity/recover`. La recuperación conserva los controles de Host y Origin locales y rechaza entradas sin confirmación, corruptas o demasiado grandes.
+El destino de respaldo debe ser nuevo. API: GET /api/continuity/status, GET /api/continuity/backup, POST /api/continuity/recover, con controles de Host/Origin y confirmación. Conservar la base original permite volver a ella. Respaldos y datos privados se excluyen de Git.
 
-## Verificación
+## Evidencia de aceptación
 
-171 pruebas Python aprobadas. Las pruebas automatizadas cubren respaldo con WAL activo, migración idempotente con copia previa, rechazo de esquemas futuros/corrupción/objetos inesperados, recuperación sin alterar original, lectura idéntica de versiones congeladas y controles HTTP de origen y confirmación. Frontend: 67 pruebas, incluidos borradores incompletos, expedientes cruzados, formato futuro, corrupción y fallo de cuota.
+| Requisito | Evidencia |
+| --- | --- |
+| Copia consistente y recuperación separada | Pruebas WAL, original intacto, esquema futuro/corrupción rechazados y HTTP con origen/revisión |
+| Registros congelados completos | Prueba integrada con matriz, árboles, agentes, comparación, barrido, decisiones, batería, investigación, variables, red e informe: tablas idénticas tras restaurar |
+| Reproducción sin inferencia | Inferencia sustituida por una función que falla si se llama; reproducción e informe/PDF idénticos tras restaurar |
+| Formularios incompletos y versiones aisladas | Contratos de los ocho grupos de laboratorios, editor y variantes; formatos inválidos, revisiones anidadas y cuota rechazados |
+| Variantes concurrentes | Escrituras intercaladas y eliminación conservadora automatizadas; navegador: variantes de 7 y 9 rondas recuperables, guardar 9 conserva la de 7 |
+| Recuperación explícita y guardado revisado | Navegador aislado: agentes, variables, árbol, red e informe recuperados y guardados; revisión inicialmente desmarcada |
+| Planes sin ejecución automática | Navegador: protocolo y batería parciales, decisión IA y pronóstico recuperados; botones de IA permanecen deshabilitados |
+| Informe trazable después de recuperar | Recorrido navegador: emisión sintética, vista A4 y reproducción confirmada desde copias congeladas |
+| Fallo de carga visible | Actualización de assets con pestaña abierta: aviso de continuidad, reapertura y acceso a registros |
 
-En navegador se comprobó crear un borrador sintético React sin crear expediente, salir/reabrir/recuperar sus campos y descartar su copia. En la Mesa estratégica se modificó el título de un expediente sintético, se reabrió en otra pestaña y se recuperó sin guardar SQLite; la confirmación nativa de limpieza encontró una limitación del navegador y no se confirmó el descarte final de esa copia de prueba. La interfaz de recuperación aceptó una base sintética de 36 KiB y creó una base separada, mostrando identificador, SHA256 e instrucciones de activación. La base activa siguió disponible. No se utilizó el caso EDESUR como fixture.
+Resultado: **172/172 pruebas Python y 80/80 pruebas frontend aprobadas**. TypeScript y build Vite aprobados. Vite conserva un aviso no bloqueante de la dependencia React Flow sobre su directiva use client. La prueba completa de restauración utiliza datos sintéticos; no se utilizó EDESUR ni información privada como fixture.
 
-La inspección visual mediante capturas sigue limitada por el navegador; no se acredita revisión móvil ni salida física de impresión. Tampoco se provocó un cierre abrupto del sistema operativo: se verificaron las rutas de almacenamiento y reapertura.
+No todos los formularios se recorrieron manualmente: su cobertura completa de estructura/contexto es automatizada; los guardados del núcleo están cubiertos por integración. Se inspeccionó visualmente la interfaz blanco/azul marino y los controles de recuperación. El proveedor del navegador devolvió un viewport distinto al solicitado en el ensayo móvil y capturas con área vacía: no se acredita revisión visual en un dispositivo móvil real. CSS oculta paneles de recuperación al imprimir y las pruebas verifican PDF A4; no se realizó impresión física. Tampoco se provocó un cierre abrupto de Windows ni se acreditó reanudación de inferencias reales en curso. Estas comprobaciones de plataforma corresponden al empaquetado/calidad de fases 9–10, no alteran la restauración de registros ya confirmados.
 
-## Extensión a laboratorios (7 de octubre de 2026)
+## Lo siguiente
 
-La interfaz React protege parámetros de simulaciones de políticas, barridos, variables, informes, árboles, redes editables, baterías, decisiones IA y formularios de evaluación. Cada copia se identifica por módulo y expediente más versión, fuente o protocolo/candidato según corresponda. El registro predictivo histórico es global y se identifica como tal. Las revisiones y los identificadores de inferencia autorizada se excluyen. Recuperar exige una acción explícita y vuelve a desmarcar la revisión; no envía solicitudes de cálculo. Se conservan campos incompletos para continuar editando, sin convertirlos en resultados válidos.
-
-La Mesa estratégica también protege parámetros de agentes, comparador, barrido y árbol. Estas copias se vinculan a expediente y revisión y se retiran manualmente desde su panel; no se eliminan automáticamente al simular. La red React conserva entidades y relaciones, además de sus fuentes editables. Los formularios de adición de nodos de la red ilustrativa de la Mesa no conservan por separado su campo de entrada: para trabajo propio se usa el editor React de redes.
-
-Se probó también en la Mesa recuperar 37 rondas en otra pestaña, con revisión desmarcada y sin resultados nuevos. Se probó en dos pestañas nuevas la recuperación de una variable sintética; se recuperó el nombre y el guardado permaneció deshabilitado, con historial sin nuevos diccionarios. Pruebas automáticas cubren separación de versiones, estructura de campos, copias corruptas y exclusión de revisiones anidadas. TypeScript y build Vite aprobados. Los 171 tests Python corresponden al bloque previo: este cambio no modifica el núcleo Python.
-
-## Estado y límites de cierre
-
-Implementación de continuidad ampliada a los laboratorios. La aceptación exhaustiva sigue abierta: falta recorrer cada formulario con recuperación y guardado, validar ventanas concurrentes con escrituras simultáneas y completar revisión móvil/impresión. Las notificaciones entre pestañas son preventivas; localStorage no ofrece una transacción entre ventanas y no garantiza ausencia de pérdida con escrituras simultáneas. Los respaldos SQLite siguen siendo la copia transportable. No se acredita cierre integral de calidad de fase 5 ni mejora predictiva real. Después corresponde distribución/calidad Windows (9–10); fase 6 no se repite y fase 8 sigue pendiente de observaciones independientes.
+Fase 5 cerrada funcionalmente. Fase 6 no se repite. Continúan distribución Windows y calidad de fases 9–10: instalable, arranque/parada, actualización con rollback, pruebas de dispositivos/impresión y fallos de proceso. Fase 8 necesita observaciones reales independientes para acreditar mejora predictiva; permanece abierta en su validación empírica.

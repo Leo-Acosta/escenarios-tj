@@ -1,3 +1,4 @@
+import {networkDraft} from './lab-draft-contract';
 import {useLabRecovery} from './use-lab-recovery';
 import {safeDraft,shape} from './lab-draft';
 import React,{useState} from 'react';
@@ -7,7 +8,7 @@ import NetworkLab from './network-lab';
 export default function NetworkEditor({source,workflowId,onDirty,onBusy,onSaved,onCancel}:{source?:{graph:Network;title:string;assumptions:string};workflowId:string;onDirty:(v:boolean)=>void;onBusy:(v:boolean)=>void;onSaved:(r:NetworkVersion)=>void;onCancel:()=>void}){
  const [dirty,setDirty]=useState(false);
  const [graph,setGraph]=useState<Network>(()=>source?copyNetwork(source.graph):{nodes:[{id:0,name:'Nueva entidad',type:1}],edges:[]}),[title,setTitle]=useState(source?.title||''),[assumptions,setAssumptions]=useState(source?.assumptions||''),[reviewed,setReviewed]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState(''),[a,setA]=useState('0'),[b,setB]=useState(''),[relation,setRelation]=useState('Influencia');
- const recovery=useLabRecovery({scope:'network:'+workflowId+':'+(source?JSON.stringify(source):'new'),value:{graph,title,assumptions},dirty,parse:v=>{safeDraft(v);const x=v as {graph:Network;title:string;assumptions:string};if(typeof x.title!=='string'||typeof x.assumptions!=='string'||!x.graph||!Array.isArray(x.graph.nodes)||!Array.isArray(x.graph.edges)||x.graph.nodes.length<1||x.graph.nodes.length>200)throw new Error('Red incompatible.');x.graph.nodes.forEach((n,i)=>{shape({id:0,name:'',type:0})(n);if(n.id!==i||!Number.isInteger(n.type)||n.type<0||n.type>=entityTypes.length)throw new Error('Entidad incompatible.');});x.graph.edges.forEach((e,i)=>{const {evidence,...base}=e;shape({id:0,a:0,b:0,type:''})(base);if(e.id!==i||![e.a,e.b].every(n=>Number.isInteger(n)&&n>=0&&n<x.graph.nodes.length)||e.a===e.b)throw new Error('Vínculo incompatible.');if(evidence)shape({source:'',reference:'',note:''})(evidence);});return x;},restore:v=>{setGraph(v.graph);setTitle(v.title);setAssumptions(v.assumptions);setDirty(true);setReviewed(false);onDirty(true);}});
+ const recovery=useLabRecovery({scope:'network:'+workflowId+':'+(source?JSON.stringify(source):'new'),value:{graph,title,assumptions},dirty,parse:networkDraft,restore:v=>{setGraph(v.graph);setTitle(v.title);setAssumptions(v.assumptions);setDirty(true);setReviewed(false);onDirty(true);}});
  function changed(){setDirty(true);setReviewed(false);onDirty(true);setError('');}
  function update(next:Network){setGraph(next);changed();}
  function evidence(id:number,key:keyof RelationEvidence,value:string){update({...graph,edges:graph.edges.map(e=>e.id===id?{...e,evidence:{source:'',reference:'',note:'',...e.evidence,[key]:value}}:e)});}

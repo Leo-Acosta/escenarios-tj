@@ -10,7 +10,7 @@ Estado al 7 de octubre de 2026. Arquitectura local: núcleo Python, SQLite e int
 | 2 · Experiencia integral | Expedientes, laboratorios, navegación y versiones | Funciones integradas; falta comprobar impresión HTML paginada |
 | 3 · Variables y unidades | Diccionario de variables con unidad, tipo, fuente, incertidumbre y vínculo explícito con el modelo | Cerrada en alcance definido: API, editor React, historial, JSON, reproducción e informe ejecutivo |
 | 4 · Gráficos avanzados | Árboles, redes, vectores y sensibilidad enlazados a versiones, con filtros y exportación | Árboles/redes existentes más vectores, sensibilidad Python, filtros, fuentes y exportaciones implementados; aceptación visual integral pendiente |
-| 5 · Continuidad de datos | Autoguardado de borradores, respaldo, restauración y migraciones | Borradores de expediente React/Mesa, respaldo SQLite, recuperación separada y esquema v1 implementados; recuperación de laboratorios implementada; aceptación exhaustiva y concurrencia pendientes |
+| 5 · Continuidad de datos | Autoguardado de borradores, respaldo, restauración y migraciones | Cerrada funcionalmente: borradores de expediente/laboratorios, variantes por pestaña, respaldo SQLite, restauración separada, esquema v1 y reproducción integral probados |
 | 6 · Informe ejecutivo unificado | Un documento que reúna matriz y laboratorios desde referencias congeladas | Cerrada en alcance funcional: selección, historial, A4, PDF vectorial, JSON y reproducción; verificación visual de impresión HTML limitada |
 | 7 · Agentes y comparación | Decisiones auditadas, políticas explícitas y mejora controlada | Implementación cerrada para juegos 2×2; baterías, registros versionados, asesor y calibración revisable integrados |
 | 8 · Evaluación predictiva | Protocolo, particiones temporales y prueba independiente | Infraestructura y recorrido terminados; validación empírica abierta por falta de observaciones reales independientes |
@@ -20,7 +20,7 @@ Estado al 7 de octubre de 2026. Arquitectura local: núcleo Python, SQLite e int
 
 [Fase 3 · variables y unidades](FASE-3-VARIABLES.md) cerrada en su alcance definido. La fase 4 incorpora gráficos avanzados vinculados a variables y versiones; falta su aceptación visual integral, documentada en [Fase 4](FASE-4-GRAFICOS.md). Las fases 7–8 ya cuentan con infraestructura y no se repiten. La fase 6 permanece cerrada en su alcance funcional, conservando sus límites de verificación documentados.
 
-El [cierre de implementación 7–8](CIERRE-FASES-7-8.md), la [guía de evaluación temporal](EVALUACION-TEMPORAL.md) y el [informe unificado de fase 6](FASE-6-INFORME-UNIFICADO.md) vinculan candidatos, métodos, decisiones y resultados observados. Lo siguiente para acreditar mejora es incorporar evidencia real bajo un protocolo independiente. Para EDESUR faltan facturas, consumo y respuestas documentadas; no se inventarán pagos ni probabilidades. Ampliación de gráficos de fase 4, aceptación exhaustiva de recuperación de fase 5 y revisión visual de impresión HTML siguen pendientes. No se necesitan mensajes de “continuá” por bloque para ejecutar una fase autorizada completa.
+El [cierre de implementación 7–8](CIERRE-FASES-7-8.md), la [guía de evaluación temporal](EVALUACION-TEMPORAL.md) y el [informe unificado de fase 6](FASE-6-INFORME-UNIFICADO.md) vinculan candidatos, métodos, decisiones y resultados observados. Lo siguiente para acreditar mejora es incorporar evidencia real bajo un protocolo independiente. Para EDESUR faltan facturas, consumo y respuestas documentadas; no se inventarán pagos ni probabilidades. Ampliación de gráficos de fase 4 y comprobaciones de plataforma/dispositivos de fases 9–10 siguen pendientes. Continuidad de fase 5 cerrada funcionalmente. No se necesitan mensajes de “continuá” por bloque para ejecutar una fase autorizada completa.
 
 ## Qué ya puede usarse
 
@@ -37,4 +37,4 @@ Primera implementación blanca y oliva en React/TypeScript, con modo inmersivo y
 
 ## Continuidad de datos · fase 5
 
-Ver [implementación, verificación y límites](FASE-5-CONTINUIDAD.md). Respaldo y restauración separada disponibles; falta completar recuperación en los formularios independientes de laboratorios para cerrar integralmente esta fase.
+Ver [implementación, verificación y límites](FASE-5-CONTINUIDAD.md). Cerrada funcionalmente. Recuperación explícita de expediente y laboratorios, variantes por pestaña y restauración integral verificadas. La guía registra alcance manual/automatizado y límites de verificación móvil, impresión física y fallos de Windows para fases 9–10.

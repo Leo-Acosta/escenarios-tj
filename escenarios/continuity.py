@@ -48,7 +48,7 @@ def inspect(path, require_data=False):
                 tables[name] = db.execute(f'SELECT COUNT(*) FROM "{name}"').fetchone()[0]
                 if 'payload' in columns:
                     for (payload,) in db.execute(f'SELECT payload FROM "{name}"'):
-                        if not isinstance(json.loads(payload), dict):
+                        if not isinstance(json.loads(payload, parse_constant=lambda value: (_ for _ in ()).throw(ValueError('Número JSON no finito: ' + value))), dict):
                             raise ValueError('Registro JSON incompatible.')
             if require_data and not tables:
                 raise ValueError('La copia no contiene tablas de Escenarios TJ.')

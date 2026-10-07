@@ -1,3 +1,4 @@
+import {variableDraft} from './lab-draft-contract';
 import {useLabRecovery} from './use-lab-recovery';
 import {shape} from './lab-draft';
 import React,{useEffect,useState} from 'react';
@@ -10,7 +11,7 @@ export default function VariableWorkspace({cases,workflowId,onDirty}:{cases:Work
  const [matrix,setMatrix]=useState<Result>(),[rows,setRows]=useState<DraftVariable[]>([blank()]),[records,setRecords]=useState<VariableSummary[]>([]),[saved,setSaved]=useState<Dictionary>();
  const [dirty,setDirty]=useState(false),[reviewed,setReviewed]=useState(false),[busy,setBusy]=useState(false),[loading,setLoading]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState(''),[refresh,setRefresh]=useState(0);
  const discard=useDiscard();
- const recovery=useLabRecovery({scope:'variables:'+scope+':'+version,value:{rows},dirty,ready:!!matrix,parse:shape({rows}),restore:v=>{setRows(v.rows);setDirty(true);setReviewed(false);setSaved(undefined);}});
+ const recovery=useLabRecovery({scope:'variables:'+scope+':'+version,value:{rows},dirty,ready:!!matrix,parse:variableDraft,restore:v=>{setRows(v.rows);setDirty(true);setReviewed(false);setSaved(undefined);}});
  useEffect(()=>{onDirty(dirty);const warn=(e:BeforeUnloadEvent)=>{if(dirty)e.preventDefault();};window.addEventListener('beforeunload',warn);return()=>{onDirty(false);window.removeEventListener('beforeunload',warn);};},[dirty,onDirty]);
  useEffect(()=>{if(!scope&&workflowId)setScope(workflowId);},[scope,workflowId]);
  useEffect(()=>{const c=new AbortController();setCurrent(undefined);setVersion('');setSaved(undefined);setError('');if(scope)get('/api/workflows?'+new URLSearchParams({id:scope}),workflow,c.signal).then(v=>{setCurrent(v);setVersion(String(v.versions[0]?.version||''));}).catch(e=>{if(!c.signal.aborted)setError(e.message);});return()=>c.abort();},[scope]);

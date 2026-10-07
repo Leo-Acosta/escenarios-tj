@@ -1,3 +1,4 @@
+import {executiveDraft} from './lab-draft-contract';
 import {useLabRecovery} from './use-lab-recovery';
 import {shape} from './lab-draft';
 import React,{useCallback,useEffect,useState} from 'react';
@@ -9,7 +10,7 @@ import ReportPreview from './report-preview';
 export default function ExecutiveWorkspace({cases,workflowId,onDirty}:{cases:WorkflowSummary[];workflowId:string;onDirty:(v:boolean)=>void}){
  const [scope,setScope]=useState(workflowId),[current,setCurrent]=useState<Workflow>(),[version,setVersion]=useState(''),[data,setData]=useState<Catalog>(),[records,setRecords]=useState<ReportSummary[]>([]),[saved,setSaved]=useState<SavedReport>(),[selected,setSelected]=useState(''),[chosen,setChosen]=useState<Kind[]>(Object.keys(sections) as Kind[]),[refs,setRefs]=useState<Source[]>([]),[title,setTitle]=useState(''),[note,setNote]=useState(''),[pending,setPending]=useState(''),[mode,setMode]=useState(''),[reviewed,setReviewed]=useState(false),[dirty,setDirty]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState(''),[refresh,setRefresh]=useState(0);
  const discard=useDiscard();
- const recovery=useLabRecovery({scope:'executive:'+scope+':'+version,value:{chosen,refs,title,note,pending,mode},dirty,ready:!!data,parse:shape({chosen:['matrix'] as Kind[],refs:[{kind:'tree',id:'',title:'',created_at:'',label:'',simulation:false,evidence:''}] as Source[],title:'',note:'',pending:'',mode:''}),restore:v=>{setChosen(v.chosen);setRefs(v.refs);setTitle(v.title);setNote(v.note);setPending(v.pending);setMode(v.mode);setDirty(true);setReviewed(false);}});
+ const recovery=useLabRecovery({scope:'executive:'+scope+':'+version,value:{chosen,refs,title,note,pending,mode},dirty,ready:!!data,parse:executiveDraft,restore:v=>{setChosen(v.chosen);setRefs(v.refs);setTitle(v.title);setNote(v.note);setPending(v.pending);setMode(v.mode);setDirty(true);setReviewed(false);}});
  useEffect(()=>{onDirty(dirty);const warn=(e:BeforeUnloadEvent)=>{if(dirty)e.preventDefault();};window.addEventListener('beforeunload',warn);return()=>{onDirty(false);window.removeEventListener('beforeunload',warn);};},[dirty,onDirty]);
  useEffect(()=>{if(!scope&&workflowId)setScope(workflowId);},[scope,workflowId]);
  useEffect(()=>{const controller=new AbortController();setCurrent(undefined);setData(undefined);setRecords([]);setSaved(undefined);setSelected('');setVersion('');if(scope)get('/api/workflows?'+new URLSearchParams({id:scope}),workflow,controller.signal).then(v=>{setCurrent(v);setVersion(String(v.versions[0]?.version||''));}).catch(e=>{if(!controller.signal.aborted)setError(e.message);});return()=>controller.abort();},[scope]);

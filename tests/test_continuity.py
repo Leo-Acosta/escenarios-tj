@@ -60,7 +60,7 @@ class ContinuityTests(unittest.TestCase):
     def test_rejects_future_corrupt_and_unexpected_schema(self):
         for statement in ['PRAGMA user_version=99', 'CREATE TABLE extra (x TEXT)',
                           'CREATE TRIGGER unexpected AFTER INSERT ON workflows BEGIN DELETE FROM workflows; END',
-                          "UPDATE workflows SET payload='broken'"]:
+                          "UPDATE workflows SET payload='broken'", "UPDATE workflows SET payload='{\"x\":NaN}'"]:
             content, _ = continuity.snapshot(self.db)
             bad = self.root / 'bad.sqlite3'
             bad.write_bytes(content)
@@ -81,3 +81,38 @@ class ContinuityTests(unittest.TestCase):
             restored, _ = continuity.recover(content, self.root / 'wal')
             with closing(sqlite3.connect(restored)) as db, db:
                 self.assertEqual(db.execute('SELECT revision FROM workflows').fetchone()[0], 2)
+
+    def test_all_frozen_laboratories_export_and_replay_after_restore_without_inference(self):
+        from unittest.mock import patch
+        from escenarios import executive, executive_pdf, graph, variables
+        from test_executive import prepared
+        source = self.root / 'complete.sqlite3'
+        case, refs = prepared(source)  # Synthetic observations and mocked agent responses only.
+        dictionary = variables.save(source, {'workflow_id': case['id'], 'version': 1, 'reviewed': True,
+            'variables': [{'name': 'Contexto sintético', 'type': 'number', 'value': 12, 'unit': 'puntos',
+                'target': 'context', 'source': 'Fixture sintético', 'uncertainty': 'No evidencia real',
+                'interval': None, 'evidence': 'synthetic'}]})
+        refs.append({'kind': 'variables', 'id': dictionary['id']})
+        graph.save_version(source, {'workflow_id': case['id'], 'title': 'Red sintética',
+            'assumptions': 'Vínculos hipotéticos', 'reviewed': True,
+            'graph': {'nodes': [{'id': 0, 'name': 'Actor', 'type': 1}], 'edges': []}})
+        report = executive.create(source, {'workflow_id': case['id'], 'version': 1, 'reviewed': True,
+            'title': 'Informe de recuperación sintético', 'executive_note': 'Prueba funcional',
+            'pending': 'Evidencia real pendiente', 'evidence_mode': 'synthetic',
+            'sections': list(executive.LABELS), 'references': refs})
+        content, metadata = continuity.snapshot(source)
+        original_bytes = source.read_bytes()
+        recovered, info = continuity.recover(content, self.root / 'complete-recovery')
+        self.assertEqual(source.read_bytes(), original_bytes)
+        self.assertEqual(metadata['tables'], info['tables'])
+        with closing(sqlite3.connect(source)) as a, closing(sqlite3.connect(recovered)) as b:
+            for name in metadata['tables']:
+                self.assertEqual(sorted(a.execute('SELECT * FROM "'+name+'"').fetchall(), key=repr),
+                                 sorted(b.execute('SELECT * FROM "'+name+'"').fetchall(), key=repr))
+        with patch('escenarios.local_ai.request', side_effect=AssertionError('No new inference')):
+            self.assertTrue(executive.replay(recovered, report['id'])['reproduced'])
+            self.assertEqual(executive.read(recovered, report['id']), report)
+            self.assertEqual(variables.read(recovered, dictionary['id']), dictionary)
+            variables.verify(variables.read(recovered, dictionary['id']))
+            self.assertEqual(executive_pdf.build_pdf(report),
+                             executive_pdf.build_pdf(executive.read(recovered, report['id'])))

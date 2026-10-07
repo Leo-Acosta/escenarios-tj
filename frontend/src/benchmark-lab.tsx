@@ -1,3 +1,4 @@
+import {benchmarkDraft} from './lab-draft-contract';
 import {useLabRecovery} from './use-lab-recovery';
 import {shape} from './lab-draft';
 import React,{useEffect,useState} from 'react';
@@ -10,7 +11,7 @@ export default function BenchmarkLab({current,onDirty}:{current:Workflow;onDirty
  const [version,setVersion]=useState(String(current.versions[0]?.version||'')),[references,setReferences]=useState(['fixed0','adaptive']),[opponents,setOpponents]=useState(['mirror']),[seeds,setSeeds]=useState('42'),[noise,setNoise]=useState('0, 0.1'),[rounds,setRounds]=useState('1'),[actor,setActor]=useState('0'),[assumptions,setAssumptions]=useState(''),[reviewed,setReviewed]=useState(false),[dirty,setDirty]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState(''),[jobs,setJobs]=useState<BenchmarkJob[]>([]),[selected,setSelected]=useState(''),[trial,setTrial]=useState(0),[round,setRound]=useState(0),[refresh,setRefresh]=useState(0);
  const discard=useDiscard();
  const namespace='benchmarks:'+current.id;
- const recovery=useLabRecovery({scope:'benchmark:'+current.id+':'+version,value:{references,opponents,seeds,noise,rounds,actor,assumptions},dirty,ready:!!version,parse:shape({references,opponents,seeds,noise,rounds,actor,assumptions}),restore:v=>{setReferences(v.references);setOpponents(v.opponents);setSeeds(v.seeds);setNoise(v.noise);setRounds(v.rounds);setActor(v.actor);setAssumptions(v.assumptions);setDirty(true);setReviewed(false);}});
+ const recovery=useLabRecovery({scope:'benchmark:'+current.id+':'+version,value:{references,opponents,seeds,noise,rounds,actor,assumptions},dirty,ready:!!version,parse:benchmarkDraft,restore:v=>{setReferences(v.references);setOpponents(v.opponents);setSeeds(v.seeds);setNoise(v.noise);setRounds(v.rounds);setActor(v.actor);setAssumptions(v.assumptions);setDirty(true);setReviewed(false);}});
  useEffect(()=>{onDirty(dirty);return()=>onDirty(false);},[dirty,onDirty]);
  useEffect(()=>{const c=new AbortController();get('/api/ai/jobs?'+new URLSearchParams({workflow:namespace}),benchmarkJobs,c.signal).then(v=>{if(v.some(j=>j.workflow_id!==namespace))throw new Error('Batería de otro expediente.');setJobs(v);setSelected(old=>v.some(j=>j.id===old)?old:v[0]?.id||'');}).catch(e=>{if(!c.signal.aborted)setError(e.message);});return()=>c.abort();},[namespace,refresh]);
  const running=jobs.filter(j=>j.state==='running').map(j=>j.id).join(',');

@@ -1,3 +1,4 @@
+import {treeDraft} from './lab-draft-contract';
 import {useLabRecovery} from './use-lab-recovery';
 import {safeDraft,shape} from './lab-draft';
 import React,{useEffect,useState} from 'react';
@@ -11,7 +12,7 @@ export function TreeEditor({source,cases,workflowId,onDirty,onCancel,onSaved}:{s
  const [draft,setDraft]=useState<TreeDraft>(()=>({...draftTree(source),workflow_id:source?.workflow?.id||workflowId||undefined})),[reviewed,setReviewed]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState('');
  const [dirty,setDirty]=useState(false);
  const clean={...draft};delete clean.ai_job_id;
- const recovery=useLabRecovery({scope:'tree:'+(draft.workflow_id||'independent')+':'+(source?.id||'new'),value:clean,dirty,parse:v=>{safeDraft(v);const d=v as TreeDraft;shape({title:'',assumptions:'',actors:[''],actions:[['']],payoffs:[[['']]]})({title:d.title,assumptions:d.assumptions,actors:d.actors,actions:d.actions,payoffs:d.payoffs});if(d.actors.length!==2||d.actions.length!==3||d.actions.some(r=>r.length!==2)||d.payoffs.length!==2||d.payoffs.some(r=>r.length!==2||r.some(p=>p.length!==2)))throw new Error('Dimensiones incompatibles.');if(d.workflow_id!==undefined&&typeof d.workflow_id!=='string')throw new Error('Expediente incompatible.');if(d.simulation)shape({iterations:'',seed:'',radius:''})(d.simulation);return d;},restore:d=>{setDraft(d);setDirty(true);setReviewed(false);onDirty(true);}});
+ const recovery=useLabRecovery({scope:'tree:'+(draft.workflow_id||'independent')+':'+(source?.id||'new'),value:clean,dirty,parse:treeDraft,restore:d=>{setDraft(d);setDirty(true);setReviewed(false);onDirty(true);}});
  useEffect(()=>{onDirty(true);const guard=(e:BeforeUnloadEvent)=>{e.preventDefault();e.returnValue='';};window.addEventListener('beforeunload',guard);return()=>window.removeEventListener('beforeunload',guard);},[onDirty]);
  function change(edit:(d:TreeDraft)=>void){setDraft(old=>{const d=structuredClone(old);edit(d);delete d.ai_job_id;return d;});setDirty(true);setReviewed(false);setError('');}
  async function submit(e:React.FormEvent){e.preventDefault();setBusy(true);setError('');try{const t=await saveTree(draft,reviewed);setDirty(false);recovery.clear();onDirty(false);onSaved(t);}catch(e){setError(e instanceof Error?e.message:'Error al guardar.');}finally{setBusy(false);}}
