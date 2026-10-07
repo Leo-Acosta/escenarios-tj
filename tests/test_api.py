@@ -11,6 +11,24 @@ from escenarios.server import Handler
 
 
 class ApiTests(unittest.TestCase):
+    def test_unified_executive_full_http_creation_export_preview_and_reproduction(self):
+        from escenarios import server,executive
+        from test_executive import prepared
+        case,refs=prepared(server.DB)
+        payload={'workflow_id':case['id'],'version':1,'title':'Informe API sintético','executive_note':'Síntesis declarada','pending':'Fuentes reales pendientes','evidence_mode':'synthetic','sections':list(executive.LABELS),'references':refs,'reviewed':True}
+        with urlopen(self.base+'/api/executive/catalog?workflow_id='+case['id']+'&version=1') as response:self.assertGreaterEqual(len(json.load(response)['items']),7)
+        def post(data):return urlopen(Request(self.base+'/api/executive',data=json.dumps(data).encode(),headers={'Content-Type':'application/json','Origin':self.base}))
+        with self.assertRaises(HTTPError) as error:post({**payload,'reviewed':False})
+        self.assertEqual(error.exception.code,400)
+        with post(payload) as response:record=json.load(response);self.assertEqual(response.status,201)
+        identity=record['id']
+        with patch('escenarios.local_ai.request',side_effect=AssertionError('No inferir')):
+            with urlopen(self.base+'/api/executive/replay?id='+identity) as response:self.assertFalse(json.load(response)['new_inference'])
+            with urlopen(self.base+'/api/executive/pdf?id='+identity) as response:self.assertEqual(response.headers['Content-Type'],'application/pdf');self.assertTrue(response.read().startswith(b'%PDF'))
+        with urlopen(self.base+'/api/executive/html?id='+identity) as response:self.assertIn('Imprimir / guardar PDF',response.read().decode())
+        with urlopen(self.base+'/api/executive/export?id='+identity) as response:self.assertEqual(json.load(response),record)
+        with urlopen(self.base+'/api/executive/history?workflow_id='+case['id']) as response:self.assertEqual(json.load(response)[0]['id'],identity)
+
     def test_benchmark_http_background_export_and_replay(self):
         from escenarios import server,ai_jobs
         from test_laboratories import prepare_case

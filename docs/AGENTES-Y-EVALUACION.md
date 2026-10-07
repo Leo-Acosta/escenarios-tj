@@ -37,4 +37,4 @@ Prueba real con Mistral: la secuencia completa terminó en 142 segundos con semi
 
 El expediente real y sus revisiones permanecen en SQLite local; los datos económicos aportados no se publican en el repositorio. Ninguna estrategia se aplicó y ninguna mejora predictiva real se demostró.
 
-Las cifras anteriores corresponden a bloques históricos. La [auditoría final 7–8](CIERRE-FASES-7-8.md) registra 147 pruebas Python, 52 frontend y recorrido real sintético completo. Fase 7 implementada; infraestructura de fase 8 terminada, validación empírica abierta. El informe ejecutivo unificado de fase 6 no está cerrado.
+Las cifras anteriores corresponden a bloques históricos. La [auditoría final 7–8](CIERRE-FASES-7-8.md) registra 147 pruebas Python, 52 frontend y recorrido real sintético completo. Fase 7 implementada; infraestructura de fase 8 terminada, validación empírica abierta. Posteriormente se completó la implementación del [informe ejecutivo de fase 6](FASE-6-INFORME-UNIFICADO.md), con sus verificaciones y límites documentados.

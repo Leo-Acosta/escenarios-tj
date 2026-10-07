@@ -11,14 +11,14 @@ Estado al 7 de octubre de 2026. Arquitectura local: núcleo Python, SQLite e int
 | 3 · Variables y unidades | Diccionario de variables con unidad, tipo, fuente, incertidumbre y vínculo explícito con el modelo | Pendiente |
 | 4 · Gráficos avanzados | Árboles, redes, vectores y sensibilidad enlazados a versiones, con filtros y exportación | Base de árboles/redes/reproducción implementada; ampliación pendiente |
 | 5 · Continuidad de datos | Autoguardado de borradores, respaldo, restauración y migraciones | Versiones y protección de descarte implementadas; autoguardado y recuperación pendientes |
-| 6 · Informe ejecutivo unificado | Un documento que reúna matriz y laboratorios desde referencias congeladas | PDF individuales disponibles; unificación pendiente |
+| 6 · Informe ejecutivo unificado | Un documento que reúna matriz y laboratorios desde referencias congeladas | Implementación funcional terminada: selección, historial, A4, PDF vectorial, JSON y reproducción; verificación visual de impresión HTML limitada |
 | 7 · Agentes y comparación | Decisiones auditadas, políticas explícitas y mejora controlada | Implementación cerrada para juegos 2×2; baterías, registros versionados, asesor y calibración revisable integrados |
 | 8 · Evaluación predictiva | Protocolo, particiones temporales y prueba independiente | Infraestructura y recorrido terminados; validación empírica abierta por falta de observaciones reales independientes |
 | 9–10 · Distribución y calidad | Instalación Windows, funcionamiento offline, rendimiento y validación integral | Pendiente |
 
 ## Próximo bloque funcional
 
-El [cierre de implementación 7–8](CIERRE-FASES-7-8.md) y la [guía de evaluación temporal](EVALUACION-TEMPORAL.md) vinculan candidatos, métodos, decisiones y resultados observados. Lo siguiente para acreditar mejora es incorporar evidencia real bajo un protocolo independiente. Para EDESUR faltan facturas, consumo y respuestas documentadas; no se inventarán pagos ni probabilidades. Variables de fase 3, recuperación de fase 5, revisión visual de impresión e informe unificado de fase 6 siguen pendientes. No se necesitan mensajes de “continuá” por bloque para ejecutar una fase autorizada completa.
+El [cierre de implementación 7–8](CIERRE-FASES-7-8.md), la [guía de evaluación temporal](EVALUACION-TEMPORAL.md) y el [informe unificado de fase 6](FASE-6-INFORME-UNIFICADO.md) vinculan candidatos, métodos, decisiones y resultados observados. Lo siguiente para acreditar mejora es incorporar evidencia real bajo un protocolo independiente. Para EDESUR faltan facturas, consumo y respuestas documentadas; no se inventarán pagos ni probabilidades. Variables de fase 3, recuperación de fase 5 y revisión visual de impresión HTML siguen pendientes. No se necesitan mensajes de “continuá” por bloque para ejecutar una fase autorizada completa.
 
 ## Qué ya puede usarse
 

@@ -13,7 +13,7 @@ En React (`/app/`), abrir **Evaluación y experimentos**. Ollama es opcional par
 7. Ajustar solo con desarrollo. El asesor propone reunir observaciones o calibrar cinco intervalos con prior entero 1–10 y mínimo técnico de cinco observaciones. La revisión explícita crea otra versión y congela entrenamiento; datos modificados durante la revisión invalidan la propuesta. No se ejecuta ni promueve automáticamente.
 8. Tras cerrar validación, evaluar todos los resultados y fundamentar selección manual. Solo ese candidato emite y evalúa prueba. Reservar datos independientes y no usarlos para ajustar; el sistema no puede impedir conocimiento externo de información futura.
 9. La prueba no admite observaciones antes del cierre de toda su ventana. Completar pendientes y conservar una única evaluación final por protocolo. Un estudio posterior requiere protocolo nuevo y datos independientes, no reutilizar prueba para ajustar.
-10. Reproducir sin IA, exportar JSON y abrir resumen imprimible. La evaluación contiene protocolo, candidato, selección, conjunto y métricas congelados. Imprimir/guardar PDF desde navegador; es resumen individual, no informe unificado de fase 6.
+10. Reproducir sin IA, exportar JSON y abrir resumen imprimible. La evaluación contiene protocolo, candidato, selección, conjunto y métricas congelados. También puede seleccionarse como fuente en el [informe unificado de fase 6](FASE-6-INFORME-UNIFICADO.md), junto a matriz y laboratorios.
 
 ## Batería de simulaciones
 

@@ -12,7 +12,7 @@ from .intake import prepare
 from .case_model import analyze_case,save_case,list_cases
 from .workflow import operate,get_workflow,list_workflows,get_version,Conflict,NotFound
 from . import local_ai,ai_jobs,sequential,simulation,agents,comparisons,payoff_sweep,library,version_diff
-from . import laboratories,research,decision_agents
+from . import laboratories,research,decision_agents,executive
 
 ROOT = Path(__file__).resolve().parent.parent
 DB = ROOT / 'data' / 'escenarios.sqlite3'
@@ -39,6 +39,25 @@ class Handler(BaseHTTPRequestHandler):
         if not self.allowed():
             return self.send(403, {'error': 'Host no autorizado.'})
         url = urlsplit(self.path)
+        if url.path.startswith('/api/executive'):
+            try:
+                args=parse_qs(url.query);identity=args.get('id',[''])[0]
+                if url.path=='/api/executive/catalog':return self.send(200,executive.catalog(DB,args.get('workflow_id',[''])[0],int(args.get('version',['0'])[0])))
+                if url.path=='/api/executive/history':return self.send(200,executive.history(DB,args.get('workflow_id',[''])[0]))
+                if url.path=='/api/executive/replay':return self.send(200,executive.replay(DB,identity))
+                record=executive.read(DB,identity)
+                if url.path=='/api/executive/export':return self.send(200,record)
+                if url.path=='/api/executive/html':
+                    from .executive_view import html
+                    return self.send(200,html(record),'text/html; charset=utf-8')
+                if url.path=='/api/executive/pdf':
+                    try:from .executive_pdf import build_pdf
+                    except ImportError:return self.send(503,{'error':'ReportLab no disponible. Usá la vista HTML A4 para imprimir.'})
+                    return self.send(200,build_pdf(record),'application/pdf')
+                if url.path=='/api/executive':return self.send(200,record)
+                return self.send(404,{'error':'Ruta de informe desconocida.'})
+            except NotFound as error:return self.send(404,{'error':str(error)})
+            except (ValueError,KeyError,TypeError) as error:return self.send(400,{'error':str(error)})
         if url.path == '/api/laboratories':
             args=parse_qs(url.query)
             try:return self.send(200,laboratories.history(DB,args.get('kind',[''])[0],args.get('workflow_id',[''])[0]))
@@ -213,13 +232,17 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         if not self.allowed() or self.headers.get('Origin') not in (f'http://127.0.0.1:{self.server.server_port}', f'http://localhost:{self.server.server_port}'):
             return self.send(403, {'error': 'Origen no autorizado.'})
-        if self.path not in ('/api/graph/versions','/api/laboratories','/api/snapshots','/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/reviews','/api/research','/api/ai/benchmark-jobs','/api/ai/research-advisor','/api/ai/decision-jobs','/api/ai/decision-optimizer','/api/predictions/forecast','/api/predictions/observe','/api/predictions/evaluate','/api/ai/config','/api/ai/jobs','/api/sequential','/api/sequential/ai-jobs','/api/sequential/ai-apply','/api/agents','/api/library/compare','/api/payoff-sweep','/api/agent-comparisons','/api/agent-comparisons/replay'):
+        if self.path not in ('/api/executive','/api/graph/versions','/api/laboratories','/api/snapshots','/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/reviews','/api/research','/api/ai/benchmark-jobs','/api/ai/research-advisor','/api/ai/decision-jobs','/api/ai/decision-optimizer','/api/predictions/forecast','/api/predictions/observe','/api/predictions/evaluate','/api/ai/config','/api/ai/jobs','/api/sequential','/api/sequential/ai-jobs','/api/sequential/ai-apply','/api/agents','/api/library/compare','/api/payoff-sweep','/api/agent-comparisons','/api/agent-comparisons/replay'):
             return self.send(404, {'error': 'Recurso inexistente.'})
         try:
             length = int(self.headers.get('Content-Length', 0))
-            if not 0 < length <= (100000 if self.path in ('/api/graph/versions','/api/laboratories','/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/reviews','/api/research','/api/ai/benchmark-jobs','/api/ai/research-advisor','/api/ai/decision-jobs','/api/ai/decision-optimizer','/api/predictions/forecast','/api/predictions/observe','/api/predictions/evaluate','/api/ai/config','/api/ai/jobs','/api/sequential','/api/sequential/ai-jobs','/api/sequential/ai-apply','/api/agents','/api/library/compare','/api/payoff-sweep','/api/agent-comparisons','/api/agent-comparisons/replay') else 2048):
+            if not 0 < length <= (100000 if self.path in ('/api/executive','/api/graph/versions','/api/laboratories','/api/graph','/api/intake','/api/cases','/api/workflows','/api/ai/reviews','/api/research','/api/ai/benchmark-jobs','/api/ai/research-advisor','/api/ai/decision-jobs','/api/ai/decision-optimizer','/api/predictions/forecast','/api/predictions/observe','/api/predictions/evaluate','/api/ai/config','/api/ai/jobs','/api/sequential','/api/sequential/ai-jobs','/api/sequential/ai-apply','/api/agents','/api/library/compare','/api/payoff-sweep','/api/agent-comparisons','/api/agent-comparisons/replay') else 2048):
                 raise ValueError()
             payload = json.loads(self.rfile.read(length))
+            if self.path=='/api/executive':
+                try:return self.send(201,executive.create(DB,payload))
+                except NotFound as error:return self.send(404,{'error':str(error)})
+                except (ValueError,KeyError,TypeError,AttributeError) as error:return self.send(400,{'error':str(error)})
             if self.path.startswith('/api/predictions/'):
                 from . import prediction_eval
                 action={'forecast':prediction_eval.forecast,'observe':prediction_eval.observe,'evaluate':prediction_eval.evaluate}[self.path.rsplit('/',1)[1]]

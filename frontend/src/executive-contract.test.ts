@@ -1,0 +1,10 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {catalog,report,history} from './executive-contract.ts';
+const hash='a'.repeat(64),stamp='2026-10-07T12:00:00Z';
+const matrix={model:{title:'Sintético',actors:['A','B'],strategies:[['1','2'],['1','2']],a:[[3,0],[5,1]],b:[[3,5],[0,1]],p:.5,q:.5},pure:[[1,1]],mixed:null,values_a:[1.5,3],values_b:[1.5,3],best_a:[1],limitations:[],context:{version:1,description:'Sintético',assumptions:'Sintéticos'}};
+const saved={id:'r',created_at:stamp,sha256:hash,payload:{engine:'unified-executive-v1',workflow:{id:'w',version:1},title:'Informe sintético',executive_note:'',pending:'Datos reales',evidence_mode:'synthetic',sections:['matrix','tree','simulation'],matrix,matrix_sha256:hash,sources:[{kind:'tree',id:'t',sha256:hash,record:{id:'t'}}],limits:['Sin validación real']}};
+test('acepta informe congelado, fuentes y clasificación explícita',()=>{assert.equal(report(saved).payload.evidence_mode,'synthetic');assert.equal(report(saved).payload.matrix.model.a[0][0],3);});
+test('rechaza selección duplicada, simulación sin árbol y fuentes ocultas',()=>{for(const selected of [['matrix','matrix'],['simulation'],['matrix']])assert.throws(()=>report({...saved,payload:{...saved.payload,sections:selected}}));});
+test('rechaza huellas y clasificación desconocidas',()=>{assert.throws(()=>report({...saved,sha256:'mal'}));assert.throws(()=>report({...saved,payload:{...saved.payload,evidence_mode:'verified'}}));});
+test('catálogo e historial conservan versiones y fechas con zona',()=>{assert.equal(catalog({workflow_id:'w',version:1,matrix,items:[],total:0,limits:[]}).version,1);assert.equal(history([{id:'r',created_at:stamp,sha256:hash,title:'Informe',version:1,evidence_mode:'declared'}]).length,1);assert.throws(()=>history([{id:'r',created_at:'2026-10-07',sha256:hash,title:'Informe',version:1,evidence_mode:'declared'}]));});

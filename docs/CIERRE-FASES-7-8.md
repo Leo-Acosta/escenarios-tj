@@ -34,4 +34,4 @@ El reloj local debe ser correcto. SHA-256 identifica contenido y permite reprodu
 
 **Fase 7: implementación cerrada para este alcance. Fase 8: infraestructura y recorrido terminados; validación empírica abierta.** Para cerrarla se requieren observaciones reales verificables, protocolo independiente, muestra justificada y evaluación fuera del desarrollo. No hay evidencia de mejora predictiva real ni datos para asignar probabilidades judiciales al caso EDESUR.
 
-Informe unificado de fase 6, recuperación automática de borradores y distribución Windows permanecen fuera de este cierre. Ver [guía temporal](EVALUACION-TEMPORAL.md) y [hoja de ruta](HOJA-DE-RUTA.md).
+Informe unificado de fase 6, recuperación automática de borradores y distribución Windows permanecen fuera de este cierre 7–8. Posteriormente se implementó el [informe unificado de fase 6](FASE-6-INFORME-UNIFICADO.md). Ver [guía temporal](EVALUACION-TEMPORAL.md) y [hoja de ruta](HOJA-DE-RUTA.md).
