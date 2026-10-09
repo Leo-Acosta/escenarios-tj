@@ -4,6 +4,8 @@ Proyecto para construir un laboratorio de escenarios multiagente en Python, con 
 
 Estado: laboratorio funcional en Python y migración progresiva a React + TypeScript. Incluye expedientes persistentes, versiones, matrices, árboles secuenciales, simulaciones y documentos. La nueva interfaz en `/app/` permite consultar, crear y editar expedientes, guardar borradores y calcular nuevas versiones. La mesa estratégica existente permanece en `/`. No es todavía una entrega premium completa.
 
+**Expediente documental y seguimiento real:** en React, conservar PDF/fotos locales, revisar datos con fuentes y fechas, registrar acciones/respuestas y correcciones, comparar lecturas en kWh y congelar informes imprimibles con exportación JSON/ZIP. Funciona sin matriz calculada; los nuevos informes ejecutivos incorporan contexto documental. Originales incluidos en respaldo SQLite. Extracción de texto PDF opcional; sin OCR ni carga automática de documentos privados. [Guía y límites de fase 11](docs/FASE-11-EXPEDIENTE-DOCUMENTAL.md).
+
 Para construir la nueva interfaz: ejecutar `npm ci`, `npm test` y `npm run build` dentro de `frontend`, y luego iniciar el servidor Python. Ver [arquitectura y fases](docs/ARQUITECTURA-PREMIUM.md).
 
 ## Ejecutar

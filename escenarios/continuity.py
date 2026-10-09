@@ -11,6 +11,7 @@ from uuid import uuid4
 SCHEMA_VERSION = 1
 MAX_BYTES = 20 * 1024 * 1024
 COLUMNS = {
+    'dossier_records': {'id', 'workflow_id', 'kind', 'payload'},
     'workflows': {'id', 'updated_at', 'revision', 'payload'},
     'workflow_versions': {'workflow_id', 'version', 'created_at', 'payload'},
     'snapshots': {'id', 'created_at', 'payload'}, 'cases': {'id', 'created_at', 'payload'},

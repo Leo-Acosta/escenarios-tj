@@ -5,7 +5,7 @@ import tempfile
 from contextlib import closing
 from pathlib import Path
 from uuid import uuid4
-from . import agents, comparisons, payoff_sweep, sequential, simulation, research, variables, decision_agents as decisions
+from . import agents, comparisons, payoff_sweep, sequential, simulation, research, variables, dossier, decision_agents as decisions
 from .case_model import analyze_case
 from .workflow import get_version, get_workflow, now
 
@@ -135,6 +135,8 @@ def create(path,payload):
           'title':text(payload.get('title'),200),'executive_note':text(payload.get('executive_note',''),4000,True),
           'pending':text(payload.get('pending',''),4000,True),'evidence_mode':mode,'sections':sections,
           'matrix':matrix,'matrix_sha256':decisions.fingerprint(matrix),'sources':picked,'limits':LIMITS}
+    documentary=dossier.frozen_context(path,workflow_id)
+    if any(documentary.values()):body['dossier']=documentary
     record={'id':str(uuid4()),'created_at':now(),'payload':body,'sha256':decisions.fingerprint(body)}
     with closing(connect(path)) as db,db:db.execute('INSERT INTO executive_reports VALUES (?,?,?)',(record['id'],workflow_id,json.dumps(record,ensure_ascii=False,allow_nan=False)))
     return record

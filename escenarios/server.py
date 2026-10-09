@@ -13,6 +13,7 @@ from .case_model import analyze_case,save_case,list_cases
 from .workflow import operate,get_workflow,list_workflows,get_version,Conflict,NotFound
 from . import local_ai,ai_jobs,sequential,simulation,agents,comparisons,payoff_sweep,library,version_diff
 from . import laboratories,research,decision_agents,executive,variables,continuity
+from . import dossier
 
 ROOT = Path(__file__).resolve().parent.parent
 DB = ROOT / 'data' / 'escenarios.sqlite3'
@@ -39,6 +40,23 @@ class Handler(BaseHTTPRequestHandler):
         if not self.allowed():
             return self.send(403, {'error': 'Host no autorizado.'})
         url = urlsplit(self.path)
+        if url.path.startswith('/api/dossier'):
+            try:
+                args=parse_qs(url.query);scope=args.get('workflow_id',[''])[0]
+                if url.path=='/api/dossier':return self.send(200,dossier.summary(DB,scope))
+                if url.path=='/api/dossier/consumption':return self.send(200,dossier.consumption(DB,scope,args.get('first',[''])[0],args.get('last',[''])[0]))
+                record=dossier.read(DB,args.get('id',[''])[0])
+                if url.path=='/api/dossier/file':
+                    import base64
+                    body=record['payload']
+                    if body['kind']!='document':raise ValueError('Original requerido.')
+                    return self.send(200,base64.b64decode(body['content']),body['mime'])
+                if url.path=='/api/dossier/html':return self.send(200,dossier.report_html(record),'text/html; charset=utf-8')
+                if url.path=='/api/dossier/zip':return self.send(200,dossier.export_zip(record),'application/zip')
+                if url.path in ('/api/dossier/record','/api/dossier/export'):return self.send(200,record)
+                return self.send(404,{'error':'Ruta documental inexistente.'})
+            except NotFound as error:return self.send(404,{'error':str(error)})
+            except (ValueError,KeyError,TypeError) as error:return self.send(400,{'error':str(error)})
         if url.path == '/api/continuity/status':
             try:return self.send(200,continuity.inspect(DB))
             except ValueError as error:return self.send(400,{'error':str(error)})
@@ -247,6 +265,13 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         if not self.allowed() or self.headers.get('Origin') not in (f'http://127.0.0.1:{self.server.server_port}', f'http://localhost:{self.server.server_port}'):
             return self.send(403, {'error': 'Origen no autorizado.'})
+        if self.path=='/api/dossier':
+            try:
+                length=int(self.headers.get('Content-Length',0))
+                if not 0<length<=3000000:raise ValueError('Solicitud documental demasiado grande.')
+                return self.send(201,dossier.save(DB,json.loads(self.rfile.read(length))))
+            except NotFound as error:return self.send(404,{'error':str(error)})
+            except (ValueError,KeyError,TypeError) as error:return self.send(400,{'error':str(error)})
         if self.path == '/api/continuity/recover':
             try:
                 import base64

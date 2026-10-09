@@ -2,6 +2,7 @@
 from html import escape
 from datetime import datetime, timedelta, timezone
 from .executive import LABELS, verify
+from .dossier import LABELS as DOCUMENTARY_LABELS
 
 POLICIES={'fixed0':'Siempre 1','fixed1':'Siempre 2','mirror':'Copiar rival','trigger':'Cambio permanente','adaptive':'Adaptativa','random':'Aleatoria','local_ai':'IA local'}
 EVIDENCE={'synthetic_only':'DATOS SINTÉTICOS - sin evidencia predictiva real',
@@ -44,6 +45,14 @@ def content(record):
             c=s['record']['payload']['summary'];summary.append(f"Batería simulada: {c['win']} victorias, {c['tie']} empates, {c['loss']} pérdidas y {c['failure']} fallos; sin acreditación predictiva real.")
     if not any(s['kind']=='evaluation' for s in sources):summary.append('Evaluación predictiva pendiente o no seleccionada; no se acredita mejora real.')
     chapter('Resumen ejecutivo',summary)
+    if p.get('dossier'):
+        d=p['dossier']
+        chapter('Expediente documental y seguimiento',[
+            'Copia congelada de documentación declarada. Los originales están en el expediente documental; este informe incorpora datos y referencias sin autenticar fuentes.',
+            *[f"Original: {r['name']}. {r['note']}" for r in d['documents']],
+            *[f"{r['payload']['title']}: {r['payload']['value']} {r['payload']['unit']} · {r['payload']['date']}. Evidencia: {DOCUMENTARY_LABELS[r['payload']['evidence']]}. Fuente: {r['payload']['locator']}. Límites: {r['payload']['uncertainty']}" for r in d['facts']],
+            *[f"{r['payload']['date']} · {r['payload']['actor']} · {DOCUMENTARY_LABELS[r['payload']['status']]}: {r['payload']['title']}. {r['payload']['detail']}" for r in d['events']],
+            *[f"Cálculo conservado: {r['payload']['result']['difference_kwh']} kWh en {r['payload']['result']['days']} días; {r['payload']['result']['daily_kwh']} kWh diarios. {' '.join(r['payload']['result']['limits'])}" for r in d.get('calculations',[])]])
     if 'matrix' in sections:
         c=chapter('Matriz estratégica',[
             f"Actores: {model['actors'][0]} / {model['actors'][1]}. p={NUMERIC(model['p'])}, q={NUMERIC(model['q'])}: supuestos, no probabilidades aprendidas.",

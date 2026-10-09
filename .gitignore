@@ -9,3 +9,6 @@ work/
 frontend/node_modules/
 frontend/dist/
 release/
+tmp/
+.test-tmp/
+output/
