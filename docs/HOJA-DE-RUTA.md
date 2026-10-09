@@ -15,7 +15,7 @@ Estado al 9 de octubre de 2026. Arquitectura local: núcleo Python, SQLite e int
 | 7 · Agentes y comparación | Decisiones auditadas, políticas explícitas y mejora controlada | Implementación cerrada para juegos 2×2; baterías, registros versionados, asesor y calibración revisable integrados |
 | 8 · Evaluación predictiva | Protocolo, particiones temporales y prueba independiente | Infraestructura y recorrido terminados; validación empírica abierta por falta de observaciones reales independientes |
 | 9 · Distribución Windows | Ejecutable portable e instalación | Cerrada funcionalmente: portable e instalador por usuario; instalación, reinstalación, desinstalación y datos conservados aprobados localmente y en dos runners Windows nuevos |
-| 10 · Calidad de plataforma | Rendimiento, dispositivos, impresión y actualización | Pendiente |
+| 10 · Calidad de plataforma | Rendimiento, dispositivos, impresión y actualización | Implementación y aceptación automatizada terminadas: presupuestos, concurrencia, A4 y matriz Windows/Linux × Python 3.11/3.13 aprobados; cierre integral abierto por impresión HTML nativa y aceptación entre navegadores pendientes |
 
 ## Próximo bloque funcional
 
@@ -43,3 +43,7 @@ Ver [implementación, verificación y límites](FASE-5-CONTINUIDAD.md). Cerrada 
 ## Distribución Windows · fase 9
 
 Ver [paquete portable, uso, actualización y verificación](FASE-9-WINDOWS.md). Ejecutable x64 y ZIP locales con recursos incluidos, datos separados y bloqueo de segunda instancia. Se probó sin Python en PATH, con PDF idéntico después de reiniciar. Instalador asistido y recorrido independiente en dos runners Windows aprobados. Fase 9 cerrada funcionalmente; calidad de dispositivos y plataformas de escritorio continúa en fase 10.
+
+## Calidad de plataforma · fase 10
+
+Ver [resultados, protocolo y límites](FASE-10-CALIDAD.md). 176 pruebas Python, 80 contratos TypeScript y compilación aprobados. Mediciones sintéticas repetidas en cuatro combinaciones de sistema/Python; PDF concurrente idéntico, reproducción sin inferencia y A4 comprobados. Vista reducida de 480 px sin desbordamiento observada. La impresión nativa quedó bloqueada por la verificación de URL de Computer Use, incluso después de abrir el usuario una ventana autorizada. No se declara cerrada la aceptación integral ni se exige repetir los bloques implementados: resta verificación visual nativa y entre navegadores. La fase 8 sigue abierta por falta de observaciones independientes.

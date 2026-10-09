@@ -166,4 +166,6 @@ Ver [guía operativa](docs/EVALUACION-TEMPORAL.md), [auditoría de cierre](docs/
 
 ## Distribución Windows
 
+**Calidad de plataforma:** [fase 10](docs/FASE-10-CALIDAD.md) incluye mediciones sintéticas reproducibles, cuatro combinaciones Windows/Linux y Python 3.11/3.13, PDF A4 y concurrencia. Código y aceptación automatizada terminados; impresión nativa y aceptación entre navegadores pendientes por límites de verificación. Se conserva [evidencia detallada](docs/verification/platform-2026-10-09.json). No se acredita mejora predictiva real.
+
 Instalador en español: `release/EscenariosTJ-0.1.0-Setup.exe`, por usuario y con datos separados. Instalación, reinstalación y desinstalación verificadas en dos runners Windows; fase 9 cerrada funcionalmente. Alternativa portable local: `release/EscenariosTJ-0.1.0-windows.zip`. Extraer la carpeta completa y abrir `EscenariosTJ.exe`. Incluye Python, React compilado y exportación PDF; guarda datos por separado en `%LOCALAPPDATA%\EscenariosTJ`. No importa automáticamente los datos del repositorio. Ver [uso, construcción y límites de fase 9](docs/FASE-9-WINDOWS.md). Artefactos binarios y bases privadas se excluyen de Git.

@@ -23,3 +23,24 @@ Los informes ejecutivos utilizan versiones congeladas, SVG y PDF vectorial. Las 
 - Límites externos visibles: impresión física, dispositivos reales, firma del ejecutable y validación predictiva empírica.
 
 La fase 8 permanece abierta hasta incorporar observaciones independientes. Una prueba sintética aprobada no demuestra mejores predicciones.
+
+## Resultados del 9 de octubre de 2026
+
+La [evidencia conservada](verification/platform-2026-10-09.json) contiene todas las duraciones, entornos, resultados y referencias. El commit probado es `535b6e25e9d754f0917c117d4c998c48b28f0206`. [CI de compatibilidad](https://github.com/Leo-Acosta/escenarios-tj/actions/runs/37974763576): los cuatro trabajos aprobaron 176 pruebas Python y los presupuestos de calidad. Localmente pasaron además 80 contratos TypeScript, compilación y seis pruebas del informe después de modificar los estilos.
+
+La [reconstrucción y aceptación Windows](https://github.com/Leo-Acosta/escenarios-tj/actions/runs/37974763585) aprobó ambos runners en ese mismo commit: compilación, portable, instalador, rechazo de actualización con la aplicación abierta, reinstalación y desinstalación sin eliminar la base. El segundo runner instaló el artefacto descargado sin preparar Python ni Node. Los binarios de este commit se encuentran en los artefactos de esa ejecución; la carpeta `release/` local conserva la construcción anterior de fase 9 y no se presenta como una reconstrucción local nueva.
+
+| Operación local, diez muestras | P95 |
+|---|---:|
+| Monte Carlo, 5.000 iteraciones | 124,64 ms |
+| Reproducción HTTP del informe | 201,14 ms |
+| HTML A4 | 27,34 ms |
+| PDF completo | 204,42 ms |
+
+Los valores de la tabla se redondean hacia arriba. Doce solicitudes de PDF con cuatro lectores devolvieron bytes idénticos. El PDF completo tiene 19 páginas A4; se inspeccionaron visualmente las páginas 4, 6, 13 y 19: matriz, agentes, evaluación y trazabilidad legibles. La fase 6 conserva su revisión previa página por página; esta comprobación nueva no la reemplaza ni afirma haber inspeccionado otra vez todas las páginas.
+
+Interfaz React inspeccionada en anchos realmente observados de 780 y 480 px. En 480 px no hubo desbordamiento horizontal y se pudo navegar al compositor y seleccionar un informe congelado. La herramienta duplicaba el tamaño solicitado y aplicaba un mínimo de 480 px: no se acredita una prueba de 390 px. La corrección de estilos añade foco visible, reducción de movimiento, ocultación obligatoria de paneles inactivos al imprimir y tablas de ancho fijo. Las reglas del informe para pantallas pequeñas quedan restringidas a `screen`, para evitar interferir con A4.
+
+La impresión HTML nativa **no quedó verificada**. La revisión automática rechazó inicialmente inspeccionar la ventana personal de Edge. Después de que el usuario abrió el informe sintético en Brave, Computer Use detuvo la sesión por no poder confirmar su URL con suficiente confianza. No se eludió esa restricción. No se realizaron más acciones de interfaz; las pruebas restantes fueron de código y CI.
+
+**Estado: implementación y aceptación automatizada terminadas; cierre integral de fase 10 abierto por aceptación visual nativa pendiente.** Para cerrar sin reservas: verificar el informe en vista previa A4 de un navegador controlable, guardar su PDF, inspeccionar paginación y contrastar capítulos; completar recorridos en otros motores de navegador. Impresora física y móviles reales requieren disponibilidad de esos dispositivos y permanecen fuera de la evidencia actual. No hay acreditación WCAG, firma Authenticode del producto ni una prueba de carga de Ollama. La identidad binaria PDF se compara dentro de cada entorno, no entre fuentes Windows y Linux.
