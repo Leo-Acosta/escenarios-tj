@@ -59,7 +59,24 @@ jobs:
           path: |
             release/EscenariosTJ-0.1.0-Setup.exe
             release/EscenariosTJ-0.1.0-Setup.exe.sha256
+            release/EscenariosTJ-0.1.0-QA-Setup.exe
             release/EscenariosTJ-0.1.0-windows.zip
             release/EscenariosTJ-0.1.0-windows.zip.sha256
             tmp/windows-installed/installer-verification.json
           retention-days: 14
+  windows-install:
+    needs: windows-clean
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: escenarios-tj-windows
+          path: downloaded
+      - name: Instalar y probar en otro runner, sin preparar Python ni Node
+        run: ./packaging/smoke-clean-windows.ps1 -Setup downloaded/release/EscenariosTJ-0.1.0-QA-Setup.exe -TestRoot tmp/clean-installed
+      - uses: actions/upload-artifact@v4
+        with:
+          name: escenarios-tj-clean-verification
+          path: tmp/clean-installed/clean-verification.json
