@@ -1,6 +1,6 @@
 # Fase 9 · distribución Windows
 
-Avance verificado el 9 de octubre de 2026: distribución portable Windows x64 construida y probada. No se declara cerrada la instalación asistida ni la fase 10 de calidad.
+Cierre funcional del 9 de octubre de 2026: distribución portable e instalador Windows x64 construidos y probados localmente y en dos runners Windows independientes. Fase 9 cerrada en este alcance; fase 10 permanece separada.
 
 ## Uso
 
@@ -27,7 +27,7 @@ La carpeta de datos debe ser escribible. Una segunda instancia sobre la misma ca
 
 Para usar una base verificada y recuperada desde la interfaz, conservar el original, copiar la base recuperada a una carpeta nueva con el nombre escenarios.sqlite3 y arrancar con --data-dir apuntando a esa carpeta. Los documentos externos referenciados deben conservarse por separado. Los borradores locales no viajan dentro de SQLite.
 
-Estas operaciones son manuales y revisables: este avance no introduce un actualizador automático ni promete compatibilidad con esquemas futuros. El ejecutable no tiene firma de código ni instalador asistido.
+Estas operaciones son manuales y revisables: no hay actualizador automático ni promesa de compatibilidad con esquemas futuros. El instalador asistido instala por usuario, no cierra procesos ni borra la carpeta de datos. El ejecutable y el instalador del producto no tienen firma de código.
 
 ## Compilación y trazabilidad
 
@@ -47,8 +47,34 @@ Entorno de esta construcción: Windows 11 x64, Python 3.13.14, PyInstaller 6.20.
 
 packaging/smoke-windows.py ejecutó el binario desde una carpeta sintética con PATH vacío: arranque, respuestas de /app/ y Mesa, APIs de expedientes, reproducción e informe PDF. Rechazó otra instancia, detuvo el proceso, volvió a iniciarlo y obtuvo un PDF de 82.314 bytes idéntico. Los datos son sintéticos. La parada de la prueba termina el proceso, por lo que también comprueba lectura de registros confirmados después de una terminación; no demuestra conservación de una inferencia interrumpida ni de campos no persistidos.
 
-No se verificó todavía en una máquina limpia diferente, ni mediante instalación asistida, firma de código, impresión física o dispositivos móviles. La prueba de recursos HTTP no sustituye revisión visual de la interfaz. PyInstaller emitió avisos de importaciones opcionales; la prueba del ejecutable confirmó las rutas utilizadas, sin acreditar todas las funcionalidades opcionales.
+La instalación asistida se verificó localmente. No se acredita firma de código, impresión física ni comprobación en dispositivos móviles. La prueba de recursos HTTP no sustituye revisión visual de la interfaz. PyInstaller emitió avisos de importaciones opcionales; la prueba del ejecutable confirmó las rutas utilizadas, sin acreditar todas las funcionalidades opcionales.
 
 ## Estado siguiente
 
-Fase 9: portable funcional terminada; instalación asistida y validación en Windows limpio pendientes. Fase 10: pruebas integrales de plataforma, rendimiento y experiencia de actualización pendientes. La fase 8 permanece abierta en validación empírica: no hay nueva evidencia de mejora predictiva real.
+Fase 9 cerrada funcionalmente: portable, instalación asistida, reinstalación, desinstalación con datos conservados y recorrido en dos runners Windows nuevos aprobados. Fase 10: pruebas integrales de plataforma, rendimiento y experiencia de actualización pendientes. La fase 8 permanece abierta en validación empírica: no hay nueva evidencia de mejora predictiva real.
+
+## Instalador asistido
+
+Archivo: EscenariosTJ-0.1.0-Setup.exe. Asistente en español, instalación por usuario sin solicitar administración, carpeta predeterminada %LOCALAPPDATA%\Programs\EscenariosTJ, acceso en el menú Inicio y acceso opcional al escritorio. Abrir la aplicación al terminar es opcional. Desinstalar desde Windows elimina los archivos instalados y accesos; conserva %LOCALAPPDATA%\EscenariosTJ y los datos personalizados fuera del programa. Se rechaza elegir la carpeta de datos predeterminada como destino de instalación.
+
+Cerrar la aplicación antes de reinstalar o actualizar. La comprobación de archivo en uso rechaza la operación sin terminar procesos. Descargar antes un respaldo; el instalador no migra bases ni prepara una restauración automática. Reinstalar la misma versión se probó como operación idempotente sobre los archivos del programa. No se acredita un cambio entre versiones de esquema futuro.
+
+Construcción con Inno Setup 6.7.3 del proveedor oficial. La firma del compilador descargado se comprobó como válida, publicada por Pyrsys B.V.; esto no firma el producto construido. [Descarga oficial](https://jrsoftware.org/isdl.php), [instalación sin administración](https://jrsoftware.org/ishelp/topic_setup_privilegesrequired.htm).
+
+~~~powershell
+powershell -NoProfile -File packaging/build-installer.ps1 -Compiler "ruta\ISCC.exe"
+~~~
+
+El script verifica el paquete portable, compila el instalador y genera SHA-256. packaging/windows-installer.iss define la instalación. La variante QA usa otro AppId para no sustituir una instalación real. packaging/smoke-installer.py prueba archivos, ejecutable sin Python en PATH, PDFs congelados, bloqueo al actualizar abierto, reinstalación y desinstalación, comparando la base sintética. packaging/smoke-clean-windows.ps1 hace otra prueba desde PowerShell, sin Python ni Node en PATH. Los dos recorridos locales aprobaron.
+
+## Aceptación independiente
+
+La automatización .github/workflows/windows-distribution.yml construye desde Git en un runner Windows nuevo, ejecuta pruebas, compila portable e instalador y prueba la instalación QA. Un segundo runner descarga el artefacto, sin pasos de preparación de Python/Node ni compilación, e instala, calcula un ejemplo sintético, exporta PDF, reinstala y desinstala con PATH vacío, conservando la base. Los runners tienen herramientas preinstaladas del proveedor: el PATH vacío comprueba independencia de esos ejecutables; no equivale a certificar toda configuración posible de Windows de escritorio.
+
+El primer intento detectó pypdf ausente de las dependencias declaradas de pruebas. Se corrigió; se conservan sus registros. Dos ejecuciones intermedias se cancelaron al quedar reemplazadas por la final. Se corrigió también el uso de Invoke-WebRequest en Windows PowerShell 5.1, verificado localmente. La firma comercial del producto y la matriz de dispositivos/Windows de escritorio corresponden a decisiones de distribución y calidad posteriores.
+
+### Resultado final independiente
+
+[GitHub Actions · ejecución 37972765418](https://github.com/Leo-Acosta/escenarios-tj/actions/runs/37972765418) terminó con **success** sobre el commit 7f41cd4. Primer job: frontend, integración Python, portable, compilador firmado, instalador QA y recorrido completo aprobados. Segundo job: instalación en otro runner, sin preparar Python/Node, cálculo sintético, PDF, reinstalación y desinstalación aprobados. Se descargó y verificó el registro del segundo job: installerVerified, runtimePathEmpty, pdfExported y dataPreserved verdaderos; synthetic verdadero. Artefacto de aceptación 11637951398.
+
+Las ejecuciones descartadas permanecen consultables en Actions. Los artefactos de construcción tienen retención de 14 días; el registro de aceptación y el enlace de ejecución se conservan en Git. Los ejecutables locales quedan en release/. GitHub no incluye datos reales. No se acredita mejora predictiva por estos ensayos.

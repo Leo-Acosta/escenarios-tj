@@ -1,0 +1,32 @@
+{
+  "phase": 9,
+  "scope": "portable_and_per_user_installer",
+  "status": "functional_acceptance_passed",
+  "date": "2026-10-09",
+  "synthetic": true,
+  "validated_commit": "7f41cd47a1a07b5e0d464689f14074e6bb5db407",
+  "workflow_run": 37972765418,
+  "workflow_url": "https://github.com/Leo-Acosta/escenarios-tj/actions/runs/37972765418",
+  "conclusion": "success",
+  "independent_windows_jobs": 2,
+  "local_installer_checks": {
+    "files": 383,
+    "installed_exe": true,
+    "running_update_rejected": true,
+    "reinstallation_kept_data": true,
+    "uninstall_kept_data": true
+  },
+  "independent_runtime": {
+    "artifact_id": 11637951398,
+    "installerVerified": true,
+    "dataPreserved": true,
+    "pdfExported": true,
+    "runtimePathEmpty": true
+  },
+  "limits": [
+    "No product code signature",
+    "No claim of all Windows desktop configurations",
+    "No physical print or mobile acceptance",
+    "No predictive improvement evidence"
+  ]
+}

@@ -14,7 +14,7 @@ Estado al 9 de octubre de 2026. Arquitectura local: núcleo Python, SQLite e int
 | 6 · Informe ejecutivo unificado | Un documento que reúna matriz y laboratorios desde referencias congeladas | Cerrada en alcance funcional: selección, historial, A4, PDF vectorial, JSON y reproducción; verificación visual de impresión HTML limitada |
 | 7 · Agentes y comparación | Decisiones auditadas, políticas explícitas y mejora controlada | Implementación cerrada para juegos 2×2; baterías, registros versionados, asesor y calibración revisable integrados |
 | 8 · Evaluación predictiva | Protocolo, particiones temporales y prueba independiente | Infraestructura y recorrido terminados; validación empírica abierta por falta de observaciones reales independientes |
-| 9 · Distribución Windows | Ejecutable portable e instalación | Portable x64 construido y probado sin Python en PATH; instalación asistida y máquina limpia pendientes |
+| 9 · Distribución Windows | Ejecutable portable e instalación | Cerrada funcionalmente: portable e instalador por usuario; instalación, reinstalación, desinstalación y datos conservados aprobados localmente y en dos runners Windows nuevos |
 | 10 · Calidad de plataforma | Rendimiento, dispositivos, impresión y actualización | Pendiente |
 
 ## Próximo bloque funcional
@@ -42,4 +42,4 @@ Ver [implementación, verificación y límites](FASE-5-CONTINUIDAD.md). Cerrada 
 
 ## Distribución Windows · fase 9
 
-Ver [paquete portable, uso, actualización y verificación](FASE-9-WINDOWS.md). Ejecutable x64 y ZIP locales con recursos incluidos, datos separados y bloqueo de segunda instancia. Se probó sin Python en PATH, con PDF idéntico después de reiniciar. Instalación asistida y verificación en máquina limpia pendientes.
+Ver [paquete portable, uso, actualización y verificación](FASE-9-WINDOWS.md). Ejecutable x64 y ZIP locales con recursos incluidos, datos separados y bloqueo de segunda instancia. Se probó sin Python en PATH, con PDF idéntico después de reiniciar. Instalador asistido y recorrido independiente en dos runners Windows aprobados. Fase 9 cerrada funcionalmente; calidad de dispositivos y plataformas de escritorio continúa en fase 10.
