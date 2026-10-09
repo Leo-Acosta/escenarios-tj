@@ -34,6 +34,8 @@ SHA-256 permite detectar cambios de contenido; no es una firma ni protege frente
 
 ## Límites operativos y pendientes externos
 
+Actualización del 9 de octubre de 2026: la lectura ejecutiva HTML/PDF elimina UUID, huellas y digest de portada, índice, capítulos, pie y tablas de lectura. Conserva referencias legibles «Fuente 1», versión de matriz y fecha argentina en formato día/mes/año y hora. Identificadores, sellos temporales originales y SHA-256 siguen intactos en los registros congelados y la exportación JSON; no se altera ninguna evidencia ni cálculo. Una prueba integrada verifica ausencia de códigos en el PDF, inmutabilidad del registro y reproducción. Los PDF ya descargados mantienen su presentación anterior: hay que exportarlos otra vez. Este ajuste no declara aprobada la impresión HTML nativa pendiente de fase 10.
+
 La fase 3 agrega **Variables y unidades** como fuente opcional del mismo expediente y versión. Los informes existentes mantienen sus referencias originales; no se incorpora un diccionario automáticamente. Ver [guía de fase 3](FASE-3-VARIABLES.md).
 
 Hasta 16 fuentes complementarias por informe; catálogo de hasta 200 fuentes e historial de 50 informes por expediente. Ampliar paginación para volúmenes mayores. Modelos con las dimensiones que soportan los laboratorios existentes; no se amplían por generar el documento. La reproducibilidad del PDF se verifica en el mismo entorno de fuentes y dependencias, no se promete identidad binaria entre sistemas operativos diferentes.

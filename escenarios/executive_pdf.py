@@ -56,7 +56,7 @@ def build_pdf(record):
                          title=view['title'],author='Escenarios TJ',pageCompression=1,invariant=1)
     flow=[Spacer(1,40*mm),p('ESCENARIOS TJ / INFORME EJECUTIVO','cover'),p(view['title'],'title'),p(view['badge'],'cover'),
           p('Modelos, escenarios y evidencia reunidos desde versiones conservadas.','cover'),Spacer(1,15*mm),
-          p('Informe '+view['id'],'cover'),p('Emisión '+view['date'],'cover'),PageBreak(),p('Contenido del informe','section')]
+          p('Emisión '+view['date'],'cover'),PageBreak(),p('Contenido del informe','section')]
     for i,c in enumerate(view['chapters']):flow.append(p(f"{i+1:02d} / {c['title']}"))
     for i,c in enumerate(view['chapters']):
         flow.extend([PageBreak(),p(f'ESCENARIOS TJ / {i+1:02d}','kicker'),p(c['title'],'section')])
@@ -80,7 +80,7 @@ def build_pdf(record):
         else:
             canvas.setStrokeColor(colors.HexColor('#cbdce3'));canvas.line(18*mm,17*mm,192*mm,17*mm)
             canvas.setFillColor(colors.HexColor('#536a78'))
-        canvas.setFont(regular,7.5);canvas.drawString(18*mm,11*mm,'Escenarios TJ / '+view['id'][:8])
+        canvas.setFont(regular,7.5);canvas.drawString(18*mm,11*mm,'Escenarios TJ / Informe ejecutivo')
         canvas.drawRightString(192*mm,11*mm,'Página '+str(document.page));canvas.restoreState()
     emitted=datetime.fromisoformat(record['created_at']).astimezone(timezone.utc)
     def canvasmaker(*args,**kwargs):

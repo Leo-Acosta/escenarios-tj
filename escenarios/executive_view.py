@@ -1,5 +1,6 @@
 """Contenido compartido por la vista A4 y el PDF, sin inferencias ni fuentes vivas."""
 from html import escape
+from datetime import datetime, timedelta, timezone
 from .executive import LABELS, verify
 
 POLICIES={'fixed0':'Siempre 1','fixed1':'Siempre 2','mirror':'Copiar rival','trigger':'Cambio permanente','adaptive':'Adaptativa','random':'Aleatoria','local_ai':'IA local'}
@@ -11,6 +12,12 @@ EVIDENCE={'synthetic_only':'DATOS SINTÉTICOS - sin evidencia predictiva real',
 PARTITIONS={'development':'Desarrollo','validation':'Validación','test':'Prueba reservada'}
 NUMERIC=lambda x:format(x,'.6g').replace('.',',') if isinstance(x,(int,float)) else str(x)
 
+def display_date(value):
+    """Presentation only; preserve the original timestamp in the frozen record."""
+    instant=datetime.fromisoformat(value.replace('Z','+00:00'))
+    if instant.tzinfo is None:instant=instant.replace(tzinfo=timezone.utc)
+    return instant.astimezone(timezone(timedelta(hours=-3))).strftime('%d/%m/%Y · %H:%M (hora argentina)')
+
 def content(record):
     verify(record,calculations=False)
     p=record['payload'];m=p['matrix'];model=m['model'];sections=p['sections'];sources=p['sources']
@@ -20,7 +27,7 @@ def content(record):
     def table(headers,rows):return {'headers':headers,'rows':[[NUMERIC(x) for x in r] for r in rows]}
     def bar(title,labels,values,unit):return {'type':'bars','title':title,'labels':labels,'values':values,'unit':unit}
     def lines(title,series,unit):return {'type':'lines','title':title,'series':series,'unit':unit}
-    def source_note(s):return f"Fuente congelada: {s['id']}. Huella SHA-256: {s['sha256']}."
+    def source_note(s):return f"Fuente {sources.index(s)+1}: {LABELS[s['kind']]}. Versión conservada; registro técnico disponible en la exportación JSON."
     selected={s['kind'] for s in sources}
     absent=[LABELS[k] for k in sections if k not in ('matrix','simulation') and k not in selected]
     note='DATOS SINTÉTICOS - prueba funcional' if p['evidence_mode']=='synthetic' else 'FUENTES DECLARADAS - verificación documental externa requerida'
@@ -50,7 +57,7 @@ def content(record):
         c['paragraphs']+=m['limitations']
     for s in sources:
         k=s['kind'];r=s['record'];body=r.get('payload',r)
-        title=LABELS[k]+' / '+s['id'][:8]
+        title=LABELS[k]
         c=chapter(title,[source_note(s)])
         if k=='variables':
             evidence_labels={'synthetic':'Sintético','assumed':'Supuesto','documented_declared':'Documentación declarada','pending':'Pendiente'}
@@ -75,7 +82,7 @@ def content(record):
                   t['actions'][e['first']+1][e['outcome'][1]],' / '.join(NUMERIC(x) for x in e['payoffs'])] for e in r['equilibria']]))
             c['paragraphs']+=r['limits']
             if 'simulation' in sections and r.get('simulation'):
-                v=r['simulation'];o=v['options'];mc=chapter('Monte Carlo / '+s['id'][:8],[
+                v=r['simulation'];o=v['options'];mc=chapter('Monte Carlo',[
                     f"{o['iterations']} repeticiones; semilla {o['seed']}; amplitud {NUMERIC(o['radius'])}. Frecuencias simuladas, no probabilidades empíricas.",
                     'P5/P95 de utilidad A: '+NUMERIC(v['utility_a']['lower_p05'])+' / '+NUMERIC(v['utility_a']['upper_p95'])+'.']+v['assumptions'])
                 mc['charts'].append(bar('Frecuencia de decisiones compatibles',[t['actions'][0][0],t['actions'][0][1],'Ambas / empate'],v['decision_frequencies'],'Frecuencia simulada 0-1'))
@@ -102,7 +109,7 @@ def content(record):
             o=body['options'];actor=o['actor'];c['paragraphs']+=[f"Actor {body['model']['actors'][actor]}; referencia {POLICIES[o['baseline']]}; rival {POLICIES[o['opponent']]}; error {NUMERIC(o['noise'])}.",'Supuestos: '+body['assumptions'],f"Diferencia media de utilidad: {NUMERIC(body['mean_utility_delta'])}. Simulación, no precisión predictiva."]+body['limits']
             c['tables'].append(table(['Semilla','Utilidad IA','Utilidad referencia','Diferencia'],[[t['seed'],t['candidate']['means'][actor],t['baseline']['means'][actor],t['utility_delta']] for t in body['trials']]))
             for t in body['trials']:
-                trace=t['decisions'][0];c['paragraphs'].append(f"Modelo {trace['model']}; digest {trace['digest']}; semilla {t['seed']}; respuestas y decisiones completas en JSON.")
+                trace=t['decisions'][0];c['paragraphs'].append(f"Modelo {trace['model']}; semilla {t['seed']}; versión técnica del modelo, respuestas y decisiones completas en JSON.")
                 c['charts'].append(lines('IA y referencia - semilla '+str(t['seed']),[{'name':name,'values':[v['totals'][actor] for v in t[key]['rounds']]} for name,key in [('IA local','candidate'),('Referencia','baseline')]],'Utilidad acumulada del actor evaluado'))
         elif k=='benchmark':
             counts=body['summary'];c['paragraphs']+=['Supuestos: '+body['assumptions']]+body['limits']
@@ -116,7 +123,7 @@ def content(record):
                              'Método candidato: '+candidate['method'],'Referencia: '+proto['baseline_method'],
                              f"n={metric['n']}; pendientes={metric['pending']}; diferencia Brier={NUMERIC(metric['delta'])}. Menor es mejor.",
                              'Intervalo pareado aproximado: '+' a '.join(NUMERIC(x) for x in metric['paired_bootstrap_95'])+'. Semilla '+str(metric['seed'])+'.',
-                             'Ventanas: '+proto['development_end']+' / '+proto['validation_end']+' / '+proto['test_end'],
+                             'Cierre de desarrollo: '+display_date(proto['development_end'])+'; validación: '+display_date(proto['validation_end'])+'; prueba reservada: '+display_date(proto['test_end']),
                              'Fuentes: '+proto['sources']+'; independencia: '+proto['independence'],'Supuestos: '+proto['assumptions']]+metric['limits']
             c['charts'].append(bar('Brier candidato y referencia',['Candidato','Referencia'],[metric['candidate_brier'],metric['baseline_brier']],'Error Brier 0-1; menor es mejor'))
             c['tables'].append(table(['Unidad','Prob. candidato','Prob. referencia','Resultado'],[[x['research']['unit_id'],x['candidate_probability'],x['baseline_probability'],x['observation']['outcome'] if x['observation'] else 'Pendiente'] for x in body['dataset'][:20]]))
@@ -132,12 +139,10 @@ def content(record):
         if value:c['paragraphs'].append(label+': '+value)
     c['paragraphs'].append('PENDIENTES DECLARADOS: '+(p['pending'] or 'Sin detalle adicional aportado. Esto no acredita completitud.'))
     chapter('Trazabilidad y límites',p['limits']+[
-        'Informe '+record['id']+'; emisión '+record['created_at'],
-        'SHA-256 del manifiesto: '+record['sha256'],
-        'SHA-256 matriz: '+p['matrix_sha256'],
-        'Los capítulos proceden solo de estas copias congeladas. JSON contiene la selección y todas las fuentes.'],
-        [table(['Tipo','Identificador','SHA-256'],[['Matriz',p['workflow']['id']+':'+str(p['workflow']['version']),p['matrix_sha256']],*[[LABELS[s['kind']],s['id'],s['sha256']] for s in sources]])])
-    return {'title':p['title'],'badge':note,'id':record['id'],'date':record['created_at'],'chapters':chapters}
+        'Emisión: '+display_date(record['created_at']),
+        'Los capítulos proceden de versiones conservadas. La exportación JSON mantiene identificadores, huellas de integridad y copias completas de las fuentes para auditoría.'],
+        [table(['Fuente','Referencia de lectura'],[['Matriz estratégica','Versión '+str(p['workflow']['version'])],*[[LABELS[s['kind']],'Fuente '+str(index+1)] for index,s in enumerate(sources)]])])
+    return {'title':p['title'],'badge':note,'id':record['id'],'date':display_date(record['created_at']),'chapters':chapters}
 
 def primitives(chart):
     """Coordenadas compartidas: 720x290, y hacia abajo, PDF y SVG idénticos."""
@@ -206,4 +211,4 @@ def html(record):
     links=''.join(f'<a href="#chapter-{i}">{e(c["title"])}</a>' for i,c in enumerate(view['chapters']))
     return '<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>'+e(view['title'])+'''</title><style>
     :root{color-scheme:light}*{box-sizing:border-box}body{margin:0;background:#e9eff2;color:#213846;font:14px/1.65 Arial,sans-serif}.toolbar{background:#112b38;color:white;padding:16px;position:sticky;top:0;z-index:2;display:flex;gap:16px;align-items:center}.toolbar a,.toolbar button{color:white;background:#137f84;border:0;padding:10px;text-decoration:none;cursor:pointer}.document{max-width:210mm;margin:28px auto;background:white;box-shadow:0 8px 32px #132b3820}.cover,.chapter{padding:18mm}.cover{background:#112b38;color:white;min-height:220mm;display:flex;flex-direction:column;justify-content:center;border-bottom:7px solid #137f84}.cover h1{font-size:38px;line-height:1.18;overflow-wrap:anywhere}.kicker{font-size:10px;letter-spacing:2px;color:#137f84;font-weight:bold}.cover .kicker{color:#70d0c4}.badge{padding:12px;border:1px solid #78bfb8;font-size:12px}.chapter{border-bottom:1px solid #d4e0e6}h2{font-size:26px;line-height:1.25;color:#163c4a;break-after:avoid}p,td,th{overflow-wrap:anywhere}p{white-space:pre-line}figure{margin:22px 0;padding:12px;border:1px solid #d4e0e6;background:#f8fbfc;break-inside:avoid}svg{width:100%;display:block;font-family:Arial,sans-serif}table{width:100%;table-layout:fixed;border-collapse:collapse;margin:18px 0;font-size:11px}th{text-align:left;background:#edf5f5}td,th{padding:9px;border-bottom:1px solid #d4e0e6;vertical-align:top}tr{break-inside:avoid}thead{display:table-header-group}.contents a{display:block;color:#137f84;padding:4px}small{overflow-wrap:anywhere}@page{size:A4;margin:16mm}@media print{body{background:white}.toolbar{display:none}.document{margin:0;max-width:none;box-shadow:none}.cover{min-height:240mm;break-after:page;padding:16mm;print-color-adjust:exact;-webkit-print-color-adjust:exact}.chapter{padding:0;break-before:page;border:0}figure,th{print-color-adjust:exact;-webkit-print-color-adjust:exact}h2{break-after:avoid}}@media screen and (max-width:700px){.cover,.chapter{padding:24px}.cover h1{font-size:30px}.toolbar{position:static;flex-wrap:wrap}}
-    </style></head><body><div class="toolbar"><strong>Vista A4 · versión congelada</strong><button onclick="window.print()">Imprimir / guardar PDF</button><a href="/api/executive/pdf?id='''+e(view['id'])+'">Descargar PDF vectorial</a></div><main class="document"><header class="cover"><p class="kicker">ESCENARIOS TJ / INFORME EJECUTIVO</p><h1>'+e(view['title'])+'</h1><p class="badge">'+e(view['badge'])+'</p><p>Modelos, escenarios y evidencia reunidos desde versiones conservadas.</p><small>Informe '+e(view['id'])+'<br>Emisión '+e(view['date'])+'</small></header><section class="chapter contents"><h2>Contenido del informe</h2>'+links+'</section>'+''.join(chapters)+'</main></body></html>'
+    </style></head><body><div class="toolbar"><strong>Vista A4 · versión congelada</strong><button onclick="window.print()">Imprimir / guardar PDF</button><a href="/api/executive/pdf?id='''+e(view['id'])+'">Descargar PDF vectorial</a></div><main class="document"><header class="cover"><p class="kicker">ESCENARIOS TJ / INFORME EJECUTIVO</p><h1>'+e(view['title'])+'</h1><p class="badge">'+e(view['badge'])+'</p><p>Modelos, escenarios y evidencia reunidos desde versiones conservadas.</p><small>Emisión '+e(view['date'])+'</small></header><section class="chapter contents"><h2>Contenido del informe</h2>'+links+'</section>'+''.join(chapters)+'</main></body></html>'

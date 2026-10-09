@@ -65,6 +65,24 @@ class ExecutiveTests(unittest.TestCase):
             db.execute('DELETE FROM agent_runs');db.execute('DELETE FROM research_records');db.execute('DELETE FROM decision_comparisons')
         self.assertTrue(e.replay(self.path,report['id'])['reproduced'])
         self.assertEqual(e.read(self.path,report['id']),report)
+    def test_executive_reading_hides_technical_ids_without_changing_audit_record(self):
+        report=e.create(self.path,self.payload);before=copy.deepcopy(report)
+        view=executive_view.content(report)
+        self.assertIn('hora argentina',view['date'])
+        self.assertEqual(executive_view.display_date('2026-10-09T18:35:11.671245+00:00'),'09/10/2026 · 15:35 (hora argentina)')
+        visible=json.dumps(view['chapters'],ensure_ascii=False)
+        pdf=executive_pdf.build_pdf(report)
+        printed=' '.join(page.extract_text() for page in PdfReader(BytesIO(pdf)).pages)
+        self.assertNotIn('; digest ',printed)
+        for source in report['payload']['sources']:
+            self.assertNotIn(source['id'][:8],printed)
+        for technical in [report['id'],report['id'][:8],report['sha256'],report['payload']['matrix_sha256'],*[s['id'] for s in report['payload']['sources']],*[s['sha256'] for s in report['payload']['sources']]]:
+            self.assertNotIn(technical,visible)
+            self.assertNotIn(technical,printed)
+        self.assertNotIn(report['id'],executive_view.html(report).split('<main class="document">')[1])
+        self.assertEqual(report,before)
+        self.assertEqual(e.read(self.path,report['id']),before)
+        self.assertTrue(e.replay(self.path,report['id'])['reproduced'])
     def test_foreign_duplicate_unreviewed_and_unselected_sources_rejected(self):
         foreign=prepare_case(self.path)
         for payload in [{**self.payload,'workflow_id':foreign['id']},{**self.payload,'references':self.refs+[self.refs[0]]},{**self.payload,'reviewed':False},{**self.payload,'sections':['matrix']},{**self.payload,'sections':['simulation']}]:
