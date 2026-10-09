@@ -22,7 +22,7 @@ jobs:
         with:
           node-version: '24'
       - name: Dependencias de construcción
-        run: python -m pip install reportlab==4.2.5 pyinstaller==6.20.0
+        run: python -m pip install reportlab==4.2.5 pyinstaller==6.20.0 pypdf==6.11.0
       - name: Interfaz y pruebas
         working-directory: frontend
         run: |
