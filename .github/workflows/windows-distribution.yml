@@ -1,0 +1,65 @@
+name: Distribución Windows
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'packaging/**'
+      - 'escenarios/**'
+      - 'frontend/**'
+      - '.github/workflows/windows-distribution.yml'
+permissions:
+  contents: read
+jobs:
+  windows-clean:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Dependencias de construcción
+        run: python -m pip install reportlab==4.2.5 pyinstaller==6.20.0
+      - name: Interfaz y pruebas
+        working-directory: frontend
+        run: |
+          npm ci
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm test
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm run build
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Integración Python
+        run: python -m unittest discover -s tests -q
+      - name: Ejecutable portable
+        run: ./packaging/build-windows.ps1
+      - name: Compilador oficial
+        run: |
+          New-Item -ItemType Directory -Force tmp/installer-tools | Out-Null
+          Invoke-WebRequest 'https://github.com/jrsoftware/issrc/releases/download/is-6_7_3/innosetup-6.7.3.exe' -OutFile tmp/installer-tools/compiler-setup.exe
+          $signature = Get-AuthenticodeSignature tmp/installer-tools/compiler-setup.exe
+          if ($signature.Status -ne 'Valid' -or $signature.SignerCertificate.Subject -notmatch 'Pyrsys B.V.') { throw 'Firma inesperada' }
+          $compilerDir = Join-Path $PWD 'tmp/installer-tools/compiler'
+          $compilerProcess = Start-Process tmp/installer-tools/compiler-setup.exe -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/NOICONS','/TASKS=',('/DIR="' + $compilerDir + '"')) -WindowStyle Hidden -PassThru -Wait
+          if ($compilerProcess.ExitCode -ne 0) { throw 'Falló compilador' }
+      - name: Instalador y recorrido en runner Windows nuevo
+        run: |
+          ./packaging/build-installer.ps1
+          & ./tmp/installer-tools/compiler/ISCC.exe /DAppGuid=9AFF3D00-2C8C-4B15-B047-AD707C91E591 /DOutputName=EscenariosTJ-0.1.0-QA-Setup packaging/windows-installer.iss
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python packaging/smoke-installer.py release/EscenariosTJ-0.1.0-QA-Setup.exe tmp/windows-installed
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: escenarios-tj-windows
+          path: |
+            release/EscenariosTJ-0.1.0-Setup.exe
+            release/EscenariosTJ-0.1.0-Setup.exe.sha256
+            release/EscenariosTJ-0.1.0-windows.zip
+            release/EscenariosTJ-0.1.0-windows.zip.sha256
+            tmp/windows-installed/installer-verification.json
+          retention-days: 14
