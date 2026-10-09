@@ -11,3 +11,35 @@
 @media print{.command-deck,.analysis-view-tabs{display:none!important}.experimental-shell .panel,.advanced-graphs .two-columns>div{border-radius:0;box-shadow:none}.experimental-shell{background:white}.experimental-shell main{padding:0}.mission-strip{display:none}.experimental-shell .notice{font-size:9pt}}
 @media(prefers-reduced-motion:reduce){.map-node{transition:none}.map-node:hover{transform:none}}
 @media screen{.experimental-shell{color:#233b56}.experimental-shell aside{color:#29435f;border-color:#dce5ef}.experimental-shell .brand{color:#19365a}.experimental-shell .brand strong,.experimental-shell .nav-label{color:#71849b}.experimental-shell nav button,.experimental-shell nav a{color:#536c88}.experimental-shell nav button:before{color:#8094ab}.experimental-shell .local{color:#355d87}.experimental-shell .local span{color:#71849b}.experimental-shell .local i{background:#315b85}.experimental-shell .secondary{color:#25476b;border-color:#ccdaea}.instrument-bar,.experimental-shell .eyebrow{color:#526e8f}.mission-strip strong{color:#35516f}.mission-strip small{color:#7b8fa5}.experimental-shell .notice{color:#657b92}.experimental-shell .panel,.experimental-shell .metrics>div,.advanced-graphs .two-columns>div{border-color:#dce5ef}.deck-copy>p:not(.eyebrow){color:#6b7e95}.deck-context{border-color:#dce5ef}.deck-context small{color:#7b8fa5}.deck-map{border-color:#dce5ef;background-image:radial-gradient(#9bb3d140 .7px,transparent .7px)}.map-label span,.map-footnote{color:#607d9e}.map-label small,.map-node small{color:#7b91aa}.map-node{border-color:#cfdeef!important;box-shadow:0 6px 22px #19365a10}.map-footnote i{background:#577ea9}.analysis-view-tabs{background:#e7eef7}.analysis-view-tabs button{color:#607b9b}.analysis-view-tabs button[aria-pressed=true]{color:#19365a}.experimental-shell .metrics strong{color:#19365a}.experimental-shell .metrics small,.experimental-shell .metrics span,.experimental-shell .selection label,.experimental-shell .actor-result h3{color:#627c99}.experimental-shell select,.experimental-shell input:not([type=checkbox]):not([type=range]),.experimental-shell textarea{background:#f7f9fc;color:#233b56;border-color:#ccd9e9}.experimental-shell th{background:#edf3fa}.experimental-shell th,.experimental-shell td{border-color:#dce5ef}.experimental-shell .badge{background:#e8f0f9;color:#315b85}.experimental-shell .executive-intro,.experimental-shell .agent-replay,.experimental-shell .tree-ai{background:linear-gradient(120deg,#fff,#edf3fa);border-color:#ccd9e9}.experimental-shell .executive-source-group legend,.experimental-shell .variable-card legend{color:#315b85}.experimental-shell .variable-card,.experimental-shell .empty{background:#f7f9fc;border-color:#ccd9e9}.advanced-graphs svg text{fill:#456079}.advanced-graphs label{color:#627c99}.experimental-shell input{accent-color:#315b85}.experimental-shell footer{color:#71849b}.experimental-shell :focus-visible{outline-color:#577ea9}.graph-evidence{border-left-color:#577ea9}}
+
+/* Strategic workspace: editorial hierarchy and real module selection. */
+.command-studio{grid-template-columns:minmax(300px,.85fr) minmax(430px,1.15fr);background:#fff;border-color:#dae3ed;border-radius:20px;box-shadow:0 20px 60px #15355608;min-height:480px}
+.command-studio .deck-copy{padding:44px 36px;background:linear-gradient(145deg,#fff,#f5f8fc)}
+.command-studio .deck-copy h2{font-size:clamp(28px,2.4vw,42px);line-height:1.17;letter-spacing:-1.4px;font-weight:600}
+.command-studio .deck-copy h2 em{color:#52749a}
+.command-studio .deck-copy>p:not(.eyebrow){font-size:14px;line-height:1.7;color:#62748a}
+.studio-workspace{padding:30px;border-left:1px solid #e2e9f1;background:#fff;min-width:0}
+.studio-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:24px}
+.studio-heading>span{font-size:10px;font-weight:600;letter-spacing:1.8px;color:#45627e}
+.studio-heading>small{font-size:11px;color:#718298}
+.studio-modules{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.experimental-shell .studio-module{display:flex;flex-direction:column;align-items:stretch;text-align:left;gap:12px;padding:20px;background:#fff;color:#19365a;border:1px solid #dce5ee;border-radius:12px;min-width:0;box-shadow:none;transition:background .18s,border-color .18s,box-shadow .18s}
+.experimental-shell .studio-module:hover{background:#f4f7fb;border-color:#98afc9;box-shadow:0 6px 18px #19365a09}
+.experimental-shell .studio-module[aria-pressed=true]{background:#19365a;color:#fff;border-color:#19365a;box-shadow:0 8px 22px #19365a20}
+.studio-module-top{display:flex;align-items:center;justify-content:space-between;color:#7e96ae;font-size:11px}
+.studio-module-top svg{width:25px;height:25px}
+.studio-module[aria-pressed=true] .studio-module-top{color:#b9cde4}
+.studio-module strong{font-size:14px;font-weight:600;line-height:1.3;letter-spacing:-.1px}
+.studio-module small{font-size:12px;font-weight:400;line-height:1.5;color:#647a90;flex:1}
+.studio-module[aria-pressed=true] small{color:#d0ddee}
+.studio-module-bottom{display:flex;justify-content:space-between;font-size:10px;font-weight:500;padding-top:10px;border-top:1px solid #e1e9f1;color:#526e8b}
+.studio-module[aria-pressed=true] .studio-module-bottom{border-color:#ffffff25;color:#e0ebf8}
+.studio-detail{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:20px;padding:20px 0 12px;border-top:1px solid #e3eaf2}
+.studio-detail-label{display:block;font-size:8px;letter-spacing:1.4px;color:#718298;margin-bottom:8px}
+.studio-detail strong{font-size:14px;color:#19365a}.studio-detail p{font-size:12px;color:#677d93;line-height:1.5;margin:7px 0 0}
+.studio-detail button{flex-shrink:0;font-size:11px;padding:12px 15px;border-radius:8px}
+.studio-footnote{font-size:10px!important;line-height:1.5;color:#718298;margin:12px 0 0}
+@media(max-width:1150px){.command-studio{grid-template-columns:1fr}.command-studio .deck-copy{padding:28px}.studio-workspace{border-left:0;border-top:1px solid #e2e9f1}}
+@media(max-width:650px){.studio-workspace{padding:20px}.studio-heading{align-items:flex-start;flex-direction:column;gap:6px}.experimental-shell .studio-module{padding:15px;gap:10px}.studio-module strong{font-size:13px}.studio-module small{font-size:11px}.studio-detail{flex-direction:column;align-items:stretch}.studio-detail button{align-self:flex-start}}
+@media(max-width:380px){.studio-modules{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.experimental-shell .studio-module{transition:none}}
