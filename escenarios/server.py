@@ -389,13 +389,25 @@ def main():
     parser.add_argument('--port', type=int, default=8765)
     parser.add_argument('--database', type=Path, help='Base local existente o nueva; permite usar una copia recuperada')
     args = parser.parse_args()
+    serve(args.database.resolve() if args.database else DB, args.port)
+
+
+def serve(database, port, open_browser=False):
     global DB
-    if args.database:DB=args.database.resolve()
-    continuity.migrate(DB)
-    ai_jobs.recover_interrupted(DB)
-    server = ThreadingHTTPServer(('127.0.0.1', args.port), Handler)
-    print(f'Escenarios TJ: http://127.0.0.1:{args.port}', flush=True)
+    # Reserve the endpoint before touching data: a busy port must not migrate it.
+    server = ThreadingHTTPServer(('127.0.0.1', port), Handler)
+    DB = Path(database)
     try:
+        continuity.migrate(DB)
+        ai_jobs.recover_interrupted(DB)
+    except BaseException:
+        server.server_close()
+        raise
+    print(f'Escenarios TJ: http://127.0.0.1:{server.server_port}/app/', flush=True)
+    try:
+        if open_browser:
+            import webbrowser
+            webbrowser.open(f'http://127.0.0.1:{server.server_port}/app/')
         server.serve_forever()
     except KeyboardInterrupt:
         pass

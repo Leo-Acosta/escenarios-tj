@@ -8,3 +8,4 @@ data/
 work/
 frontend/node_modules/
 frontend/dist/
+release/
