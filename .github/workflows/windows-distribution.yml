@@ -9,6 +9,9 @@ on:
       - '.github/workflows/windows-distribution.yml'
 permissions:
   contents: read
+concurrency:
+  group: windows-distribution-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   windows-clean:
     runs-on: windows-latest

@@ -33,13 +33,13 @@ try {
     $appProcess = Start-Process -FilePath (Join-Path $appPath 'EscenariosTJ.exe') -ArgumentList @('--no-browser',('--port='+$testPort),('--data-dir="'+$dataPath+'"')) -WindowStyle Hidden -PassThru
     $deadline = [DateTime]::UtcNow.AddSeconds(30)
     do {
-        try { $status = Invoke-WebRequest -Uri ($baseUrl+'/api/continuity/status') -TimeoutSec 1; break }
+        try { $status = Invoke-WebRequest -UseBasicParsing -Uri ($baseUrl+'/api/continuity/status') -TimeoutSec 1; break }
         catch { if ($appProcess.HasExited -or [DateTime]::UtcNow -gt $deadline) { throw 'No inició el ejecutable instalado.' }; Start-Sleep -Milliseconds 100 }
     } while ($true)
-    if ((Invoke-WebRequest -Uri ($baseUrl+'/app/')).StatusCode -ne 200) { throw 'No respondió React.' }
+    if ((Invoke-WebRequest -UseBasicParsing -Uri ($baseUrl+'/app/')).StatusCode -ne 200) { throw 'No respondió React.' }
     $snapshot = Invoke-RestMethod -Uri ($baseUrl+'/api/snapshots') -Method Post -ContentType 'application/json' -Headers @{Origin=$baseUrl} -Body '{"cooperation":0.6,"cost":3}'
     if (-not $snapshot.id) { throw 'No guardó la prueba sintética.' }
-    Invoke-WebRequest -Uri ($baseUrl+'/api/report.pdf?q=0.6&cost=3') -OutFile (Join-Path $rootPath 'sintetico.pdf') | Out-Null
+    Invoke-WebRequest -UseBasicParsing -Uri ($baseUrl+'/api/report.pdf?q=0.6&cost=3') -OutFile (Join-Path $rootPath 'sintetico.pdf') | Out-Null
     $prefix = [Text.Encoding]::ASCII.GetString([IO.File]::ReadAllBytes((Join-Path $rootPath 'sintetico.pdf')),0,4)
     if ($prefix -ne '%PDF') { throw 'No se exportó PDF.' }
 } finally {
