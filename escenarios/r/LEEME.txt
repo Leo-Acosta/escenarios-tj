@@ -1,0 +1,22 @@
+ESCENARIOS TJ · LABORATORIO CIENTÍFICO
+La versión y las corridas están congeladas. manifest.json permite comprobar integridad.
+Extraer el ZIP en una carpeta local y ejecutar desde esa carpeta:
+Rscript graficos.R
+Rscript exploracion.R
+Instalar R y ggplot2 antes de ejecutar. Opcionales: igraph, simmer, arules, caret, nnet.
+No se instalan paquetes automáticamente ni se envían datos a servicios externos.
+PNG 300 dpi y PDF vectorial se generan en resultados/. Colores blanco y azul marino.
+CSV se puede importar en Tableau/Power BI; RStudio es un IDE, no un paquete gráfico.
+Boxplots requieren corridas guardadas de agentes de la misma versión.
+Las matrices y simulaciones son supuestos; no evidencia de precisión predictiva real.
+aprendizaje.R necesita observaciones revisadas y cortes temporales; excluye casos
+que cruzan particiones. Registra modelos, semilla, pronósticos y entorno. Los
+resultados externos necesitan revisión antes de registrarse en el protocolo Python.
+El ejemplo de eventos es sintético; asociaciones no implican causalidad.
+No hay promoción automática ni cambios de pagos. SBO++ no se usa: no se verificó
+un paquete oficial con ese nombre. Se compara recocido con búsqueda exhaustiva.
+Red pequeña opcional con caret/nnet. Red profunda opcional con keras3 y backend
+configurado: activar ESCENARIOS_KERAS=1 antes de ejecutar aprendizaje.R.
+Semilla fijada; determinismo entre backends/dispositivos no garantizado.
+Plotly/htmlwidgets generan una vista 3D de q y las dos utilidades de A.
+La red profunda y la vista 3D necesitan verificar entorno y resultados.

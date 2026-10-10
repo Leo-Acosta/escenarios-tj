@@ -48,3 +48,7 @@ Ver [paquete portable, uso, actualización y verificación](FASE-9-WINDOWS.md). 
 ## Calidad de plataforma · fase 10
 
 Ver [resultados, protocolo y límites](FASE-10-CALIDAD.md). 176 pruebas Python, 80 contratos TypeScript y compilación aprobados. Mediciones sintéticas repetidas en cuatro combinaciones de sistema/Python; PDF concurrente idéntico, reproducción sin inferencia y A4 comprobados. Vista reducida de 480 px sin desbordamiento observada. La impresión nativa quedó bloqueada por la verificación de URL de Computer Use, incluso después de abrir el usuario una ventana autorizada. No se declara cerrada la aceptación integral ni se exige repetir los bloques implementados: resta verificación visual nativa y entre navegadores. La fase 8 sigue abierta por falta de observaciones independientes.
+
+## Ampliación científica R · etapas 1–2 solicitadas
+
+Exportación científica integrada con versiones congeladas y recetas de ggplot2, Plotly, optim, redes, eventos, asociaciones y aprendizaje temporal. Ver [estado y límites](MEJORAS-CIENTIFICAS.md). Implementación inicial comprobada en Python/TypeScript; ejecución y verificación visual R pendientes por ausencia de Rscript. Ambas etapas permanecen abiertas; no hay evidencia nueva de mejora predictiva real.

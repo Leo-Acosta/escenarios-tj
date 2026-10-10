@@ -13,7 +13,7 @@ from .case_model import analyze_case,save_case,list_cases
 from .workflow import operate,get_workflow,list_workflows,get_version,Conflict,NotFound
 from . import local_ai,ai_jobs,sequential,simulation,agents,comparisons,payoff_sweep,library,version_diff
 from . import laboratories,research,decision_agents,executive,variables,continuity
-from . import dossier
+from . import dossier,scientific
 
 ROOT = Path(__file__).resolve().parent.parent
 DB = ROOT / 'data' / 'escenarios.sqlite3'
@@ -40,6 +40,13 @@ class Handler(BaseHTTPRequestHandler):
         if not self.allowed():
             return self.send(403, {'error': 'Host no autorizado.'})
         url = urlsplit(self.path)
+        if url.path=='/api/scientific/status':return self.send(200,scientific.status())
+        if url.path=='/api/scientific/bundle':
+            try:
+                args=parse_qs(url.query)
+                return self.send(200,scientific.bundle(DB,args.get('workflow_id',[''])[0],int(args.get('version',['0'])[0])),'application/zip')
+            except NotFound as error:return self.send(404,{'error':str(error)})
+            except (ValueError,KeyError,TypeError) as error:return self.send(400,{'error':str(error)})
         if url.path.startswith('/api/dossier'):
             try:
                 args=parse_qs(url.query);scope=args.get('workflow_id',[''])[0]
