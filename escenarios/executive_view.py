@@ -45,6 +45,15 @@ def content(record):
             c=s['record']['payload']['summary'];summary.append(f"Batería simulada: {c['win']} victorias, {c['tie']} empates, {c['loss']} pérdidas y {c['failure']} fallos; sin acreditación predictiva real.")
     if not any(s['kind']=='evaluation' for s in sources):summary.append('Evaluación predictiva pendiente o no seleccionada; no se acredita mejora real.')
     chapter('Resumen ejecutivo',summary)
+    for science in p.get('scientific',[]):
+        result=science['result'];metric=result['metrics']
+        note='DATOS SINTÉTICOS · prueba funcional' if science['mode']=='synthetic' else 'Observaciones declaradas · evaluación retrospectiva' if science['mode']=='observed' else 'Supuestos del modelo · exploración'
+        c=chapter('Laboratorio científico R',[note,'Fuente: '+science['source'],*science['limits']])
+        if metric:
+            method={'referencia':'Referencia','logistica':'Regresión logística','red':'Red neuronal pequeña','profunda':'Red neuronal profunda'}[result['selected']]
+            c['paragraphs'].append(f"Método seleccionado: {method}. {metric['n']} unidades reservadas. Diferencia Brier: {NUMERIC(metric['delta'])}. Reproducción de métricas desde pronósticos guardados; no hay inferencia nueva.")
+            c['charts'].append(bar('Evaluación científica · menor Brier es mejor',['Candidato','Referencia'],[metric['candidate_brier'],metric['baseline_brier']],'Error Brier'))
+            c['tables'].append(table(['Mejoras','Empates','Pérdidas'],[[metric['wins'],metric['ties'],metric['losses']]]))
     if p.get('dossier'):
         d=p['dossier']
         chapter('Expediente documental y seguimiento',[
@@ -150,7 +159,7 @@ def content(record):
     chapter('Trazabilidad y límites',p['limits']+[
         'Emisión: '+display_date(record['created_at']),
         'Los capítulos proceden de versiones conservadas. La exportación JSON mantiene identificadores, huellas de integridad y copias completas de las fuentes para auditoría.'],
-        [table(['Fuente','Referencia de lectura'],[['Matriz estratégica','Versión '+str(p['workflow']['version'])],*[[LABELS[s['kind']],'Fuente '+str(index+1)] for index,s in enumerate(sources)]])])
+        [table(['Fuente','Referencia de lectura'],[['Matriz estratégica','Versión '+str(p['workflow']['version'])],*[[LABELS[s['kind']],'Fuente '+str(index+1)] for index,s in enumerate(sources)],*[["Laboratorio científico R","Versión "+str(s['workflow']['version'])+' · '+('datos sintéticos' if s['mode']=='synthetic' else 'supuestos' if s['mode']=='graphics' else 'observaciones declaradas')] for s in p.get('scientific',[])]])])
     return {'title':p['title'],'badge':note,'id':record['id'],'date':display_date(record['created_at']),'chapters':chapters}
 
 def primitives(chart):
@@ -159,7 +168,7 @@ def primitives(chart):
     def line(x1,y1,x2,y2,color='#cedbe2',width=1):output.append(('line',x1,y1,x2,y2,color,width))
     def rect(x,y,w,h,color):output.append(('rect',x,y,w,h,color))
     def label(x,y,value,size=12,color='#213846'):output.append(('text',x,y,str(value),size,color))
-    palette=['#137f84','#c37445','#7d65a5','#82969f']
+    palette=['#19365a','#a16428','#397e9c','#686e89']
     typ=chart['type'];label(20,20,chart['title'] if len(chart['title'])<=45 else chart['title'][:42]+'...',14)
     if typ not in ('lines','tree'):label(20,282,chart.get('unit',''),10,'#536a78')
     if typ=='tree':

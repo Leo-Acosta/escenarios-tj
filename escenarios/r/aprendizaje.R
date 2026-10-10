@@ -15,6 +15,7 @@ stopifnot(length(xs)>0,all(vapply(d[xs],is.numeric,logical(1))))
 stopifnot(all(is.finite(as.matrix(d[xs]))))
 dev <- d[d$observado<=cortes[1],];val <- d[d$disponible>cortes[1]&d$observado<=cortes[2],];test <- d[d$disponible>cortes[2],]
 stopifnot(nrow(dev)>=30,nrow(val)>=30,nrow(test)>=30,length(unique(dev$resultado))==2)
+if(nrow(dev)+nrow(val)+nrow(test)!=nrow(d)) stop('Hay unidades que cruzan cortes temporales; no se omiten silenciosamente.')
 # Sin normalización sobre validación/prueba; selección solo con validación.
 set.seed(42)
 formula <- reformulate(xs,response='resultado')
@@ -29,6 +30,7 @@ if(requireNamespace('caret',quietly=TRUE)&&requireNamespace('nnet',quietly=TRUE)
 if(Sys.getenv('ESCENARIOS_KERAS')=='1') {
  stopifnot(requireNamespace('keras3',quietly=TRUE))
  keras3::set_random_seed(42)
+ reticulate::py_run_string('import torch; torch.set_num_threads(1); torch.use_deterministic_algorithms(True)')
  centro <- vapply(dev[xs],mean,numeric(1));escala <- vapply(dev[xs],sd,numeric(1));escala[escala==0]<-1
  transformar <- function(d) sweep(sweep(as.matrix(d[xs]),2,centro),2,escala,'/')
  red_profunda <- keras3::keras_model_sequential(input_shape=c(length(xs))) |>
@@ -51,8 +53,20 @@ saveRDS(list(modelos=modelos,referencia=referencia,elegido=elegido,cortes=cortes
 if(exists('red_profunda')) {
  keras3::save_model(red_profunda,'evaluacion-final/red-profunda.keras')
  saveRDS(list(centro=centro,escala=escala,variables=xs),'evaluacion-final/normalizacion.rds')
+ reticulate::py_run_string("import keras, torch, sys; open('evaluacion-final/entorno-python.txt','w').write('Python: '+sys.version+'\\nKeras: '+keras.__version__+'\\nTorch: '+torch.__version__)")
 }
 write.csv(data.frame(unidad=test$unidad,resultado=test$resultado,pronostico=p,referencia=referencia),'evaluacion-final/pronosticos.csv',row.names=FALSE)
 write.csv(data.frame(metodo=names(puntajes),brier_validacion=puntajes),'evaluacion-final/validacion.csv',row.names=FALSE)
+write.csv(data.frame(unidad=val$unidad,resultado=val$resultado,as.data.frame(pred_val)),'evaluacion-final/pronosticos-validacion.csv',row.names=FALSE)
+if(requireNamespace('ggplot2',quietly=TRUE)) {
+ library(ggplot2)
+ v <- data.frame(metodo=names(puntajes),brier=as.numeric(puntajes))
+ etiquetas <- c(referencia='Referencia',logistica='Regresión logística',red='Red pequeña',profunda='Red profunda')
+ v$metodo <- unname(etiquetas[v$metodo])
+ g <- ggplot(v,aes(reorder(metodo,brier),brier,fill=metodo))+geom_col(show.legend=FALSE)+scale_fill_manual(values=c('#19365a','#397e9c','#a16428','#686e89'))+labs(title='Comparación de modelos · validación',subtitle='Menor Brier es mejor; selección antes de abrir prueba',x='Método',y='Error Brier')+theme_minimal(base_size=12)
+ ggsave('evaluacion-final/validacion.png',g,width=10,height=6,dpi=300);ggsave('evaluacion-final/validacion.pdf',g,width=10,height=6)
+ g <- ggplot(data.frame(p=p,y=test$resultado),aes(p,y))+geom_point(alpha=.35,colour='#19365a',position=position_jitter(height=.03,width=0,seed=42))+labs(title='Pronósticos y resultados · prueba reservada',subtitle=paste('Modelo seleccionado:',etiquetas[elegido]),x='Probabilidad pronosticada',y='Resultado observado binario')+theme_minimal(base_size=12)
+ ggsave('evaluacion-final/pronosticos.png',g,width=10,height=6,dpi=300);ggsave('evaluacion-final/pronosticos.pdf',g,width=10,height=6)
+}
 writeLines(c(paste('Método:',elegido),paste('Brier prueba:',brier(p,test$resultado)),paste('Brier referencia:',brier(rep(referencia,nrow(test)),test$resultado)),'No garantiza superioridad futura; revisión e incorporación al protocolo Python requeridas.'),'evaluacion-final/resumen.txt')
 writeLines(capture.output(sessionInfo()),'evaluacion-final/entorno-R.txt')

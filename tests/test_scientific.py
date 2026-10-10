@@ -32,7 +32,7 @@ class ScientificTests(unittest.TestCase):
         for version in [True,0,-1,'1']:
             with self.assertRaises(ValueError):scientific.bundle(self.path,self.case['id'],version)
         with self.assertRaises(NotFound):scientific.bundle(self.path,self.case['id'],99)
-        self.assertEqual(scientific.status()['execution'],'external_reviewed')
+        self.assertEqual(scientific.status()['execution'],'local_bounded')
     def test_http_download_matches_core(self):
         previous=server.DB;server.DB=self.path
         http=ThreadingHTTPServer(('127.0.0.1',0),server.Handler)

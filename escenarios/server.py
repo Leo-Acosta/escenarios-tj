@@ -13,7 +13,7 @@ from .case_model import analyze_case,save_case,list_cases
 from .workflow import operate,get_workflow,list_workflows,get_version,Conflict,NotFound
 from . import local_ai,ai_jobs,sequential,simulation,agents,comparisons,payoff_sweep,library,version_diff
 from . import laboratories,research,decision_agents,executive,variables,continuity
-from . import dossier,scientific
+from . import dossier,scientific,scientific_runtime
 
 ROOT = Path(__file__).resolve().parent.parent
 DB = ROOT / 'data' / 'escenarios.sqlite3'
@@ -40,7 +40,29 @@ class Handler(BaseHTTPRequestHandler):
         if not self.allowed():
             return self.send(403, {'error': 'Host no autorizado.'})
         url = urlsplit(self.path)
-        if url.path=='/api/scientific/status':return self.send(200,scientific.status())
+        if url.path=='/api/scientific/status':return self.send(200,scientific_runtime.status())
+        if url.path.startswith('/api/scientific/') and url.path!='/api/scientific/bundle':
+            try:
+                args=parse_qs(url.query)
+                if url.path=='/api/scientific/history':return self.send(200,scientific_runtime.history(DB,args.get('workflow_id',[''])[0],int(args.get('version',['0'])[0])))
+                record=scientific_runtime.read(DB,args.get('id',[''])[0])
+                if url.path=='/api/scientific/job':return self.send(200,scientific_runtime.public(record))
+                if url.path=='/api/scientific/replay':return self.send(200,scientific_runtime.verify(record))
+                if url.path=='/api/scientific/report':return self.send(200,scientific_runtime.report(record),'text/html; charset=utf-8')
+                if url.path=='/api/scientific/export':
+                    import base64
+                    return self.send(200,base64.b64decode(record['archive']),'application/zip')
+                if url.path=='/api/scientific/asset':
+                    name=args.get('name',[''])[0]
+                    # Interactive R HTML is opened in a sandboxed iframe, not served executable at root origin.
+                    if name.endswith(('.html','.js')):raise ValueError('Usá la visualización interactiva integrada o la exportación local.')
+                    return self.send(200,scientific_runtime.asset(record,name),mimetypes.guess_type(name)[0] or 'application/octet-stream')
+                if url.path=='/api/scientific/view':
+                    import base64
+                    return self.send(200,{'html':scientific_runtime.widget(record)})
+                return self.send(404,{'error':'Ruta científica inexistente.'})
+            except NotFound as error:return self.send(404,{'error':str(error)})
+            except (ValueError,KeyError,TypeError) as error:return self.send(400,{'error':str(error)})
         if url.path=='/api/scientific/bundle':
             try:
                 args=parse_qs(url.query)
@@ -272,6 +294,14 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         if not self.allowed() or self.headers.get('Origin') not in (f'http://127.0.0.1:{self.server.server_port}', f'http://localhost:{self.server.server_port}'):
             return self.send(403, {'error': 'Origen no autorizado.'})
+        if self.path=='/api/scientific/run':
+            try:
+                length=int(self.headers.get('Content-Length',0))
+                if not 0<length<=1200000:raise ValueError('Configuración científica demasiado grande.')
+                return self.send(202,scientific_runtime.start(DB,json.loads(self.rfile.read(length))))
+            except Conflict as error:return self.send(409,{'error':str(error)})
+            except NotFound as error:return self.send(404,{'error':str(error)})
+            except (ValueError,KeyError,TypeError) as error:return self.send(400,{'error':str(error)})
         if self.path=='/api/dossier':
             try:
                 length=int(self.headers.get('Content-Length',0))
@@ -432,6 +462,7 @@ def serve(database, port, open_browser=False):
     try:
         continuity.migrate(DB)
         ai_jobs.recover_interrupted(DB)
+        scientific_runtime.recover(DB)
     except BaseException:
         server.server_close()
         raise

@@ -51,4 +51,4 @@ Ver [resultados, protocolo y límites](FASE-10-CALIDAD.md). 176 pruebas Python, 
 
 ## Ampliación científica R · etapas 1–2 solicitadas
 
-Exportación científica integrada con versiones congeladas y recetas de ggplot2, Plotly, optim, redes, eventos, asociaciones y aprendizaje temporal. Ver [estado y límites](MEJORAS-CIENTIFICAS.md). Implementación inicial comprobada en Python/TypeScript; ejecución y verificación visual R pendientes por ausencia de Rscript. Ambas etapas permanecen abiertas; no hay evidencia nueva de mejora predictiva real.
+Etapas 1–2 cerradas funcionalmente el 10 de octubre de 2026 en Windows: R instalado, gráficos y cuatro modelos ejecutados, red profunda y modelos guardados reproducidos, resultados integrados en React e informes congelados. Ver [aceptación y límites](MEJORAS-CIENTIFICAS.md). La fase 8 permanece abierta por falta de evaluación empírica independiente. La revisión visual completa del 3D, impresión nativa, otros dispositivos y distribución del runtime científico mantienen los límites documentados de plataforma.

@@ -5,7 +5,7 @@ import tempfile
 from contextlib import closing
 from pathlib import Path
 from uuid import uuid4
-from . import agents, comparisons, payoff_sweep, sequential, simulation, research, variables, dossier, decision_agents as decisions
+from . import agents, comparisons, payoff_sweep, sequential, simulation, research, variables, dossier, scientific_runtime, decision_agents as decisions
 from .case_model import analyze_case
 from .workflow import get_version, get_workflow, now
 
@@ -137,6 +137,8 @@ def create(path,payload):
           'matrix':matrix,'matrix_sha256':decisions.fingerprint(matrix),'sources':picked,'limits':LIMITS}
     documentary=dossier.frozen_context(path,workflow_id)
     if any(documentary.values()):body['dossier']=documentary
+    science=scientific_runtime.frozen_context(path,workflow_id,version)
+    if science:body['scientific']=science
     record={'id':str(uuid4()),'created_at':now(),'payload':body,'sha256':decisions.fingerprint(body)}
     with closing(connect(path)) as db,db:db.execute('INSERT INTO executive_reports VALUES (?,?,?)',(record['id'],workflow_id,json.dumps(record,ensure_ascii=False,allow_nan=False)))
     return record
@@ -163,7 +165,10 @@ def verify(record,calculations=True):
         if decisions.fingerprint(source['record'])!=source['sha256'] or not compatible(source['kind'],source['record'],body['workflow']['id'],body['workflow']['version']):
             raise ValueError('Una fuente congelada fue alterada o es incompatible.')
         if calculations:verify_source(source['kind'],source['record'])
+    for science in body.get('scientific',[]):
+        if science['workflow']!=body['workflow'] or science['matrix']!=body['matrix']:raise ValueError('Laboratorio científico de otra matriz.')
+        if calculations:scientific_runtime.verify_summary(science)
     if calculations:verify_source('matrix',body['matrix'])
-    return {'id':record['id'],'sha256':record['sha256'],'reproduced':True,'sources':len(body['sources'])+1,'new_inference':False}
+    return {'id':record['id'],'sha256':record['sha256'],'reproduced':True,'sources':len(body['sources'])+1+len(body.get('scientific',[])),'new_inference':False}
 
 def replay(path,identity):return verify(read(path,identity))

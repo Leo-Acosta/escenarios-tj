@@ -13,8 +13,9 @@ from . import laboratories
 RECIPES = Path(__file__).parent / 'r'
 
 def status():
-    return {'r_available': bool(shutil.which('Rscript')), 'execution': 'external_reviewed',
-            'limits': ['R se ejecuta fuera del servidor local.', 'Simulaciones no demuestran mejora predictiva real.']}
+    from . import scientific_runtime
+    return {**scientific_runtime.status(),'execution':'local_bounded',
+            'limits':['Solo se ejecutan las recetas R incluidas en el proyecto.','Simulaciones no demuestran mejora predictiva real.']}
 
 def csv_bytes(headers, rows):
     stream=io.StringIO(newline='');writer=csv.writer(stream);writer.writerow(headers);writer.writerows(rows)
@@ -31,7 +32,7 @@ def bundle(path, identity, version):
     files['rondas.csv']=csv_bytes(['corrida','semilla','ronda','actor','politica','pago'],
         [(r['id'],r['options']['seed'],row['round'],model['actors'][i],r['options']['policies'][i],row['payments'][i]) for r in runs for row in r['rounds'] for i in range(2)])
     files['corridas.json']=json.dumps(runs,ensure_ascii=False,allow_nan=False).encode('utf-8')
-    for name in ['graficos.R','aprendizaje.R','exploracion.R','LEEME.txt']:
+    for name in ['graficos.R','aprendizaje.R','exploracion.R','reproducir.R','LEEME.txt']:
         files[name]=(RECIPES/name).read_bytes()
     manifest={'schema':'scientific-bundle-v1','workflow_id':identity,'version':version,'seed':42,
               'classification':'supuestos del modelo; no observaciones empíricas',

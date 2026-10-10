@@ -175,3 +175,5 @@ Instalador en español: `release/EscenariosTJ-0.1.0-Setup.exe`, por usuario y co
 ### Laboratorio científico R
 
 El panel de gráficos permite descargar la versión congelada con CSV y scripts R para gráficos publicables y analítica avanzada. Consultá [uso, dependencias y límites](docs/MEJORAS-CIENTIFICAS.md). R es opcional y externo; los cálculos centrales siguen en Python.
+
+El laboratorio R ahora se ejecuta desde el Observatorio científico, conserva resultados y los incorpora al informe ejecutivo. Instalación adicional: scripts/install-scientific.ps1. Las dos etapas científicas están cerradas funcionalmente en Windows; la mejora predictiva real sigue pendiente de datos independientes.

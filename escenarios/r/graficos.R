@@ -6,6 +6,8 @@ dir.create('resultados', showWarnings=FALSE)
 pagos <- read.csv('pagos.csv', fileEncoding='UTF-8', check.names=FALSE)
 sensibilidad <- read.csv('sensibilidad.csv', fileEncoding='UTF-8')
 rondas <- read.csv('rondas.csv', fileEncoding='UTF-8')
+politicas <- c(fixed0='Alternativa 1',fixed1='Alternativa 2',mirror='Copiar rival',trigger='Cambio condicionado',adaptive='Adaptativa',random='Aleatoria')
+if(nrow(rondas)>0) rondas$politica <- unname(politicas[rondas$politica])
 theme_set(theme_minimal(base_size=12) + theme(panel.grid.minor=element_blank(), plot.title=element_text(face='bold',colour='#19365a'), legend.position='bottom'))
 colores <- c('#19365a','#a16428','#397e9c','#686e89')
 guardar <- function(nombre, grafico) {
@@ -27,6 +29,6 @@ if(requireNamespace('plotly',quietly=TRUE)&&requireNamespace('htmlwidgets',quiet
 }
 if(nrow(rondas)>0) {
  guardar('distribuciones',ggplot(rondas,aes(politica,pago,fill=politica))+geom_boxplot()+facet_wrap(~actor,scales='free_y')+scale_fill_manual(values=rep(colores,length.out=length(unique(rondas$politica))))+labs(title='Distribución de pagos por política',subtitle='Rondas dependientes dentro de cada corrida; no prueba estadística de superioridad',x='Política',y='Pago',fill='Política'))
- guardar('trayectorias',ggplot(rondas,aes(ronda,pago,group=interaction(corrida,actor),colour=politica))+geom_line(alpha=.7)+facet_wrap(~actor,scales='free_y')+labs(title='Trayectorias de pagos',x='Ronda',y='Pago',colour='Política'))
+ guardar('trayectorias',ggplot(rondas,aes(ronda,pago,group=interaction(corrida,actor),colour=politica))+geom_line(alpha=.55)+facet_wrap(~actor,scales='free_y')+scale_colour_manual(values=rep(colores,length.out=length(unique(rondas$politica))))+labs(title='Trayectorias de pagos',subtitle='Corridas conservadas; rondas dependientes dentro de cada corrida',x='Ronda',y='Pago',colour='Política'))
 }
 writeLines(capture.output(sessionInfo()),'resultados/entorno-R.txt')

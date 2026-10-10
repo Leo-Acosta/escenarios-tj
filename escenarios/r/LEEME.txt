@@ -3,7 +3,9 @@ La versión y las corridas están congeladas. manifest.json permite comprobar in
 Extraer el ZIP en una carpeta local y ejecutar desde esa carpeta:
 Rscript graficos.R
 Rscript exploracion.R
-Instalar R y ggplot2 antes de ejecutar. Opcionales: igraph, simmer, arules, caret, nnet.
+La aplicación puede ejecutar las recetas localmente y conservar resultados,
+modelos y gráficos. Instalación reproducible: scripts/install-scientific.ps1.
+Paquetes: ggplot2, plotly, htmlwidgets, igraph, simmer, arules, caret, nnet, keras3.
 No se instalan paquetes automáticamente ni se envían datos a servicios externos.
 PNG 300 dpi y PDF vectorial se generan en resultados/. Colores blanco y azul marino.
 CSV se puede importar en Tableau/Power BI; RStudio es un IDE, no un paquete gráfico.
@@ -13,6 +15,9 @@ aprendizaje.R necesita observaciones revisadas y cortes temporales; excluye caso
 que cruzan particiones. Registra modelos, semilla, pronósticos y entorno. Los
 resultados externos necesitan revisión antes de registrarse en el protocolo Python.
 El ejemplo de eventos es sintético; asociaciones no implican causalidad.
+Desde un paquete terminado: Rscript reproducir.R verifica modelos conservados
+sin entrenamiento. El botón Verificar reproducción recalcula Brier en Python
+desde pronósticos guardados, sin ejecutar inferencia R.
 No hay promoción automática ni cambios de pagos. SBO++ no se usa: no se verificó
 un paquete oficial con ese nombre. Se compara recocido con búsqueda exhaustiva.
 Red pequeña opcional con caret/nnet. Red profunda opcional con keras3 y backend

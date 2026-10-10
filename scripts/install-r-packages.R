@@ -1,0 +1,10 @@
+args <- commandArgs(trailingOnly=TRUE)
+stopifnot(length(args)==1)
+dir.create(args[1],recursive=TRUE,showWarnings=FALSE)
+.libPaths(c(args[1],.libPaths()))
+options(repos=c(CRAN='https://cloud.r-project.org'),timeout=600)
+packages <- c('ggplot2','plotly','htmlwidgets','igraph','simmer','arules','caret','nnet','keras3','jsonlite')
+missing <- packages[!vapply(packages,requireNamespace,logical(1),quietly=TRUE)]
+if(length(missing)>0) install.packages(missing,lib=args[1],type=if(.Platform$OS.type=='windows')'binary' else 'source',Ncpus=2)
+stopifnot(all(vapply(packages,requireNamespace,logical(1),quietly=TRUE)))
+jsonlite::write_json(list(R=R.version.string,packages=as.list(setNames(vapply(packages,function(p)as.character(packageVersion(p)),character(1)),packages))),file.path(args[1],'verified-environment.json'),auto_unbox=TRUE,pretty=TRUE)

@@ -1,62 +1,138 @@
-# Mejoras científicas en R
+# Ampliación científica R · cierre funcional de etapas 1–2
 
-Estas dos etapas complementan la hoja de ruta existente; no reinician su numeración.
+Actualización: 10 de octubre de 2026. Estas etapas complementan la hoja de ruta;
+no reinician la numeración de las fases anteriores.
+
+## Estado
+
+**Implementación funcional terminada y ejecutada en Windows.** R 4.6.1 instalado
+localmente en `.tools/R`, paquetes en `.tools/R-library` y Keras en un entorno
+aislado `.tools/keras-python`. Python mantiene matrices, restricciones y auditoría;
+React/TypeScript mantiene la interfaz. No se utiliza un servicio remoto para inferir.
+
+La evaluación empírica de la fase 8 permanece abierta: el ejemplo de aceptación
+es sintético y no contiene datos EDESUR ni evidencia de precisión real.
 
 ## Etapa 1: gráficos científicos
 
-El observatorio React ofrece **Descargar laboratorio R**. La API GET
-`/api/scientific/bundle?workflow_id=...&version=1` entrega un ZIP reproducible:
-matriz congelada, pagos CSV, sensibilidad Python, corridas guardadas de esa versión,
-scripts y manifiesto SHA-256. No incluye documentos privados del expediente.
-El contenido de la matriz puede contener nombres introducidos por el usuario:
-revisar antes de compartir el ZIP. No se envía automáticamente a GitHub.
+Desde Centro de análisis → Observatorio de gráficos → Observatorio científico:
 
-`graficos.R` genera puntos, líneas, barras de valores y boxplots por actor cuando
-existen corridas. Colores azul marino y ocre, leyendas en español, facetas y ejes
-independientes para actores con unidades diferentes. Salida PDF vectorial y PNG
-300 dpi. La interfaz interactiva existente continúa usando React/TypeScript.
+1. Seleccionar versión calculada y tipo de análisis.
+2. Confirmar revisión y ejecutar el laboratorio local.
+3. Consultar gráficos, abrir sensibilidad 3D, verificar reproducción o exportar.
 
-RStudio es un IDE; Tableau y Power BI son aplicaciones que pueden importar los
-CSV. No se agregaron paquetes ficticios con esos nombres. Plotly/htmlwidgets
-generan una vista 3D opcional de q y las dos utilidades de A, sin inventar variables.
+ggplot2 genera puntos, líneas, barras de valores, boxplots y facetas por actor.
+La paleta es azul marino, ocre y azul claro; leyendas y políticas están en español.
+Salidas: nueve gráficos en el recorrido completo, PNG 300 dpi y PDF vectorial.
+igraph construye la red de estrategias, presentada con ggplot2. Plotly genera
+sensibilidad 3D de q y las dos utilidades de A; no se inventa una tercera variable.
+El widget se presenta en un iframe aislado sin acceso a la red ni al origen de la
+aplicación. RStudio es un IDE; Tableau y Power BI pueden importar los CSV.
 
-## Etapa 2: analítica avanzada
+Los PNG y páginas PDF se revisaron visualmente. La interfaz se verificó mediante
+controles y árbol accesible: inicio, fin, selección de gráficos, resultado,
+reproducción y canvas 3D. La captura de pantalla del navegador falló: no se afirma
+una revisión visual completa del widget 3D ni compatibilidad con todos los GPU.
+Se conserva la salida 2D como alternativa. Impresión nativa y revisión entre
+navegadores siguen en el alcance pendiente de calidad de plataforma (fase 10).
 
-`aprendizaje.R` recibe datos externos revisados y cortes temporales. Compara una
-referencia de prevalencia del desarrollo, regresión logística y, si están
-instalados caret/nnet, una red pequeña. Selección por Brier de validación;
-keras3 ofrece una red profunda opcional activada con `ESCENARIOS_KERAS=1`, con
-normalización de desarrollo, semilla y modelo guardados. Requiere backend
-configurado y no garantiza determinismo entre dispositivos.
-normalización aprendida solo en desarrollo. Se excluyen unidades que cruzan
-cortes. La carpeta final conserva modelos RDS, pronósticos, puntajes y entorno.
-No permite sobrescribir una evaluación final existente. No autentica fechas ni
-impide al operador repetir el análisis en otra carpeta: el protocolo Python
-existente sigue siendo el registro de referencia para una evaluación prospectiva.
-Los resultados externos no se importan ni promocionan automáticamente.
+## Etapa 2: modelos y análisis
 
-`exploracion.R` compara búsqueda exhaustiva discreta y recocido SANN sobre la
-utilidad de A. No suma pagos de actores ni modifica la matriz. igraph representa
-relaciones entre estrategias; simmer ejecuta un ejemplo sintético de cola de
-atención; arules procesa transacciones binarias externas, si existen.
-Las asociaciones no representan causalidad. La cola no modela el caso EDESUR.
-No se encontró respaldo oficial de un paquete llamado SBO++; se utiliza optim.
+Comparación entre referencia de prevalencia de desarrollo, regresión logística,
+red pequeña caret/nnet y red profunda keras3 con backend PyTorch CPU. La red
+pequeña usa salida numérica acotada a 0–1; no se acredita calibración real. Los
+hiperparámetros están fijados en la receta, sin búsqueda sobre la prueba final.
 
-## Verificación y pendientes
+- Desarrollo, validación y prueba separados por fechas UTC.
+- Unidades únicas; mínimo 30 por partición. Se rechazan casos que cruzan cortes,
+  información posterior al resultado, observaciones futuras y valores no finitos.
+- Normalización aprendida solo en desarrollo. Selección por Brier de validación.
+- Prueba evaluada con el candidato seleccionado y referencia explícita.
+- Modelos perdedores conservados, pronósticos de validación, pronósticos de prueba,
+  modelos RDS/Keras, semilla, código y versiones del entorno.
+- Optimización: búsqueda exhaustiva en una grilla y recocido SANN. Optimizar q
+  identifica supuestos favorables; no convierte la conducta rival en una acción
+  controlable. No se modifica ningún pago.
+- simmer: cola de atención sintética, sin atribuirla a EDESUR.
+- arules: asociaciones de variables binarias, usando solo desarrollo; asociación
+  no implica causalidad.
 
-Pruebas Python verifican integridad, exportación determinista, correspondencia de
-matriz/corridas y rechazo de versiones inválidas. Compilación TypeScript valida
-la integración. **Rscript no está disponible en el entorno de desarrollo**:
-los scripts no se han ejecutado ni sus gráficos se han inspeccionado visualmente.
-No declarar cerradas ambas etapas hasta ejecutar R, revisar resultados y verificar
-dependencias/versiones. La ejecución es externa y explícita; el servidor no admite
-código R arbitrario ni instala paquetes.
+No se usa un supuesto paquete SBO++ sin respaldo oficial. La aplicación no
+promociona modelos ni modifica automáticamente matrices o evidencia.
 
-Pendientes: gráficos R/3D ejecutados y revisados;
-keras3 con entorno y datos suficientes; integración revisada de resultados R en
-protocolos prospectivos Python; evaluación empírica independiente. No existe
-evidencia nueva de mejora predictiva real.
+## Datos observados
 
-Fuentes: [ggplot2](https://ggplot2.tidyverse.org/reference/),
+Modo “Datos observados”: CSV hasta 1 MB / 2000 unidades con columnas `unidad`,
+`disponible`, `observado`, `resultado`, `x1` y opcionales `x2`…`x20`. Fechas UTC
+`AAAA-MM-DDTHH:MM:SSZ`, resultado 0/1 y características numéricas. Fuente e
+independencia requieren revisión explícita. No incluir identificadores personales.
+
+Esta integración realiza evaluación **retrospectiva**, no sustituye el protocolo
+prospectivo existente. Los cortes, disponibilidad de características e independencia
+son declaraciones del analista, no autenticación de evidencia. Repetir candidatos
+tras conocer resultados impide considerar una prueba independiente. Para afirmar
+mejora real se requiere reservar nuevas observaciones en la fase 8.
+
+## Conservación y reproducción
+
+Trabajos en segundo plano; una ejecución activa por base, con protección entre
+procesos y recuperación de interrupciones. Solo recetas incluidas; no código R
+arbitrario ni comandos suministrados por el cliente. Límite de diez minutos por
+receta, archivo comprimido de 10 MB y controles del límite de respaldo SQLite.
+Errores e intentos fallidos permanecen registrados. Se muestran veinte ejecuciones
+recientes; no se eliminan las anteriores. Carpetas de trabajo quedan locales.
+
+El ZIP conserva matriz/corridas congeladas, datos, scripts, modelos, gráficos y
+entorno. El registro tiene huellas de integridad. La exportación puede incluir
+datos aportados: revisar antes de compartir. Nada se sube automáticamente a GitHub.
+El respaldo SQLite incluye los resultados, no solo rutas a archivos externos.
+
+“Verificar reproducción” recalcula en Python Brier de validación, selección,
+Brier final, mejoras/empates/pérdidas e intervalo pareado desde pronósticos
+guardados, sin inferencia. `reproducir.R` recarga el modelo seleccionado y el
+profundo para comparar pronósticos, sin entrenar; tolerancia 1e-7.
+No se garantiza identidad entre versiones de backend o hardware diferentes.
+
+El informe ejecutivo incorpora hasta tres laboratorios terminados de la versión
+seleccionada. Conserva copias de datos/pronósticos para recalcular métricas sin
+depender del laboratorio vivo. Resumen HTML A4 con gráficos y PDF ejecutivo
+verificado en ocho páginas A4; los códigos técnicos permanecen en los registros.
+
+## Evidencia de aceptación sintética
+
+Recorrido reproducible: `python scripts/verify-scientific.py --output tmp/verificacion-nueva`.
+Usar una carpeta nueva: no sobrescribe una aceptación anterior.
+
+- 360 unidades sintéticas: 120 desarrollo, 120 validación, 120 prueba.
+- Seis corridas de agentes: tres semillas y dos pares de políticas.
+- Cuatro métodos entrenados/comparados, incluyendo Keras; 53 archivos conservados.
+- Validación Brier: referencia 0,249444; logística 0,163259; red pequeña 0,162540;
+  profunda 0,164182. Selección: red pequeña.
+- Prueba: Brier 0,182973 frente a referencia 0,250833; diferencia -0,067861.
+  Intervalo pareado aproximado [-0,105660; -0,025773]. 88 mejoras, 0 empates,
+  32 pérdidas por unidad. Esto es un resultado sintético, no evidencia real.
+- Dos ejecuciones completas reprodujeron los mismos puntajes y pronósticos.
+- Recarga R de modelos conservados aprobada; reproducción Python sin inferencia
+  aprobada; respaldo íntegro e informe congelado aprobados.
+- Ejecución adicional de gráficos iniciada desde la interfaz: terminó correctamente.
+- Pruebas automatizadas de rutas, versiones, tiempos, integridad, fallo conservado,
+  recuperación entre instancias y manipulación de resúmenes.
+
+Versiones verificadas: ggplot2 4.0.3, plotly 4.12.1, htmlwidgets 1.6.4,
+igraph 2.3.3, simmer 4.4.7, arules 1.7.15, caret 7.0-1, nnet 7.3-20,
+keras3 1.5.1, jsonlite 2.0.0; Keras Python 3.12.0 y PyTorch 2.14.1+cpu.
+
+## Instalación en otra computadora
+
+Windows: `scripts/install-scientific.ps1 -Python python` con Python 3.11–3.13.
+El script descarga R desde CRAN y comprueba su huella, instala los paquetes y
+crea el entorno CPU en `.tools`. Reiniciar el servidor para cargar el código nuevo.
+También admite `SCENARIOS_RSCRIPT`, `R_LIBS_USER` y `RETICULATE_PYTHON` cuando no
+existe el entorno local. El instalador portable de la aplicación no incorpora los
+gigabytes del runtime científico: requiere esa instalación adicional. No se
+recompiló un nuevo instalador Windows en este cierre.
+
+Fuentes: [CRAN Windows](https://cran.r-project.org/bin/windows/base/),
+[ggplot2](https://ggplot2.tidyverse.org/reference/),
 [optim](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/optim.html),
 [simmer](https://r-simmer.org/), [keras3](https://keras3.posit.co/).
