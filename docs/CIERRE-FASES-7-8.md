@@ -1,6 +1,24 @@
 # Auditoría de cierre · fases 7–8
 
-Estado al 7 de octubre de 2026: implementación funcional terminada para el alcance actual (juegos 2×2 y resultados binarios). La validación empírica de mejora predictiva continúa abierta.
+Estado al 13 de octubre de 2026: **fase 8 cerrada funcionalmente por solicitud del usuario**, para juegos 2×2 y resultados binarios. La validación empírica no se declara terminada; se conserva como pendiente transversal **P-EMP-01**. El cierre no acredita mejores predicciones reales.
+
+## Acta de cierre funcional · fase 8
+
+Quedan aceptados el protocolo, las particiones temporales, referencias explícitas,
+registro versionado, comparación, fallos visibles, reproducción sin inferencia,
+exportación e integración en React/informe ejecutivo. No se repiten esos bloques.
+La ampliación científica añadió cuatro métodos, gráficos R, modelos conservados,
+verificación 3D e impresión A4. La aceptación más reciente aprobó 191 pruebas
+Python y el instalador científico. Ver [evidencia conservada](verification/scientific-platform-2026-10-13.json).
+
+**P-EMP-01 permanece pendiente:** incorporar observaciones reales verificables,
+justificar muestra e independencia, congelar objetivo y referencia, reservar prueba
+temporal no utilizada en desarrollo y publicar resultados favorables o desfavorables.
+Su aceptación requiere evidencia, no una nueva declaración de cierre. El siguiente
+trabajo es revisar el expediente EDESUR mediante la fase 11; ese caso individual
+permite conciliación documental, pero no demuestra generalización predictiva.
+
+Las comprobaciones siguientes conservan la evidencia histórica del 7 de octubre.
 
 Se auditó el motor de agentes, los trabajos locales, las versiones de expedientes y el evaluador prospectivo existente. Se reutilizaron cálculos, Brier y contratos; el registro nuevo enlaza esas funciones mediante protocolos temporales. La evaluación anterior queda aislada para impedir abrir una prueba reservada por otro endpoint.
 
@@ -32,6 +50,6 @@ El candidato original usa probabilidades aportadas por el analista con un métod
 
 El reloj local debe ser correcto. SHA-256 identifica contenido y permite reproducción, pero no es firma ni defensa contra reescribir deliberadamente toda la base. El bootstrap presupone unidades independientes; treinta eventos es un mínimo operativo, no un cálculo de potencia. Resultados negativos, muestra e intervalo permanecen visibles.
 
-**Fase 7: implementación cerrada para este alcance. Fase 8: infraestructura y recorrido terminados; validación empírica abierta.** Para cerrarla se requieren observaciones reales verificables, protocolo independiente, muestra justificada y evaluación fuera del desarrollo. No hay evidencia de mejora predictiva real ni datos para asignar probabilidades judiciales al caso EDESUR.
+**Fase 7 y fase 8: cerradas funcionalmente para este alcance. Validación empírica: pendiente P-EMP-01.** Para aceptar esa validación se requieren observaciones reales verificables, protocolo independiente, muestra justificada y evaluación fuera del desarrollo. No hay evidencia de mejora predictiva real ni datos para asignar probabilidades judiciales al caso EDESUR.
 
 Informe unificado de fase 6, recuperación automática de borradores y distribución Windows permanecen fuera de este cierre 7–8. Posteriormente se implementó el [informe unificado de fase 6](FASE-6-INFORME-UNIFICADO.md). Ver [guía temporal](EVALUACION-TEMPORAL.md) y [hoja de ruta](HOJA-DE-RUTA.md).

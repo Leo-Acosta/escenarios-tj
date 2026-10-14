@@ -1,6 +1,6 @@
 # Escenarios TJ · hoja de ruta actualizada
 
-Estado al 9 de octubre de 2026. Arquitectura local: núcleo Python, SQLite e interfaz React/TypeScript. IA local opcional con revisión del analista. El sistema explora consecuencias de supuestos; aún no acredita capacidad de predicción empírica.
+Estado al 13 de octubre de 2026. Arquitectura local: núcleo Python, SQLite e interfaz React/TypeScript. IA local opcional con revisión del analista. El sistema explora consecuencias de supuestos; aún no acredita capacidad de predicción empírica.
 
 ## Estado y orden de continuación
 
@@ -13,7 +13,7 @@ Estado al 9 de octubre de 2026. Arquitectura local: núcleo Python, SQLite e int
 | 5 · Continuidad de datos | Autoguardado de borradores, respaldo, restauración y migraciones | Cerrada funcionalmente: borradores de expediente/laboratorios, variantes por pestaña, respaldo SQLite, restauración separada, esquema v1 y reproducción integral probados |
 | 6 · Informe ejecutivo unificado | Un documento que reúna matriz y laboratorios desde referencias congeladas | Cerrada en alcance funcional: selección, historial, A4, PDF vectorial, JSON y reproducción; verificación visual de impresión HTML limitada |
 | 7 · Agentes y comparación | Decisiones auditadas, políticas explícitas y mejora controlada | Implementación cerrada para juegos 2×2; baterías, registros versionados, asesor y calibración revisable integrados |
-| 8 · Evaluación predictiva | Protocolo, particiones temporales y prueba independiente | Infraestructura y recorrido terminados; validación empírica abierta por falta de observaciones reales independientes |
+| 8 · Evaluación predictiva | Protocolo, particiones temporales y prueba independiente | Cerrada funcionalmente por solicitud del usuario; validación empírica conservada como pendiente transversal P-EMP-01, sin mejora real acreditada |
 | 9 · Distribución Windows | Ejecutable portable e instalación | Cerrada funcionalmente: portable e instalador por usuario; instalación, reinstalación, desinstalación y datos conservados aprobados localmente y en dos runners Windows nuevos |
 | 10 · Calidad de plataforma | Rendimiento, dispositivos, impresión y actualización | Implementación y aceptación automatizada terminadas: presupuestos, concurrencia, A4 y matriz Windows/Linux × Python 3.11/3.13 aprobados; cierre integral abierto por impresión HTML nativa y aceptación entre navegadores pendientes |
 | 11 · Expediente documental y seguimiento real | Originales locales, datos revisados, acciones/respuestas e informes congelados | Implementada en alcance acotado: PDF/PNG/JPEG, extracción de texto no OCR, correcciones, comparación de lecturas, exportación y recuperación. Ver FASE-11-EXPEDIENTE-DOCUMENTAL.md |
@@ -29,6 +29,11 @@ El [cierre de implementación 7–8](CIERRE-FASES-7-8.md), la [guía de evaluaci
 Crear y editar expedientes guiados, calcular y consultar matrices 2×2, comparar versiones, crear árboles secuenciales, explorar Monte Carlo, ejecutar agentes con memoria y repetir combinaciones de políticas, explorar incentivos, editar redes con evidencia y consultar propuestas locales de IA. Descargar PDF individuales de matrices, árboles, agentes, comparaciones e incentivos. Consultar sus PDF mediante el visor del navegador.
 
 ## Criterios que siguen abiertos
+
+**P-EMP-01 · validación empírica:** pendiente independiente del cierre funcional de
+fase 8. Exige observaciones reales verificables, muestra justificada, referencia
+congelada y prueba temporal independiente. No se oculta ni se cuenta como cumplido.
+El siguiente trabajo concreto es revisar el expediente EDESUR en fase 11.
 
 La impresión HTML necesita revisión visual paginada en un navegador que permita observar su salida. El visor PDF depende del navegador y mantiene descarga alternativa. Los escenarios complejos requieren ampliar las dimensiones actuales y las transformaciones de variables; el diccionario básico está implementado, y la IA no reemplaza la validación del modelo. Los editores de expediente ofrecen recuperación de copias locales al reabrir. Los formularios de laboratorios ofrecen recuperación explícita de borradores, documentada en fase 5. No hay fecha ni porcentaje de terminación global medidos.
 
@@ -47,8 +52,8 @@ Ver [paquete portable, uso, actualización y verificación](FASE-9-WINDOWS.md). 
 
 ## Calidad de plataforma · fase 10
 
-Ver [resultados, protocolo y límites](FASE-10-CALIDAD.md). 176 pruebas Python, 80 contratos TypeScript y compilación aprobados. Mediciones sintéticas repetidas en cuatro combinaciones de sistema/Python; PDF concurrente idéntico, reproducción sin inferencia y A4 comprobados. Vista reducida de 480 px sin desbordamiento observada. La impresión nativa quedó bloqueada por la verificación de URL de Computer Use, incluso después de abrir el usuario una ventana autorizada. No se declara cerrada la aceptación integral ni se exige repetir los bloques implementados: resta verificación visual nativa y entre navegadores. La fase 8 sigue abierta por falta de observaciones independientes.
+Ver [resultados, protocolo y límites](FASE-10-CALIDAD.md). 176 pruebas Python, 80 contratos TypeScript y compilación aprobados. Mediciones sintéticas repetidas en cuatro combinaciones de sistema/Python; PDF concurrente idéntico, reproducción sin inferencia y A4 comprobados. Vista reducida de 480 px sin desbordamiento observada. La impresión nativa quedó bloqueada por la verificación de URL de Computer Use, incluso después de abrir el usuario una ventana autorizada. No se declara cerrada la aceptación integral ni se exige repetir los bloques implementados: resta verificación visual nativa y entre navegadores. La fase 8 está cerrada funcionalmente; P-EMP-01 sigue pendiente por falta de observaciones independientes.
 
 ## Ampliación científica R · etapas 1–2 solicitadas
 
-Etapas 1–2 cerradas funcionalmente el 10 de octubre de 2026 en Windows: R instalado, gráficos y cuatro modelos ejecutados, red profunda y modelos guardados reproducidos, resultados integrados en React e informes congelados. El 13 de octubre se verificaron giro 3D en Chromium/Firefox, vista móvil y PDF A4, y se construyó un instalador científico con R y Keras CPU. Ver [aceptación y límites](CIERRE-CIENTIFICO-WINDOWS.md). La fase 8 permanece abierta por falta de evaluación empírica independiente; otros navegadores nativos, dispositivos, impresión física y un Windows limpio para el nuevo paquete mantienen límites de plataforma.
+Etapas 1–2 cerradas funcionalmente el 10 de octubre de 2026 en Windows: R instalado, gráficos y cuatro modelos ejecutados, red profunda y modelos guardados reproducidos, resultados integrados en React e informes congelados. El 13 de octubre se verificaron giro 3D en Chromium/Firefox, vista móvil y PDF A4, y se construyó un instalador científico con R y Keras CPU. Ver [aceptación y límites](CIERRE-CIENTIFICO-WINDOWS.md). La fase 8 está cerrada funcionalmente; P-EMP-01 permanece pendiente por falta de evaluación empírica independiente; otros navegadores nativos, dispositivos, impresión física y un Windows limpio para el nuevo paquete mantienen límites de plataforma.

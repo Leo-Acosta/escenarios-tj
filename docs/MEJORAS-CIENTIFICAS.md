@@ -10,7 +10,8 @@ localmente en `.tools/R`, paquetes en `.tools/R-library` y Keras en un entorno
 aislado `.tools/keras-python`. Python mantiene matrices, restricciones y auditoría;
 React/TypeScript mantiene la interfaz. No se utiliza un servicio remoto para inferir.
 
-La evaluación empírica de la fase 8 permanece abierta: el ejemplo de aceptación
+La fase 8 está cerrada funcionalmente. Su evaluación empírica permanece pendiente
+como P-EMP-01: el ejemplo de aceptación
 es sintético y no contiene datos EDESUR ni evidencia de precisión real.
 
 ## Etapa 1: gráficos científicos
@@ -71,7 +72,7 @@ Esta integración realiza evaluación **retrospectiva**, no sustituye el protoco
 prospectivo existente. Los cortes, disponibilidad de características e independencia
 son declaraciones del analista, no autenticación de evidencia. Repetir candidatos
 tras conocer resultados impide considerar una prueba independiente. Para afirmar
-mejora real se requiere reservar nuevas observaciones en la fase 8.
+mejora real se requiere reservar nuevas observaciones para P-EMP-01.
 
 ## Conservación y reproducción
 

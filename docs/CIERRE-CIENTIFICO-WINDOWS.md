@@ -86,7 +86,8 @@ El caso puede analizarse documentalmente sin esperar a entrenar un predictor.
 5. Construir escenarios y restricciones con supuestos revisados; separar hechos documentados, declaraciones y pendientes. Las rutas administrativas/judiciales requieren fuentes vigentes y revisión jurídica específica.
 6. Para medir mejora predictiva, reunir observaciones suficientes e independientes, reservar una prueba temporal y comparar contra una referencia congelada. Un expediente individual y un consumo diario estimado no bastan para entrenar o validar generalización.
 
-La fase 8 permanece abierta en validación empírica. No se concluye sobrefacturación,
+La fase 8 está cerrada funcionalmente; la validación empírica sigue pendiente como
+P-EMP-01. No se concluye sobrefacturación,
 fraude, responsabilidad o éxito de una demanda a partir del ejemplo sintético.
 
 El comparador científico actual evalúa resultados binarios (0/1), por ejemplo
