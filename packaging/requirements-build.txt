@@ -1,0 +1,5 @@
+# Verified Windows scientific build / browser QA environment.
+pyinstaller==6.22.3
+reportlab==5.0.1
+pypdf==6.20.0
+playwright==1.63.0

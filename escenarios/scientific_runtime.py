@@ -11,6 +11,7 @@ import re
 import shutil
 import sqlite3
 import subprocess
+import sys
 import threading
 import zipfile
 from contextlib import closing
@@ -22,23 +23,28 @@ from .workflow import get_version, get_workflow, now, NotFound, Conflict
 from .decision_agents import fingerprint
 
 ROOT=Path(__file__).resolve().parent.parent
-SOURCE_SHA256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+SOURCE_SHA256=hashlib.sha256(Path(__file__).with_suffix('.py').read_bytes()).hexdigest()
 LOCK=threading.Lock()
 MAX_ARCHIVE=10*1024*1024
 PACKAGES=['ggplot2','plotly','htmlwidgets','igraph','simmer','arules','caret','nnet','keras3','jsonlite']
 
+def runtime_root():
+    """Installed runtimes live beside the executable, not PyInstaller's _internal."""
+    return Path(sys.executable).resolve().parent if getattr(sys,'frozen',False) else ROOT
+
 def executable():
     configured=os.getenv('SCENARIOS_RSCRIPT')
     if configured:return configured if Path(configured).is_file() else None
-    local=ROOT/'.tools/R/bin/x64/Rscript.exe'
+    local=runtime_root()/'.tools/R/bin/x64/Rscript.exe'
     return str(local) if local.is_file() else shutil.which('Rscript')
 
 def environment():
-    env=os.environ.copy();library=ROOT/'.tools/R-library'
+    env=os.environ.copy();library=runtime_root()/'.tools/R-library'
     for key in list(env):
         if key.startswith('LC_') or key=='LANG':env.pop(key,None)
     if library.is_dir():env['R_LIBS_USER']=str(library)
-    python=ROOT/'.tools/keras-python/Scripts/python.exe'
+    python=runtime_root()/'.tools/keras-python/python.exe'
+    if not python.is_file():python=runtime_root()/'.tools/keras-python/Scripts/python.exe'
     if python.is_file():env['RETICULATE_PYTHON']=str(python)
     env.update(KERAS_BACKEND='torch',CUDA_VISIBLE_DEVICES='-1',OMP_NUM_THREADS='1',MKL_NUM_THREADS='1',PYTHONHASHSEED='42')
     return env

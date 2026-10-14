@@ -1,5 +1,16 @@
 # Fase 10 · aceptación de plataforma
 
+## Actualización del 13 de octubre de 2026
+
+Se amplió la aceptación con Chromium y Firefox: giro WebGL 3D real, reproducción,
+vista de 390 px sin desbordamiento y estilos de impresión aprobados. Chromium
+generó cinco páginas científicas y ocho ejecutivas A4, revisadas visualmente.
+Ver [evidencia y distribución científica](CIERRE-CIENTIFICO-WINDOWS.md).
+La aceptación entre esos motores y el PDF de impresión queda verificada;
+vista previa nativa Edge/Safari/Firefox, impresora física y dispositivos reales
+siguen fuera del alcance probado. Los resultados históricos siguientes no se
+presentan como una prueba nueva del instalador científico en runners limpios.
+
 ## Alcance verificable
 
 La aceptación usa expedientes sintéticos en una base separada. No modifica datos personales ni ejecuta Ollama. Se comprueban cálculo reproducible, exportación congelada, cuatro lectores simultáneos, presupuesto de respuesta, asignaciones Python, formato A4 y compatibilidad del núcleo Python 3.11/3.13 en Windows/Linux. La interfaz distribuida sigue orientada a Windows x64; comprobar el núcleo en Linux no equivale a distribuir un instalador Linux.

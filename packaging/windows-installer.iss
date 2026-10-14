@@ -18,7 +18,7 @@ ArchitecturesInstallIn64BitMode=x64compatible
 MinVersion=10.0
 OutputDir=..\release
 OutputBaseFilename={#OutputName}
-Compression=lzma2
+Compression=lzma2/fast
 SolidCompression=yes
 WizardStyle=modern
 DisableWelcomePage=no
@@ -53,6 +53,10 @@ var
 begin
   Result := '';
   AppPath := Lowercase(AddBackslash(ExpandConstant('{app}')));
+  if Length(AppPath) > 80 then begin
+    Result := 'Elegí una carpeta de instalación más corta (máximo 80 caracteres). Esto evita errores de rutas largas de Windows con el entorno científico.';
+    Exit;
+  end;
   DataPath := Lowercase(AddBackslash(ExpandConstant('{localappdata}\EscenariosTJ')));
   if Pos(DataPath, AppPath) = 1 then begin
     Result := 'Elegí una carpeta de programa distinta de la carpeta de datos de Escenarios TJ.';

@@ -47,6 +47,21 @@ class LauncherTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 release.manifest(root)
 
+    def test_scientific_package_data_allowed_but_private_databases_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)
+            (root/'EscenariosTJ.exe').write_bytes(b'synthetic')
+            assets=root/'_internal/frontend/dist';assets.mkdir(parents=True)
+            (assets/'index.html').write_text('synthetic')
+            package=root/'.tools/R-library/example/data';package.mkdir(parents=True)
+            (package/'public.rda').write_bytes(b'package data')
+            self.assertEqual(len(release.manifest(root)['files']),3)
+            index=root/'.tools/R/doc';index.mkdir(parents=True)
+            (index/'KEYWORDS.db').write_bytes(b'public R keyword index')
+            self.assertEqual(len(release.manifest(root)['files']),4)
+            (package/'private.db').write_bytes(b'private')
+            with self.assertRaises(ValueError):release.manifest(root)
+
 
 if __name__ == '__main__':
     unittest.main()

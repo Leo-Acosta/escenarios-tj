@@ -1,0 +1,115 @@
+{
+  "date": "2026-10-13",
+  "synthetic_only": true,
+  "browsers": [
+    {
+      "engine": "chromium",
+      "synthetic": true,
+      "errors": [],
+      "version": "153.0.8010.12",
+      "rotation_verified": true,
+      "replay_verified": true,
+      "mobile_overflow_px": 0,
+      "scientific_print_toolbar_hidden": true,
+      "scientific_a4_pages": 5,
+      "executive_print_toolbar_hidden": true,
+      "executive_a4_pages": 8,
+      "passed": true
+    },
+    {
+      "engine": "firefox",
+      "synthetic": true,
+      "errors": [],
+      "version": "155.0",
+      "rotation_verified": true,
+      "replay_verified": true,
+      "mobile_overflow_px": 0,
+      "scientific_print_toolbar_hidden": true,
+      "executive_print_toolbar_hidden": true,
+      "passed": true
+    }
+  ],
+  "scientific_runtime": {
+    "runtime": {
+      "r_available": true,
+      "ready": true,
+      "version": "R version 4.6.1 (2026-06-24 ucrt) ",
+      "packages": {
+        "ggplot2": "4.0.3",
+        "plotly": "4.12.1",
+        "htmlwidgets": "1.6.4",
+        "igraph": "2.3.3",
+        "simmer": "4.4.7",
+        "arules": "1.7.15",
+        "caret": "7.0.1",
+        "nnet": "7.3.20",
+        "keras3": "1.5.1",
+        "jsonlite": "2.0.0"
+      },
+      "error": null
+    },
+    "assets": 53,
+    "result": {
+      "classification": "synthetic_only",
+      "new_inference": false,
+      "validation": [
+        {
+          "metodo": "referencia",
+          "brier_validacion": "0.249444444444444"
+        },
+        {
+          "metodo": "logistica",
+          "brier_validacion": "0.16325941384912"
+        },
+        {
+          "metodo": "red",
+          "brier_validacion": "0.162539909068008"
+        },
+        {
+          "metodo": "profunda",
+          "brier_validacion": "0.164182461591799"
+        }
+      ],
+      "selected": "red",
+      "metrics": {
+        "n": 120,
+        "candidate_brier": 0.1829727717578236,
+        "baseline_brier": 0.25083333333333335,
+        "delta": -0.06786056157550978,
+        "paired_bootstrap_95": [
+          -0.10566040003697634,
+          -0.02577270451119493
+        ],
+        "wins": 88,
+        "ties": 0,
+        "losses": 32
+      },
+      "promotion_allowed": false
+    },
+    "replayed": true
+  },
+  "deep_model_reload_after_header_removal": true,
+  "installer": {
+    "synthetic": true,
+    "installed_files_verified": 27515,
+    "installed_exe_tested": true,
+    "installed_r_verified": true,
+    "long_path_rejected_before_install": true,
+    "running_update_rejected": true,
+    "reinstallation_kept_data": true,
+    "uninstall_kept_data": true
+  },
+  "python_tests_passed": 191,
+  "setup": {
+    "filename": "EscenariosTJ-0.1.0-Setup.exe",
+    "bytes": 455194502,
+    "sha256": "299886a8fe2be8ea727396e1cf5c1d14b24e1f54c35777991bf26830da49e47d"
+  },
+  "limits": [
+    "Native Edge/Safari/Firefox print preview unverified",
+    "Physical printer and real mobile devices unverified",
+    "Scientific installer not tested on a second clean Windows",
+    "No predictive improvement demonstrated with real data",
+    "Ollama models not bundled"
+  ]
+}

@@ -1,4 +1,4 @@
-param([string]$Compiler = '')
+param([string]$Compiler = '', [string]$Python = 'python')
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 Set-Location -LiteralPath $projectRoot
@@ -7,7 +7,7 @@ if (-not $Compiler) {
     $Compiler = $candidates | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
 }
 if (-not $Compiler) { throw 'Se requiere Inno Setup 6.7.3 o compatible.' }
-python packaging/release_manifest.py release/EscenariosTJ
+& $Python packaging/release_manifest.py release/EscenariosTJ --manifest-only
 if ($LASTEXITCODE -ne 0) { throw 'Paquete inválido.' }
 & $Compiler packaging/windows-installer.iss
 if ($LASTEXITCODE -ne 0) { throw 'Falló el instalador.' }

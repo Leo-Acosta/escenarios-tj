@@ -29,12 +29,12 @@ sensibilidad 3D de q y las dos utilidades de A; no se inventa una tercera variab
 El widget se presenta en un iframe aislado sin acceso a la red ni al origen de la
 aplicación. RStudio es un IDE; Tableau y Power BI pueden importar los CSV.
 
-Los PNG y páginas PDF se revisaron visualmente. La interfaz se verificó mediante
-controles y árbol accesible: inicio, fin, selección de gráficos, resultado,
-reproducción y canvas 3D. La captura de pantalla del navegador falló: no se afirma
-una revisión visual completa del widget 3D ni compatibilidad con todos los GPU.
-Se conserva la salida 2D como alternativa. Impresión nativa y revisión entre
-navegadores siguen en el alcance pendiente de calidad de plataforma (fase 10).
+Los PNG y páginas PDF se revisaron visualmente. El 13 de octubre se verificaron
+renderizado y giro 3D en Chromium y Firefox, reproducción desde React y vista de
+390 px sin desbordamiento. Se revisaron trece páginas A4 generadas por Chromium
+y estilos de impresión Firefox. Ver [alcance y límites](CIERRE-CIENTIFICO-WINDOWS.md):
+no se acredita vista previa nativa de otros navegadores, todos los GPU o impresión física.
+Se conserva la salida 2D como alternativa.
 
 ## Etapa 2: modelos y análisis
 
@@ -128,9 +128,10 @@ Windows: `scripts/install-scientific.ps1 -Python python` con Python 3.11–3.13.
 El script descarga R desde CRAN y comprueba su huella, instala los paquetes y
 crea el entorno CPU en `.tools`. Reiniciar el servidor para cargar el código nuevo.
 También admite `SCENARIOS_RSCRIPT`, `R_LIBS_USER` y `RETICULATE_PYTHON` cuando no
-existe el entorno local. El instalador portable de la aplicación no incorpora los
-gigabytes del runtime científico: requiere esa instalación adicional. No se
-recompiló un nuevo instalador Windows en este cierre.
+existe el entorno local. La construcción científica admite `-IncludeScientific`
+e incorpora R, paquetes CRAN y un intérprete independiente Keras/PyTorch CPU.
+Ver [distribución y verificaciones](CIERRE-CIENTIFICO-WINDOWS.md). Los binarios
+y datos personales permanecen excluidos de Git; Ollama no se incluye.
 
 Fuentes: [CRAN Windows](https://cran.r-project.org/bin/windows/base/),
 [ggplot2](https://ggplot2.tidyverse.org/reference/),

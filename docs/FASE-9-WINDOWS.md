@@ -1,5 +1,11 @@
 # Fase 9 · distribución Windows
 
+Actualización científica del 13 de octubre: se construyó un nuevo instalador local
+con R, paquetes CRAN y Keras/PyTorch CPU. Ver [pruebas y límites](CIERRE-CIENTIFICO-WINDOWS.md).
+El ZIP histórico de fase 9 no contiene este entorno científico; no se presenta
+como un ZIP nuevo con R. Los resultados de los dos runners descritos abajo
+corresponden al paquete anterior.
+
 Cierre funcional del 9 de octubre de 2026: distribución portable e instalador Windows x64 construidos y probados localmente y en dos runners Windows independientes. Fase 9 cerrada en este alcance; fase 10 permanece separada.
 
 ## Uso

@@ -13,6 +13,10 @@ from escenarios.workflow import Conflict
 from test_laboratories import prepare_case
 
 class RuntimeTests(unittest.TestCase):
+    def test_installed_runtime_uses_executable_directory(self):
+        with patch.object(r.sys,'frozen',True,create=True),patch.object(r.sys,'executable',str(Path('installed/EscenariosTJ.exe').resolve())):
+            self.assertEqual(r.runtime_root(),Path('installed').resolve())
+
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup)
         self.path=Path(self.tmp.name)/'db.sqlite3';self.case=prepare_case(self.path)

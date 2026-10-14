@@ -14,7 +14,8 @@ from pathlib import Path
 def verify_files(app):
     manifest = json.loads((app / 'release-manifest.json').read_text(encoding='utf-8'))
     for name, digest in manifest['files'].items():
-        assert hashlib.sha256((app / name).read_bytes()).hexdigest() == digest, name
+        with (app / name).open('rb') as stream:
+            assert hashlib.file_digest(stream,'sha256').hexdigest() == digest, name
     return len(manifest['files'])
 
 
@@ -23,9 +24,13 @@ def run(setup, root):
         raise ValueError('La prueba requiere un instalador QA con AppId separado.')
     root.mkdir(parents=True, exist_ok=False)
     app = root / 'programa'
+    long_app=root / ('carpeta-'*20)
+    rejected=subprocess.run([str(setup),'/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/NOICONS',
+        '/DIR='+str(long_app),'/LOG='+str(root/'long-path.log')],timeout=60)
+    assert rejected.returncode!=0 and not (long_app/'EscenariosTJ.exe').exists()
     args = [str(setup), '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/NOICONS',
             '/NOCLOSEAPPLICATIONS', '/DIR=' + str(app), '/LOG=' + str(root / 'install.log')]
-    subprocess.run(args, check=True, timeout=120)
+    subprocess.run(args, check=True, timeout=600)
     count = verify_files(app)
     spec = importlib.util.spec_from_file_location('smoke_windows', Path(__file__).with_name('smoke-windows.py'))
     smoke = importlib.util.module_from_spec(spec)
@@ -49,6 +54,10 @@ def run(setup, root):
                     if process.poll() is not None or time.monotonic() > deadline:
                         raise RuntimeError('No inició la prueba de actualización en uso.')
                     time.sleep(.1)
+            if (app / '.tools/R/bin/x64/Rscript.exe').is_file():
+                with urlopen(f'http://127.0.0.1:{port}/api/scientific/status',timeout=90) as response:
+                    runtime=json.load(response)
+                assert runtime['ready'],runtime
             blocked = subprocess.run(args, timeout=60)
             assert blocked.returncode != 0, 'No se rechazó actualizar la aplicación abierta.'
             assert process.poll() is None, 'El instalador cerró la aplicación.'
@@ -56,15 +65,17 @@ def run(setup, root):
         finally:
             process.terminate()
             process.wait(timeout=10)
-    subprocess.run(args, check=True, timeout=120)
+    subprocess.run(args, check=True, timeout=600)
     assert verify_files(app) == count
     assert hashlib.sha256(database.read_bytes()).hexdigest() == original
     uninstaller = app / 'unins000.exe'
     assert uninstaller.resolve().parent == app.resolve() and app.resolve().is_relative_to(root.resolve())
-    subprocess.run([str(uninstaller), '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART'], check=True, timeout=120)
+    subprocess.run([str(uninstaller), '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART'], check=True, timeout=600)
     assert not (app / 'EscenariosTJ.exe').exists()
     assert hashlib.sha256(database.read_bytes()).hexdigest() == original
     result = {'synthetic': True, 'installed_files_verified': count, 'installed_exe_tested': True,
+              'installed_r_verified': (root/'install.log').exists() and 'runtime' in locals(),
+              'long_path_rejected_before_install': True,
               'running_update_rejected': True, 'reinstallation_kept_data': True, 'uninstall_kept_data': True}
     (root / 'installer-verification.json').write_text(json.dumps(result, indent=2), encoding='utf-8')
     print(json.dumps(result))
