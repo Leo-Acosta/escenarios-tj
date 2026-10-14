@@ -305,7 +305,7 @@ class Handler(BaseHTTPRequestHandler):
         if self.path=='/api/dossier':
             try:
                 length=int(self.headers.get('Content-Length',0))
-                if not 0<length<=3000000:raise ValueError('Solicitud documental demasiado grande.')
+                if not 0<length<=((dossier.MAX_FILE+2)//3)*4+65536:raise ValueError('Solicitud documental demasiado grande.')
                 return self.send(201,dossier.save(DB,json.loads(self.rfile.read(length))))
             except NotFound as error:return self.send(404,{'error':str(error)})
             except (ValueError,KeyError,TypeError) as error:return self.send(400,{'error':str(error)})

@@ -1,5 +1,6 @@
 """Local documentary dossier. Append-only evidence, facts, events and snapshots."""
 import base64
+import copy
 import hashlib
 import io
 import json
@@ -13,7 +14,7 @@ from pathlib import Path
 from uuid import uuid4
 from .workflow import get_workflow, now, text, NotFound
 
-MAX_FILE = 2 * 1024 * 1024
+MAX_FILE = 5 * 1024 * 1024
 MAX_TOTAL = 8 * 1024 * 1024
 KINDS = ('document', 'fact', 'event', 'calculation', 'snapshot')
 LABELS={'documented_declared':'Documentación declarada','declared':'Declarado','assumed':'Supuesto','pending':'Pendiente',
@@ -25,8 +26,51 @@ def digest(value):
 def connect(path):
     db=sqlite3.connect(path,timeout=10)
     db.execute('CREATE TABLE IF NOT EXISTS dossier_records (id TEXT PRIMARY KEY, workflow_id TEXT, kind TEXT, payload TEXT)')
+    db.execute('CREATE TABLE IF NOT EXISTS dossier_blobs (sha256 TEXT PRIMARY KEY, content BLOB)')
     db.commit()
     return db
+
+def packed(record,db):
+    """Physical deduplication only: the analytical record and its hash stay intact."""
+    record=copy.deepcopy(record)
+    def visit(item):
+        body=item['payload']
+        if body['kind']=='document':
+            raw=base64.b64decode(body.pop('content'),validate=True)
+            key=hashlib.sha256(raw).hexdigest()
+            if key!=body['file_sha256']:raise ValueError('Original alterado.')
+            db.execute('INSERT OR IGNORE INTO dossier_blobs VALUES (?,?)',(key,raw))
+            stored=db.execute('SELECT content FROM dossier_blobs WHERE sha256=?',(key,)).fetchone()[0]
+            if not isinstance(stored,bytes) or hashlib.sha256(stored).hexdigest()!=key:raise ValueError('Archivo compartido alterado.')
+            body['stored_content_sha256']=key
+        for child in body.get('records',[]):visit(child)
+        for child in body.get('inputs',[]):visit(child)
+    visit(record)
+    return record
+
+def hydrated(record,db):
+    def visit(item):
+        body=item['payload']
+        if body['kind']=='document' and 'stored_content_sha256' in body:
+            key=body.pop('stored_content_sha256')
+            row=db.execute('SELECT content FROM dossier_blobs WHERE sha256=?',(key,)).fetchone()
+            if not row or not isinstance(row[0],bytes) or hashlib.sha256(row[0]).hexdigest()!=key:raise ValueError('Archivo documental ausente o alterado.')
+            body['content']=base64.b64encode(row[0]).decode()
+        for child in body.get('records',[]):visit(child)
+        for child in body.get('inputs',[]):visit(child)
+    visit(record)
+    return verify(record)
+
+def deduplicate_storage(path):
+    """Explicit maintenance after a backup. Does not change IDs or logical hashes."""
+    with closing(connect(path)) as db,db:
+        db.execute('BEGIN IMMEDIATE')
+        rows=db.execute('SELECT id,payload FROM dossier_records').fetchall()
+        for identity,payload in rows:
+            original=hydrated(json.loads(payload),db)
+            stored=packed(original,db)
+            db.execute('UPDATE dossier_records SET payload=? WHERE id=?',(json.dumps(stored,ensure_ascii=False,allow_nan=False),identity))
+    return len(rows)
 
 def verify(record):
     if digest(record['payload'])!=record['sha256']:raise ValueError('Registro documental alterado.')
@@ -48,14 +92,14 @@ def verify(record):
 def read(path,identity):
     with closing(connect(path)) as db:
         row=db.execute('SELECT payload FROM dossier_records WHERE id=?',(identity,)).fetchone()
-    if not row:raise NotFound('Registro documental inexistente.')
-    return verify(json.loads(row[0]))
+        if not row:raise NotFound('Registro documental inexistente.')
+        return hydrated(json.loads(row[0]),db)
 
 def records(path,workflow_id):
     get_workflow(path,workflow_id)
     with closing(connect(path)) as db:
         rows=db.execute('SELECT payload FROM dossier_records WHERE workflow_id=? ORDER BY rowid',(workflow_id,)).fetchall()
-    return [verify(json.loads(r[0])) for r in rows]
+        return [hydrated(json.loads(r[0]),db) for r in rows]
 
 def active(items,kind):
     superseded={r['payload'].get('supersedes') for r in items}
@@ -72,7 +116,7 @@ def save(path,value):
         name=text(value.get('name'),160)
         if any(c in name for c in '/\\\x00') or name in ('.','..'):raise ValueError('Nombre de archivo inválido.')
         raw=base64.b64decode(value.get('content',''),validate=True)
-        if not 0<len(raw)<=MAX_FILE:raise ValueError('Cada documento admite hasta 2 MiB.')
+        if not 0<len(raw)<=MAX_FILE:raise ValueError('Cada documento admite hasta 5 MiB.')
         if sum(r['payload']['size'] for r in previous if r['payload']['kind']=='document')+len(raw)>MAX_TOTAL:raise ValueError('El expediente admite hasta 8 MiB de originales.')
         suffix=Path(name).suffix.lower()
         signatures={'.pdf':(b'%PDF-', 'application/pdf'),'.png':(b'\x89PNG\r\n\x1a\n','image/png'),'.jpg':(b'\xff\xd8\xff','image/jpeg'),'.jpeg':(b'\xff\xd8\xff','image/jpeg')}
@@ -124,7 +168,8 @@ def save(path,value):
         if body.get('supersedes'):
             for (raw_record,) in db.execute('SELECT payload FROM dossier_records WHERE workflow_id=? AND kind=?',(scope,kind)):
                 if json.loads(raw_record)['payload'].get('supersedes')==body['supersedes']:raise ValueError('Este registro ya tiene una corrección.')
-        db.execute('INSERT INTO dossier_records VALUES (?,?,?,?)',(record['id'],scope,kind,json.dumps(record,ensure_ascii=False,allow_nan=False)))
+        stored=packed(record,db)
+        db.execute('INSERT INTO dossier_records VALUES (?,?,?,?)',(record['id'],scope,kind,json.dumps(stored,ensure_ascii=False,allow_nan=False)))
     return record
 
 def summary(path,scope):
@@ -157,7 +202,7 @@ def report_html(record):
     if record['payload']['kind']!='snapshot':raise ValueError('Seleccioná un informe congelado.')
     body=record['payload'];items=body['records'];e=lambda x:escape(str(x))
     parts=['<!doctype html><html lang="es"><meta charset="utf-8"><title>'+e(body['title'])+'</title><style>body{font:15px Arial;color:#163451;max-width:900px;margin:40px auto;padding:20px}article{break-inside:avoid;border-bottom:1px solid #ddd;padding:12px 0}img{max-width:100%;max-height:350px}p{white-space:pre-wrap}@page{size:A4;margin:18mm}@media print{button{display:none}body{margin:0;padding:0}}</style><button onclick="window.print()">Imprimir / guardar PDF</button><h1>'+e(body['title'])+'</h1><p>Documentación declarada y seguimiento real. No acredita autenticidad, éxito judicial ni mejora predictiva. Versión congelada: '+e(record['created_at'][:10])+'</p>']
-    for kind,label in [('document','Originales aportados'),('fact','Datos revisados vigentes'),('event','Seguimiento vigente'),('calculation','Cálculos conservados')]:
+    for kind,label in [('document','Documentos conservados'),('fact','Datos revisados vigentes'),('event','Seguimiento vigente'),('calculation','Cálculos conservados')]:
         parts.append('<h2>'+label+'</h2>')
         selected=[r for r in items if r['payload']['kind']==kind] if kind=='document' else active(items,kind)
         for r in selected:
@@ -165,7 +210,7 @@ def report_html(record):
             if kind=='document':
                 parts.append('<p>'+e(b['note'])+'</p>')
                 if b['mime'].startswith('image/'):
-                    parts.append('<img alt="Original aportado" src="data:'+b['mime']+';base64,'+b['content']+'">')
+                    parts.append('<img alt="Archivo conservado; procedencia descrita arriba" src="data:'+b['mime']+';base64,'+b['content']+'">')
             elif kind=='fact':parts.append('<p>'+e(b['date']+' · '+b['value']+' '+b['unit']+' · '+LABELS[b['evidence']])+'</p><p>Fuente: '+e(b['locator'])+'</p><p>Límites: '+e(b['uncertainty'])+'</p>')
             elif kind=='event':parts.append('<p>'+e(b['date']+' · '+b['actor']+' · '+LABELS[b['status']]+' · '+b['reference'])+'</p><p>'+e(b['detail'])+'</p>')
             else:

@@ -1,6 +1,6 @@
 # Escenarios TJ · hoja de ruta actualizada
 
-Estado al 13 de octubre de 2026. Arquitectura local: núcleo Python, SQLite e interfaz React/TypeScript. IA local opcional con revisión del analista. El sistema explora consecuencias de supuestos; aún no acredita capacidad de predicción empírica.
+Estado al 14 de octubre de 2026. Arquitectura local: núcleo Python, SQLite e interfaz React/TypeScript. IA local opcional con revisión del analista. El sistema explora consecuencias de supuestos; aún no acredita capacidad de predicción empírica.
 
 ## Estado y orden de continuación
 
@@ -16,13 +16,13 @@ Estado al 13 de octubre de 2026. Arquitectura local: núcleo Python, SQLite e in
 | 8 · Evaluación predictiva | Protocolo, particiones temporales y prueba independiente | Cerrada funcionalmente por solicitud del usuario; validación empírica conservada como pendiente transversal P-EMP-01, sin mejora real acreditada |
 | 9 · Distribución Windows | Ejecutable portable e instalación | Cerrada funcionalmente: portable e instalador por usuario; instalación, reinstalación, desinstalación y datos conservados aprobados localmente y en dos runners Windows nuevos |
 | 10 · Calidad de plataforma | Rendimiento, dispositivos, impresión y actualización | Implementación y aceptación automatizada terminadas: presupuestos, concurrencia, A4 y matriz Windows/Linux × Python 3.11/3.13 aprobados; cierre integral abierto por impresión HTML nativa y aceptación entre navegadores pendientes |
-| 11 · Expediente documental y seguimiento real | Originales locales, datos revisados, acciones/respuestas e informes congelados | Implementada en alcance acotado: PDF/PNG/JPEG, extracción de texto no OCR, correcciones, comparación de lecturas, exportación y recuperación. Ver FASE-11-EXPEDIENTE-DOCUMENTAL.md |
+| 11 · Expediente documental y seguimiento real | Originales locales, datos revisados, acciones/respuestas e informes congelados | Cerrada en alcance funcional y análisis documental disponible: originales privados, correcciones, comparación de lecturas, exportación y recuperación. Conflicto real y documentación externa pendientes. Ver FASE-11-EXPEDIENTE-DOCUMENTAL.md |
 
 ## Próximo bloque funcional
 
 [Fase 3 · variables y unidades](FASE-3-VARIABLES.md) cerrada en su alcance definido. La fase 4 incorpora gráficos avanzados vinculados a variables y versiones; falta su aceptación visual integral, documentada en [Fase 4](FASE-4-GRAFICOS.md). Las fases 7–8 ya cuentan con infraestructura y no se repiten. La fase 6 permanece cerrada en su alcance funcional, conservando sus límites de verificación documentados.
 
-El [cierre de implementación 7–8](CIERRE-FASES-7-8.md), la [guía de evaluación temporal](EVALUACION-TEMPORAL.md) y el [informe unificado de fase 6](FASE-6-INFORME-UNIFICADO.md) vinculan candidatos, métodos, decisiones y resultados observados. Lo siguiente para acreditar mejora es incorporar evidencia real bajo un protocolo independiente. Para EDESUR ya se aportaron facturas, estimación de equipos y foto del medidor en el trabajo local; falta revisar su incorporación al expediente y registrar reclamos/respuestas verificables. La [fase 11](FASE-11-EXPEDIENTE-DOCUMENTAL.md) permite hacerlo sin inventar pagos ni probabilidades. Comprobaciones de plataforma y aceptación visual siguen abiertas; continuidad de fase 5 cerrada funcionalmente.
+El [cierre de implementación 7–8](CIERRE-FASES-7-8.md), la [guía de evaluación temporal](EVALUACION-TEMPORAL.md) y el [informe unificado de fase 6](FASE-6-INFORME-UNIFICADO.md) vinculan candidatos, métodos, decisiones y resultados observados. Lo siguiente para acreditar mejora es incorporar evidencia real bajo un protocolo independiente. Para EDESUR ya se aportaron facturas, estimación de equipos y foto del medidor en el trabajo local; incorporación y análisis documental privados verificados; faltan reclamos/respuestas verificables y documentación externa. La [fase 11](FASE-11-EXPEDIENTE-DOCUMENTAL.md) permite hacerlo sin inventar pagos ni probabilidades. Comprobaciones de plataforma y aceptación visual siguen abiertas; continuidad de fase 5 cerrada funcionalmente.
 
 ## Qué ya puede usarse
 
@@ -33,7 +33,7 @@ Crear y editar expedientes guiados, calcular y consultar matrices 2×2, comparar
 **P-EMP-01 · validación empírica:** pendiente independiente del cierre funcional de
 fase 8. Exige observaciones reales verificables, muestra justificada, referencia
 congelada y prueba temporal independiente. No se oculta ni se cuenta como cumplido.
-El siguiente trabajo concreto es revisar el expediente EDESUR en fase 11.
+El siguiente trabajo concreto es incorporar las constancias externas pendientes y sus resultados observados al expediente EDESUR.
 
 La impresión HTML necesita revisión visual paginada en un navegador que permita observar su salida. El visor PDF depende del navegador y mantiene descarga alternativa. Los escenarios complejos requieren ampliar las dimensiones actuales y las transformaciones de variables; el diccionario básico está implementado, y la IA no reemplaza la validación del modelo. Los editores de expediente ofrecen recuperación de copias locales al reabrir. Los formularios de laboratorios ofrecen recuperación explícita de borradores, documentada en fase 5. No hay fecha ni porcentaje de terminación global medidos.
 

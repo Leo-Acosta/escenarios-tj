@@ -13,6 +13,7 @@ MAX_BYTES = 20 * 1024 * 1024
 COLUMNS = {
     'scientific_jobs': {'id', 'workflow_id', 'payload'},
     'dossier_records': {'id', 'workflow_id', 'kind', 'payload'},
+    'dossier_blobs': {'sha256', 'content'},
     'workflows': {'id', 'updated_at', 'revision', 'payload'},
     'workflow_versions': {'workflow_id', 'version', 'created_at', 'payload'},
     'snapshots': {'id', 'created_at', 'payload'}, 'cases': {'id', 'created_at', 'payload'},

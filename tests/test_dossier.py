@@ -6,6 +6,7 @@ import tempfile
 import threading
 import unittest
 import zipfile
+from contextlib import closing
 from pathlib import Path
 from urllib.request import Request,urlopen
 from urllib.error import HTTPError
@@ -45,6 +46,34 @@ class DossierTests(unittest.TestCase):
         content,_=continuity.snapshot(self.path)
         recovered,_=continuity.recover(content,Path(self.tmp.name)/'recovered')
         self.assertEqual(dossier.read(recovered,snap['id']),snap)
+
+    def test_large_original_is_retained_and_oversize_rejected(self):
+        source=base64.b64decode(self.document()['payload']['content'])
+        large=source+b' '*(3*1024*1024)
+        item=self.save(kind='document',name='original-grande-sintetico.pdf',content=base64.b64encode(large).decode())
+        self.assertEqual(base64.b64decode(dossier.read(self.path,item['id'])['payload']['content']),large)
+        self.assertEqual(item['payload']['size'],len(large))
+        with self.assertRaises(ValueError):
+            self.save(kind='document',name='exceso.pdf',content=base64.b64encode(b'%PDF-'+b' '*(dossier.MAX_FILE+1)).decode())
+
+    def test_shared_originals_keep_immutable_snapshots_and_detect_blob_tampering(self):
+        import sqlite3
+        doc=self.document()
+        a=self.save(kind='snapshot',title='Primera copia',reviewed=True)
+        b=self.save(kind='snapshot',title='Segunda copia',reviewed=True)
+        with closing(sqlite3.connect(self.path)) as db,db:
+            self.assertEqual(db.execute('SELECT COUNT(*) FROM dossier_blobs').fetchone()[0],1)
+            stored=db.execute('SELECT payload FROM dossier_records WHERE id=?',(a['id'],)).fetchone()[0]
+            self.assertNotIn(doc['payload']['content'],stored)
+        self.assertEqual(dossier.read(self.path,a['id']),a)
+        self.assertEqual(dossier.read(self.path,b['id']),b)
+        # An old inline record is compacted without changing its logical hash.
+        with closing(sqlite3.connect(self.path)) as db,db:
+            db.execute('UPDATE dossier_records SET payload=? WHERE id=?',(json.dumps(a),a['id']))
+        dossier.deduplicate_storage(self.path)
+        self.assertEqual(dossier.read(self.path,a['id']),a)
+        with closing(sqlite3.connect(self.path)) as db,db:db.execute('UPDATE dossier_blobs SET content=?',(b'alterado',))
+        with self.assertRaises(ValueError):dossier.read(self.path,a['id'])
     def test_cross_scope_missing_review_invalid_files_and_tampering(self):
         doc=self.document();other=operate(self.path,{'action':'create','title':'Otra prueba','description':'Expediente distinto'})
         self.scope=other['id']
@@ -74,6 +103,10 @@ class DossierTests(unittest.TestCase):
         worker=threading.Thread(target=http.serve_forever,daemon=True);worker.start()
         self.addCleanup(http.server_close);self.addCleanup(http.shutdown)
         root='http://127.0.0.1:'+str(http.server_port)
+        raw=base64.b64decode(self.document()['payload']['content'])+b' '*(3*1024*1024)
+        large={'workflow_id':self.scope,'kind':'document','name':'original-grande-http.pdf','content':base64.b64encode(raw).decode()}
+        uploaded=json.load(urlopen(Request(root+'/api/dossier',data=json.dumps(large).encode(),headers={'Content-Type':'application/json','Origin':root})))
+        self.assertEqual(urlopen(root+'/api/dossier/file?id='+uploaded['id']).read(),raw)
         payload={'workflow_id':self.scope,'kind':'snapshot','title':'Prueba HTTP','reviewed':True}
         with self.assertRaises(HTTPError):urlopen(Request(root+'/api/dossier',data=json.dumps(payload).encode(),headers={'Content-Type':'application/json'}))
         r=json.load(urlopen(Request(root+'/api/dossier',data=json.dumps(payload).encode(),headers={'Content-Type':'application/json','Origin':root})))
