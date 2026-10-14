@@ -1,5 +1,8 @@
 """Exercise the built executable in a synthetic folder with no Python on PATH."""
 import json
+import base64
+import io
+import zipfile
 import os
 import socket
 import subprocess
@@ -11,7 +14,7 @@ from urllib.request import urlopen
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tests'))
-from escenarios import executive
+from escenarios import executive, dossier
 from tests.test_executive import prepared
 
 
@@ -22,6 +25,12 @@ def run(executable, directory):
     report = executive.create(database, {'workflow_id': case['id'], 'version': 1,
         'title': 'Distribución · prueba sintética', 'sections': ['matrix', 'tree', 'agents'],
         'sources': refs[:2], 'evidence_mode': 'synthetic', 'reviewed': True})
+    from reportlab.pdfgen import canvas
+    stream=io.BytesIO(); page=canvas.Canvas(stream); page.drawString(50,700,'Prueba documental sintetica'); page.save()
+    original=stream.getvalue()+b' '*(3*1024*1024)
+    document=dossier.save(database,{'workflow_id':case['id'],'kind':'document','name':'sintetico.pdf',
+        'content':base64.b64encode(original).decode(),'note':'Datos sinteticos, no caso real'})
+    frozen=dossier.save(database,{'workflow_id':case['id'],'kind':'snapshot','title':'Prueba documental sintetica','reviewed':True})
     environment = {**os.environ, 'PATH': ''}
     with socket.socket() as sock:
         sock.bind(('127.0.0.1', 0))
@@ -48,6 +57,13 @@ def run(executable, directory):
                 for endpoint in ['/app/', '/', '/api/workflows', '/api/executive/replay?id=' + report['id']]:
                     with urlopen(base + endpoint, timeout=5) as response:
                         assert response.status == 200
+                with urlopen(base+'/api/dossier/export?id='+frozen['id'],timeout=10) as response:
+                    assert json.load(response)==frozen
+                with urlopen(base+'/api/dossier/file?id='+document['id'],timeout=10) as response:
+                    assert response.read()==original
+                with urlopen(base+'/api/dossier/zip?id='+frozen['id'],timeout=15) as response:
+                    with zipfile.ZipFile(io.BytesIO(response.read())) as archive:
+                        assert json.loads(archive.read('registro.json'))==frozen
                 with urlopen(base + '/api/executive/pdf?id=' + report['id'], timeout=10) as response:
                     pdf = response.read()
                     assert pdf.startswith(b'%PDF')
@@ -62,7 +78,8 @@ def run(executable, directory):
     second = cycle()
     assert first == second, 'La reproducción cambió después de reiniciar.'
     result = {'synthetic': True, 'python_on_path': False, 'cycles': 2,
-              'duplicate_rejected': True, 'frozen_pdf_identical': True, 'pdf_bytes': len(first)}
+              'duplicate_rejected': True, 'frozen_pdf_identical': True, 'pdf_bytes': len(first),
+              'documentary_export_identical':True,'large_original_identical':True,'documentary_zip_verified':True}
     (directory / 'verification.json').write_text(json.dumps(result, indent=2), encoding='utf-8')
     print(json.dumps(result))
 

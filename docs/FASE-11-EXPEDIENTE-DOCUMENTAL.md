@@ -43,4 +43,4 @@ Verificación: 193 pruebas Python aprobadas; las siete pruebas documentales apro
 
 Pendiente externo: actas de retiro/instalación y cierre comercial, comprobantes e imputación de pagos, explicación técnica de lecturas y registro, número de reclamo formal y respuesta escrita. La suma aritmética coherente de una factura no valida su consumo, tarifa o legalidad. La estimación de aparatos no mide consumo histórico. El conflicto EDESUR sigue abierto y no constituye evaluación predictiva independiente.
 
-El instalador científico publicado localmente en el cierre anterior requiere reconstrucción para incorporar esta revisión documental; este cierre se verifica en la aplicación del repositorio. Los límites de OCR, importación ZIP, volumen, cifrado y exportación Word nativa continúan vigentes.
+La reconstrucción y verificación del instalador actualizado se documentan en INSTALADOR-FASE11.md. Los límites de OCR, importación ZIP, volumen, cifrado y exportación Word nativa continúan vigentes.
