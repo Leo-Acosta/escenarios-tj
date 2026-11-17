@@ -11,6 +11,7 @@ from uuid import uuid4
 SCHEMA_VERSION = 1
 MAX_BYTES = 20 * 1024 * 1024
 COLUMNS = {
+    'studio_scenarios': {'id','workflow_id','payload'},
     'scientific_jobs': {'id', 'workflow_id', 'payload'},
     'dossier_records': {'id', 'workflow_id', 'kind', 'payload'},
     'dossier_blobs': {'sha256', 'content'},

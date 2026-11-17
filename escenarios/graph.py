@@ -5,6 +5,11 @@ from contextlib import closing
 
 
 def validate_graph(payload):
+    if not isinstance(payload,dict):raise ValueError('Red inválida.')
+    if payload.get('schema') not in (None,2):raise ValueError('Versión de red no compatible.')
+    if payload.get('schema')==2:
+        from .visual_graph import validate
+        return validate(payload)
     nodes, edges = payload['nodes'], payload['edges']
     if not isinstance(nodes,list) or not isinstance(edges,list) or not 1 <= len(nodes) <= 200 or len(edges)>1000:
         raise ValueError('Se permiten de 1 a 200 nodos y hasta 1000 relaciones.')
@@ -66,6 +71,11 @@ def save_version(path, payload):
     graph = validate_graph(payload['graph'])
     record = dict(id=str(uuid4()), created_at=datetime.now(timezone.utc).isoformat(),
                   title=title.strip(), assumptions=assumptions.strip(), graph=graph)
+    parent=payload.get('parent_id')
+    if parent:
+        previous=get_version(path,parent)
+        if previous.get('workflow',{}).get('id','')!=payload.get('workflow_id',''):raise ValueError('Red de otro expediente.')
+        record['parent_id']=parent
     identity = payload.get('workflow_id')
     if identity is not None and not isinstance(identity, str):
         raise ValueError('Referencia de expediente inválida.')
@@ -73,6 +83,9 @@ def save_version(path, payload):
         from .workflow import get_workflow
         case = get_workflow(path, identity)
         record['workflow'] = {key: case[key] for key in ('id', 'title', 'revision')}
+    if graph.get('schema')==2:
+        from .decision_agents import fingerprint
+        record['sha256']=fingerprint(record)
     path.parent.mkdir(parents=True, exist_ok=True)
     with closing(sqlite3.connect(path)) as db, db:
         db.execute('CREATE TABLE IF NOT EXISTS graph_versions (id TEXT PRIMARY KEY, payload TEXT NOT NULL)')
@@ -93,3 +106,20 @@ def version_history(path, workflow_id=''):
             sql += " WHERE json_extract(payload,'$.workflow.id')=?"
             args = (workflow_id,)
         return [json.loads(row[0]) for row in db.execute(sql+' ORDER BY rowid DESC LIMIT 30', args)]
+
+
+def verify_version(record):
+    from .decision_agents import fingerprint
+    if record['graph'].get('schema')==2 and not record.get('sha256'):raise ValueError('Falta la huella de la red visual.')
+    if record.get('sha256') and fingerprint({k:v for k,v in record.items() if k!='sha256'})!=record['sha256']:
+        raise ValueError('Versión de red alterada.')
+    if validate_graph(record['graph'])!=record['graph']:raise ValueError('Red conservada incompatible.')
+    return record
+
+def get_version(path,identity):
+    from .workflow import NotFound
+    with closing(sqlite3.connect(path)) as db:
+        if not db.execute("SELECT 1 FROM sqlite_master WHERE name='graph_versions'").fetchone():raise NotFound('Red inexistente.')
+        row=db.execute('SELECT payload FROM graph_versions WHERE id=?',(identity,)).fetchone()
+    if not row:raise NotFound('Red inexistente.')
+    return verify_version(json.loads(row[0]))

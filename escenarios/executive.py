@@ -11,9 +11,9 @@ from .workflow import get_version, get_workflow, now
 
 LABELS = {'matrix':'Matriz estratégica', 'tree':'Árbol decisorio', 'simulation':'Monte Carlo',
           'agents':'Agentes con memoria', 'comparison':'Comparación de políticas',
-          'sweep':'Sensibilidad de incentivos', 'decision':'Decisiones de IA local', 'benchmark':'Batería de agentes IA', 'evaluation':'Evaluación predictiva', 'variables':'Variables y unidades'}
+          'sweep':'Sensibilidad de incentivos', 'decision':'Decisiones de IA local', 'benchmark':'Batería de agentes IA', 'evaluation':'Evaluación predictiva', 'variables':'Variables y unidades', 'graph':'Red de relaciones', 'scenario':'Escenarios integrados'}
 TABLES = {'tree':'sequential_versions', 'agents':'agent_runs', 'comparison':'agent_comparisons',
-          'sweep':'payoff_sweeps', 'decision':'decision_comparisons', 'benchmark':'decision_benchmarks', 'evaluation':'research_records', 'variables':'variable_versions'}
+          'sweep':'payoff_sweeps', 'decision':'decision_comparisons', 'benchmark':'decision_benchmarks', 'evaluation':'research_records', 'variables':'variable_versions','graph':'graph_versions','scenario':'studio_scenarios'}
 LIMITS = ['Documento exploratorio condicionado a modelos y supuestos; no garantiza predicciones ni éxito judicial.',
           'Los documentos y hechos son declarados por el analista; su autenticidad exige revisión externa.',
           'SHA-256 identifica contenido, no es una firma ni acredita veracidad.',
@@ -42,12 +42,12 @@ def _sources(path,kind):
 
 def scope(kind,record):
     if kind=='evaluation':return record['payload']['protocol']['payload']['workflow']
-    if kind in ('decision','benchmark','variables'):return record['payload'].get('workflow',{})
+    if kind in ('decision','benchmark','variables','scenario'):return record['payload'].get('workflow',{})
     return record.get('workflow',{})
 
 def compatible(kind,record,workflow_id,version):
     source=scope(kind,record)
-    return source.get('id')==workflow_id and (kind=='tree' or source.get('version')==version)
+    return source.get('id')==workflow_id and (kind in ('tree','graph','scenario') or source.get('version')==version)
 
 def catalog(path,workflow_id,version):
     matrix=get_version(path,workflow_id,version)
@@ -57,6 +57,7 @@ def catalog(path,workflow_id,version):
             if not compatible(kind,record,workflow_id,version):continue
             body=record.get('payload',record)
             title=body.get('model',{}).get('title') or (body['candidate']['payload']['name'] if kind=='evaluation' else 'Diccionario de '+str(len(body['variables']))+' variables' if kind=='variables' else kind)
+            if kind in ('graph','scenario'):title=body['title']
             items.append({'kind':kind,'id':record['id'],'title':title,'created_at':record.get('created_at',record.get('calculated_at','')),
                           'label':LABELS[kind],'simulation':bool(record.get('simulation')),
                           'evidence':body['result']['evidence'] if kind=='evaluation' else 'variables_declared' if kind=='variables' else 'simulation_only'})
@@ -65,6 +66,12 @@ def catalog(path,workflow_id,version):
 
 def verify_source(kind,record):
     """Recalcular con motores originales; las decisiones IA se leen de sus trazas."""
+    if kind=='graph':
+        from .graph import verify_version
+        verify_version(record);return
+    if kind=='scenario':
+        from .studio import verify as verify_scenario
+        verify_scenario(record);return
     if kind=='variables':
         variables.verify(record);return
     elif kind=='matrix':
@@ -135,6 +142,11 @@ def create(path,payload):
           'title':text(payload.get('title'),200),'executive_note':text(payload.get('executive_note',''),4000,True),
           'pending':text(payload.get('pending',''),4000,True),'evidence_mode':mode,'sections':sections,
           'matrix':matrix,'matrix_sha256':decisions.fingerprint(matrix),'sources':picked,'limits':LIMITS}
+    scenarios=[s['record'] for s in picked if s['kind']=='scenario']
+    if len(scenarios)>2:raise ValueError('Seleccioná hasta dos escenarios por informe integrado.')
+    if len(scenarios)==2:
+        from .studio import compare as compare_scenarios
+        body['scenario_comparison']=compare_scenarios(*scenarios)
     documentary=dossier.frozen_context(path,workflow_id)
     if any(documentary.values()):body['dossier']=documentary
     science=scientific_runtime.frozen_context(path,workflow_id,version)
@@ -159,6 +171,10 @@ def history(path,workflow_id):
 
 def verify(record,calculations=True):
     body=record['payload']
+    if calculations and body.get('scenario_comparison'):
+        from .studio import compare as compare_scenarios
+        scenarios=[s['record'] for s in body['sources'] if s['kind']=='scenario']
+        if len(scenarios)!=2 or compare_scenarios(*scenarios)!=body['scenario_comparison']:raise ValueError('Comparación de escenarios alterada.')
     if body['engine']!='unified-executive-v1' or decisions.fingerprint(body)!=record['sha256'] or decisions.fingerprint(body['matrix'])!=body['matrix_sha256']:
         raise ValueError('El manifiesto o la matriz no coincide con su huella.')
     for source in body['sources']:

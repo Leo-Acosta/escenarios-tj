@@ -13,7 +13,7 @@ from reportlab.pdfgen.canvas import Canvas
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle, PageBreak, Spacer, Flowable, KeepTogether
 from .executive_view import content, primitives
 
-INK='#213846';TEAL='#137f84';PALE='#edf5f5'
+INK='#213846';TEAL='#244d78';PALE='#edf3fa'
 
 def fonts():
     candidates=[(Path('C:/Windows/Fonts/arial.ttf'),Path('C:/Windows/Fonts/arialbd.ttf')),
@@ -46,7 +46,7 @@ def build_pdf(record):
     view=content(record);regular,bold=fonts();width=174*mm;out=BytesIO()
     styles={
         'title':ParagraphStyle('CoverTitle',fontName=bold,fontSize=29,leading=35,textColor=colors.white,spaceAfter=18,splitLongWords=True),
-        'cover':ParagraphStyle('CoverBody',fontName=regular,fontSize=11,leading=17,textColor=colors.HexColor('#dcf2f0'),spaceAfter=12,splitLongWords=True),
+        'cover':ParagraphStyle('CoverBody',fontName=regular,fontSize=11,leading=17,textColor=colors.HexColor('#e3edf9'),spaceAfter=12,splitLongWords=True),
         'section':ParagraphStyle('Section',fontName=bold,fontSize=20,leading=25,textColor=colors.HexColor(INK),spaceAfter=16,keepWithNext=True),
         'body':ParagraphStyle('Body',fontName=regular,fontSize=9.5,leading=14.5,textColor=colors.HexColor(INK),spaceAfter=9,splitLongWords=True),
         'small':ParagraphStyle('Small',fontName=regular,fontSize=7.5,leading=10.5,textColor=colors.HexColor(INK),spaceAfter=4,splitLongWords=True),
@@ -61,22 +61,27 @@ def build_pdf(record):
     for i,c in enumerate(view['chapters']):
         flow.extend([PageBreak(),p(f'ESCENARIOS TJ / {i+1:02d}','kicker'),p(c['title'],'section')])
         flow.extend(p(v) for v in c['paragraphs'])
+        if c['title']=='Red de relaciones':
+            for chart in c['charts']:flow.extend([Spacer(1,5*mm),VectorChart(chart,width,regular),Spacer(1,5*mm)])
         for t in c['tables']:
             rows=[[p(v,'small') for v in t['headers']]]+[[p(v,'small') for v in row] for row in t['rows']]
             n=len(t['headers']);sizes=[width/n]*n
+            if c['title']=='Red de relaciones':
+                sizes=[width*x for x in ([.08,.29,.2,.23,.2] if n==5 else [.15,.24,.31,.3])]
             if c['title']=='Trazabilidad y límites' and n==3:sizes=[width*.2,width*.32,width*.48]
             table=Table(rows,colWidths=sizes,repeatRows=1,hAlign='LEFT',splitInRow=1)
             table.setStyle(TableStyle([('BACKGROUND',(0,0),(-1,0),colors.HexColor(PALE)),('VALIGN',(0,0),(-1,-1),'TOP'),
                                       ('TOPPADDING',(0,0),(-1,-1),8),('BOTTOMPADDING',(0,0),(-1,-1),8),
                                       ('LINEBELOW',(0,0),(-1,-1),.4,colors.HexColor('#cbdce3'))]))
             flow.extend([Spacer(1,4*mm),table])
-        for chart in c['charts']:flow.extend([Spacer(1,5*mm),VectorChart(chart,width,regular),Spacer(1,5*mm)])
+        if c['title']!='Red de relaciones':
+            for chart in c['charts']:flow.extend([Spacer(1,5*mm),VectorChart(chart,width,regular),Spacer(1,5*mm)])
     def footer(canvas,document):
         canvas.saveState()
         if document.page==1:
-            canvas.setFillColor(colors.HexColor('#112b38'));canvas.rect(0,0,*A4,fill=1,stroke=0)
+            canvas.setFillColor(colors.HexColor('#102b4c'));canvas.rect(0,0,*A4,fill=1,stroke=0)
             canvas.setFillColor(colors.HexColor(TEAL));canvas.rect(0,0,8*mm,A4[1],fill=1,stroke=0)
-            canvas.setFillColor(colors.HexColor('#dcf2f0'))
+            canvas.setFillColor(colors.HexColor('#e3edf9'))
         else:
             canvas.setStrokeColor(colors.HexColor('#cbdce3'));canvas.line(18*mm,17*mm,192*mm,17*mm)
             canvas.setFillColor(colors.HexColor('#536a78'))

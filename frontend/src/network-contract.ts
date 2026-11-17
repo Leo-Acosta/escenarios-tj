@@ -11,11 +11,12 @@ export function network(value:unknown):Network|null{
  return {nodes,edges};
 }
 
-export type NetworkVersion={id:string;created_at:string;title:string;assumptions:string;graph:Network;workflow?:{id:string;title:string;revision:number}};
+export type NetworkVersion={visualSchema?:2;id:string;created_at:string;title:string;assumptions:string;graph:Network;workflow?:{id:string;title:string;revision:number}};
 export function networkVersion(value:unknown):NetworkVersion{
  const o=object(value),graph=network(o);
  if(!graph||typeof o.id!=='string'||typeof o.created_at!=='string'||typeof o.title!=='string'||typeof o.assumptions!=='string')throw new Error('Versión de red incompatible.');
  const r:NetworkVersion={id:o.id,created_at:o.created_at,title:o.title,assumptions:o.assumptions,graph};
+ if(object(o.graph).schema===2)r.visualSchema=2;
  if(o.workflow!==undefined){const w=object(o.workflow);if(typeof w.id!=='string'||typeof w.title!=='string'||!Number.isSafeInteger(w.revision)||(w.revision as number)<1)throw new Error('Referencia histórica de red incompatible.');r.workflow={id:w.id,title:w.title,revision:w.revision as number};}
  return r;
 }

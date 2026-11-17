@@ -77,7 +77,24 @@ def content(record):
         k=s['kind'];r=s['record'];body=r.get('payload',r)
         title=LABELS[k]
         c=chapter(title,[source_note(s)])
-        if k=='variables':
+        if k=='graph':
+            from .visual_report import chapters as network_chapter
+            visual=network_chapter(r);c['paragraphs']+=visual['paragraphs'];c['tables']+=visual['tables'];c['charts']+=visual['charts']
+        elif k=='scenario':
+            units=body['payoff_units'];model=body['matrix']['model']
+            c['paragraphs']+=[body['title'],f"Revisión {body['revision']}; matriz v{body['workflow']['version']}. Evidencia: { {'synthetic':'Datos sintéticos','declared':'Fuentes declaradas','pending':'Pendiente'}[body['evidence_mode']] }.",
+                'Supuestos: '+body['assumptions'],'Escalas propias: '+' / '.join(units),
+                'Restricciones declaradas (no se ejecutan como código): '+'; '.join(body['constraints']),*body['limits']]
+            c['tables'].append(table(['Variable','Valor / unidad','Fuente / evidencia','Transformación revisada'],
+                [[v['name'],v['value']+' '+v['unit'],v['source']+' / '+{'assumed':'Hipótesis','declared':'Declarado','documented_declared':'Documentación declarada','pending':'Pendiente'}[v['status']],('Contexto' if v['target']=='context' else 'Parámetro '+v['target'])+' → '+str(v['model_value'])+'; '+v['transformation']] for v in body['variables']]))
+            from .visual_graph import upgrade
+            names={n['uid']:n['name'] for n in upgrade(body['network']['graph'],body['network']['id'])['nodes']}
+            c['tables'].append(table(['Entidad','Modelo','Actor','Estrategias o alternativas'],
+                [[names[v['node_uid']], 'Matriz' if v['kind']=='matrix' else 'Árbol',
+                  (model if v['kind']=='matrix' else body['tree']['model'])['actors'][v['actor']],
+                  ', '.join(str(i+1) for i in v['strategies']) or 'Actor completo'] for v in body['links']]))
+            c['tables'].append(table(['Estrategia de A',*model['strategies'][1]],[[model['strategies'][0][i],*[f"{model['a'][i][j]} / {model['b'][i][j]}" for j in range(2)]] for i in range(2)]))
+        elif k=='variables':
             evidence_labels={'synthetic':'Sintético','assumed':'Supuesto','documented_declared':'Documentación declarada','pending':'Pendiente'}
             type_labels={'number':'Número','category':'Categoría','boolean':'Booleano'}
             def target_label(target):
@@ -146,6 +163,19 @@ def content(record):
             c['charts'].append(bar('Brier candidato y referencia',['Candidato','Referencia'],[metric['candidate_brier'],metric['baseline_brier']],'Error Brier 0-1; menor es mejor'))
             c['tables'].append(table(['Unidad','Prob. candidato','Prob. referencia','Resultado'],[[x['research']['unit_id'],x['candidate_probability'],x['baseline_probability'],x['observation']['outcome'] if x['observation'] else 'Pendiente'] for x in body['dataset'][:20]]))
             c['paragraphs'].append(f"Se muestran hasta veinte eventos; JSON conserva {len(body['dataset'])}. No se omiten pérdidas del cálculo.")
+    comparison=p.get('scenario_comparison')
+    if comparison:
+        scenarios=[s['record']['payload'] for s in sources if s['kind']=='scenario']
+        c=chapter('Comparación de escenarios',[
+            'Primer escenario: '+scenarios[0]['title']+'. Segundo escenario: '+scenarios[1]['title']+'.',
+            'Diferencias calculadas como segundo menos primero; cada actor conserva su propia escala.',
+            'Escalas declaradas compatibles.' if comparison['comparable'] else 'Escalas no comparables: no se muestran diferencias numéricas de utilidad.',
+            str(len(comparison['differences']))+' diferencias de configuración. No son medidas de precisión predictiva.'])
+        if comparison['comparable']:
+            for actor,key in enumerate(('expected_a_delta','expected_b_delta')):
+                c['charts'].append(bar('Cambio de utilidad esperada · '+scenarios[0]['matrix']['model']['actors'][actor],scenarios[0]['matrix']['model']['strategies'][actor],comparison[key],scenarios[0]['payoff_units'][actor]))
+        labels={'assumptions':'Supuestos','evidence_mode':'Evidencia','payoff_units':'Escalas','constraints':'Restricciones','variables':'Variables','links':'Asignaciones de actores','network':'Versión de red','matrix':'Versión de matriz','tree':'Versión de árbol','dictionary':'Diccionario'}
+        c['tables'].append(table(['Campo con diferencias'],[[labels.get(v['field'],v['field'])] for v in comparison['differences']]))
     evidence=m['context'].get('evidence',[])
     c=chapter('Fuentes, hechos declarados y pendientes',[
         'DOCUMENTACIÓN DECLARADA: los elementos siguientes contienen referencias aportadas, no verificación automática.',
@@ -171,10 +201,23 @@ def primitives(chart):
     palette=['#19365a','#a16428','#397e9c','#686e89']
     typ=chart['type'];label(20,20,chart['title'] if len(chart['title'])<=45 else chart['title'][:42]+'...',14)
     if typ not in ('lines','tree'):label(20,282,chart.get('unit',''),10,'#536a78')
-    if typ=='tree':
+    if typ=='network':
+        nodes=chart['nodes'];positions={n['id']:(110+(i%4)*165,80+(i//4)*70) for i,n in enumerate(nodes)}
+        for edge in chart['edges']:
+            if edge['a'] not in positions or edge['b'] not in positions:continue
+            a,b=positions[edge['a']],positions[edge['b']];line(*a,*b,'#8098b0',1)
+            if edge.get('directed'):
+                import math
+                dx,dy=b[0]-a[0],b[1]-a[1];length=math.hypot(dx,dy) or 1
+                x,y=b[0]-dx/length*32,b[1]-dy/length*18
+                line(x,y,x-dx/length*9+dy/length*4,y-dy/length*9-dx/length*4,'#163451',1)
+                line(x,y,x-dx/length*9-dy/length*4,y-dy/length*9+dx/length*4,'#163451',1)
+        for n in nodes:
+            x,y=positions[n['id']];rect(x-55,y-17,110,34,'#e9f0f7');label(x-48,y+4,f"N{n['id']+1} · "+n['name'][:12],10)
+    elif typ=='tree':
         m=chart['model'];nodes=[(360,55),(185,130),(535,130),(90,225),(270,225),(450,225),(630,225)]
         for a,b in [(0,1),(0,2),(1,3),(1,4),(2,5),(2,6)]:line(*nodes[a],*nodes[b],'#9dbbc1',2)
-        for i,(x,y) in enumerate(nodes):rect(x-58,y-18,116,36,'#edf5f5');label(x-49,y+4,('A' if i==0 else 'B' if i<3 else ' / '.join(NUMERIC(v) for v in m['payoffs'][(i-3)//2][(i-3)%2])),12)
+        for i,(x,y) in enumerate(nodes):rect(x-58,y-18,116,36,'#edf3fa');label(x-49,y+4,('A' if i==0 else 'B' if i<3 else ' / '.join(NUMERIC(v) for v in m['payoffs'][(i-3)//2][(i-3)%2])),12)
         for i,x in enumerate((185,535)):label(x-70,102,m['actions'][0][i][:22],11)
         for i,x in enumerate((90,270,450,630)):label(x-75,194,m['actions'][i//2+1][i%2][:23],10)
         label(20,282,'Etiquetas completas y pagos en la tabla del capítulo.',10,'#536a78')
@@ -184,7 +227,7 @@ def primitives(chart):
         width=570/len(vals)
         for i,(name,value) in enumerate(zip(chart['labels'],vals)):
             x=85+i*width;y=240-(value-lo)/span*175
-            rect(x,min(y,zero),width*.55,max(1,abs(y-zero)),palette[i%4]);label(x,y-8 if value>=0 else y+16,NUMERIC(value),13)
+            rect(x,min(y,zero),width*.55,max(1,abs(y-zero)),palette[i%4]);label(x,y-8 if value>=0 else zero-8,NUMERIC(value),13)
             label(x,260,name[:min(22,int(width/9))],9)
         label(22,65,NUMERIC(hi),10);label(22,240,NUMERIC(lo),10)
     elif typ=='lines':
@@ -225,8 +268,10 @@ def html(record):
         tables=[]
         for t in c['tables']:
             tables.append('<table><thead><tr>'+''.join('<th>'+e(v)+'</th>' for v in t['headers'])+'</tr></thead><tbody>'+''.join('<tr>'+''.join('<td>'+e(v)+'</td>' for v in row)+'</tr>' for row in t['rows'])+'</tbody></table>')
-        chapters.append(f'<section class="chapter" id="chapter-{i}"><p class="kicker">ESCENARIOS TJ / {i+1:02d}</p><h2>'+e(c['title'])+'</h2>'+''.join('<p>'+e(v)+'</p>' for v in c['paragraphs'])+''.join(tables)+''.join('<figure>'+svg(v)+'</figure>' for v in c['charts'])+'</section>')
+        graphics=''.join('<figure>'+svg(v)+'</figure>' for v in c['charts'])
+        body=(''.join(tables)+graphics) if c['title']!='Red de relaciones' else (graphics+''.join(tables))
+        chapters.append(f'<section class="chapter" id="chapter-{i}"><p class="kicker">ESCENARIOS TJ / {i+1:02d}</p><h2>'+e(c['title'])+'</h2>'+''.join('<p>'+e(v)+'</p>' for v in c['paragraphs'])+body+'</section>')
     links=''.join(f'<a href="#chapter-{i}">{e(c["title"])}</a>' for i,c in enumerate(view['chapters']))
     return '<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>'+e(view['title'])+'''</title><style>
-    :root{color-scheme:light}*{box-sizing:border-box}body{margin:0;background:#e9eff2;color:#213846;font:14px/1.65 Arial,sans-serif}.toolbar{background:#112b38;color:white;padding:16px;position:sticky;top:0;z-index:2;display:flex;gap:16px;align-items:center}.toolbar a,.toolbar button{color:white;background:#137f84;border:0;padding:10px;text-decoration:none;cursor:pointer}.document{max-width:210mm;margin:28px auto;background:white;box-shadow:0 8px 32px #132b3820}.cover,.chapter{padding:18mm}.cover{background:#112b38;color:white;min-height:220mm;display:flex;flex-direction:column;justify-content:center;border-bottom:7px solid #137f84}.cover h1{font-size:38px;line-height:1.18;overflow-wrap:anywhere}.kicker{font-size:10px;letter-spacing:2px;color:#137f84;font-weight:bold}.cover .kicker{color:#70d0c4}.badge{padding:12px;border:1px solid #78bfb8;font-size:12px}.chapter{border-bottom:1px solid #d4e0e6}h2{font-size:26px;line-height:1.25;color:#163c4a;break-after:avoid}p,td,th{overflow-wrap:anywhere}p{white-space:pre-line}figure{margin:22px 0;padding:12px;border:1px solid #d4e0e6;background:#f8fbfc;break-inside:avoid}svg{width:100%;display:block;font-family:Arial,sans-serif}table{width:100%;table-layout:fixed;border-collapse:collapse;margin:18px 0;font-size:11px}th{text-align:left;background:#edf5f5}td,th{padding:9px;border-bottom:1px solid #d4e0e6;vertical-align:top}tr{break-inside:avoid}thead{display:table-header-group}.contents a{display:block;color:#137f84;padding:4px}small{overflow-wrap:anywhere}@page{size:A4;margin:16mm}@media print{body{background:white}.toolbar{display:none}.document{margin:0;max-width:none;box-shadow:none}.cover{min-height:240mm;break-after:page;padding:16mm;print-color-adjust:exact;-webkit-print-color-adjust:exact}.chapter{padding:0;break-before:page;border:0}figure,th{print-color-adjust:exact;-webkit-print-color-adjust:exact}h2{break-after:avoid}}@media screen and (max-width:700px){.cover,.chapter{padding:24px}.cover h1{font-size:30px}.toolbar{position:static;flex-wrap:wrap}}
+    :root{color-scheme:light}*{box-sizing:border-box}body{margin:0;background:#e9eff2;color:#213846;font:14px/1.65 Arial,sans-serif}.toolbar{background:#102b4c;color:white;padding:16px;position:sticky;top:0;z-index:2;display:flex;gap:16px;align-items:center}.toolbar a,.toolbar button{color:white;background:#244d78;border:0;padding:10px;text-decoration:none;cursor:pointer}.document{max-width:210mm;margin:28px auto;background:white;box-shadow:0 8px 32px #132b3820}.cover,.chapter{padding:18mm}.cover{background:#102b4c;color:white;min-height:220mm;display:flex;flex-direction:column;justify-content:center;border-bottom:7px solid #244d78}.cover h1{font-size:38px;line-height:1.18;overflow-wrap:anywhere}.kicker{font-size:10px;letter-spacing:2px;color:#244d78;font-weight:bold}.cover .kicker{color:#b9d2ef}.badge{padding:12px;border:1px solid #78bfb8;font-size:12px}.chapter{border-bottom:1px solid #d4e0e6}h2{font-size:26px;line-height:1.25;color:#163c4a;break-after:avoid}p,td,th{overflow-wrap:anywhere}p{white-space:pre-line}figure{margin:22px 0;padding:12px;border:1px solid #d4e0e6;background:#f8fbfc;break-inside:avoid}svg{width:100%;display:block;font-family:Arial,sans-serif}table{width:100%;table-layout:fixed;border-collapse:collapse;margin:18px 0;font-size:11px}th{text-align:left;background:#edf3fa}td,th{padding:9px;border-bottom:1px solid #d4e0e6;vertical-align:top}tr{break-inside:avoid}thead{display:table-header-group}.contents a{display:block;color:#244d78;padding:4px}small{overflow-wrap:anywhere}@page{size:A4;margin:16mm}@media print{body{background:white}.toolbar{display:none}.document{margin:0;max-width:none;box-shadow:none}.cover{min-height:240mm;break-after:page;padding:16mm;print-color-adjust:exact;-webkit-print-color-adjust:exact}.chapter{padding:0;break-before:page;border:0}figure,th{print-color-adjust:exact;-webkit-print-color-adjust:exact}h2{break-after:avoid}}@media screen and (max-width:700px){.cover,.chapter{padding:24px}.cover h1{font-size:30px}.toolbar{position:static;flex-wrap:wrap}}
     </style></head><body><div class="toolbar"><strong>Vista A4 · versión congelada</strong><button onclick="window.print()">Imprimir / guardar PDF</button><a href="/api/executive/pdf?id='''+e(view['id'])+'">Descargar PDF vectorial</a></div><main class="document"><header class="cover"><p class="kicker">ESCENARIOS TJ / INFORME EJECUTIVO</p><h1>'+e(view['title'])+'</h1><p class="badge">'+e(view['badge'])+'</p><p>Modelos, escenarios y evidencia reunidos desde versiones conservadas.</p><small>Emisión '+e(view['date'])+'</small></header><section class="chapter contents"><h2>Contenido del informe</h2>'+links+'</section>'+''.join(chapters)+'</main></body></html>'

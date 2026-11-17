@@ -6,11 +6,12 @@ import {TreeSimulation} from './tree-simulation';
 import {TreeEditor} from './tree-editor';
 import ReportPreview from './report-preview';
 import {trees,treeGraph,type TreeRecord} from './tree-contract';
-export default function TreeLab({onDirty,cases,workflowId,onOpenWorkflow}:{cases:WorkflowSummary[];workflowId:string;onOpenWorkflow:(id:string)=>void;onDirty:(v:boolean)=>void}){
+export default function TreeLab({onDirty,cases,workflowId,onOpenWorkflow,initialId}:{initialId?:string;cases:WorkflowSummary[];workflowId:string;onOpenWorkflow:(id:string)=>void;onDirty:(v:boolean)=>void}){
  const [previewIndex,setPreviewIndex]=useState<number|null>(null);
  const [scope,setScope]=useState(workflowId);
  const [editing,setEditing]=useState(false),[source,setSource]=useState<TreeRecord|undefined>(),[notice,setNotice]=useState('');
- const [records,setRecords]=useState<TreeRecord[]>([]),[id,setId]=useState(''),[choice,setChoice]=useState<number|null>(null),[selected,setSelected]=useState('root'),[error,setError]=useState(''),[loading,setLoading]=useState(true),[retry,setRetry]=useState(0);
+ const [records,setRecords]=useState<TreeRecord[]>([]),[id,setId]=useState(initialId||''),[choice,setChoice]=useState<number|null>(null),[selected,setSelected]=useState('root'),[error,setError]=useState(''),[loading,setLoading]=useState(true),[retry,setRetry]=useState(0);
+ useEffect(()=>{if(initialId)setId(initialId);},[initialId]);
  useEffect(()=>{const controller=new AbortController();setLoading(true);setError('');get('/api/sequential'+(scope?'?'+new URLSearchParams({workflow_id:scope}):''),trees,controller.signal).then(data=>{setRecords(data);setId(old=>data.some(t=>t.id===old)?old:data[0]?.id||'');setLoading(false);}).catch(e=>{if(!controller.signal.aborted){setError(e instanceof Error?e.message:'Error de conexión.');setLoading(false);}});return()=>controller.abort();},[retry,scope]);
  const scopeControl=<section className="panel selection"><label>Árboles del expediente<select value={scope} onChange={e=>{setId('');setChoice(null);setScope(e.target.value);}}><option value="">Todos los expedientes y árboles independientes</option>{cases.map(c=><option key={c.id} value={c.id}>{c.title}</option>)}</select></label></section>;
  const tree=records.find(t=>t.id===id),sample=tree?.simulation?.preview[previewIndex??-1];const graph=useMemo(()=>tree?treeGraph(tree,choice,sample):null,[tree,choice,sample]);

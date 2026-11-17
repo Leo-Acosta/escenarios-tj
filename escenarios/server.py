@@ -13,7 +13,7 @@ from .case_model import analyze_case,save_case,list_cases
 from .workflow import operate,get_workflow,list_workflows,get_version,Conflict,NotFound
 from . import local_ai,ai_jobs,sequential,simulation,agents,comparisons,payoff_sweep,library,version_diff
 from . import laboratories,research,decision_agents,executive,variables,continuity
-from . import dossier,scientific,scientific_runtime
+from . import dossier,scientific,scientific_runtime,studio
 
 ROOT = Path(__file__).resolve().parent.parent
 DB = ROOT / 'data' / 'escenarios.sqlite3'
@@ -67,6 +67,24 @@ class Handler(BaseHTTPRequestHandler):
             try:
                 args=parse_qs(url.query)
                 return self.send(200,scientific.bundle(DB,args.get('workflow_id',[''])[0],int(args.get('version',['0'])[0])),'application/zip')
+            except NotFound as error:return self.send(404,{'error':str(error)})
+            except (ValueError,KeyError,TypeError) as error:return self.send(400,{'error':str(error)})
+        if url.path.startswith('/api/studio'):
+            try:
+                args=parse_qs(url.query);identity=args.get('id',[''])[0]
+                if url.path=='/api/studio/catalog':return self.send(200,studio.catalog(DB,args.get('workflow_id',[''])[0]))
+                if url.path=='/api/studio/compare':return self.send(200,studio.compare(studio.read(DB,args.get('left',[''])[0]),studio.read(DB,args.get('right',[''])[0])))
+                if url.path=='/api/studio/network':
+                    from .graph import get_version as network_version
+                    return self.send(200,network_version(DB,identity))
+                if url.path=='/api/studio/svg':
+                    from .graph import get_version as network_version
+                    from .visual_report import svg
+                    return self.send(200,svg(network_version(DB,identity)),'image/svg+xml')
+                record=studio.read(DB,identity)
+                if url.path=='/api/studio/replay':return self.send(200,{'id':record['id'],'sha256':record['sha256'],'reproduced':True,'new_inference':False})
+                if url.path in ('/api/studio/record','/api/studio/export'):return self.send(200,record)
+                return self.send(404,{'error':'Ruta de estudio inexistente.'})
             except NotFound as error:return self.send(404,{'error':str(error)})
             except (ValueError,KeyError,TypeError) as error:return self.send(400,{'error':str(error)})
         if url.path.startswith('/api/dossier'):
@@ -294,6 +312,24 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         if not self.allowed() or self.headers.get('Origin') not in (f'http://127.0.0.1:{self.server.server_port}', f'http://localhost:{self.server.server_port}'):
             return self.send(403, {'error': 'Origen no autorizado.'})
+        if self.path=='/api/studio':
+            try:
+                length=int(self.headers.get('Content-Length',0))
+                if not 0<length<=3000000:raise ValueError('Estudio demasiado grande.')
+                value=json.loads(self.rfile.read(length))
+                if not isinstance(value,dict):raise ValueError('Solicitud de estudio inválida.')
+                action=value.get('action')
+                if action=='network':
+                    studio.catalog(DB,value.get('workflow_id'))
+                    return self.send(201,save_graph_version(DB,value))
+                if action=='scenario':return self.send(201,studio.save(DB,value))
+                if action=='report':
+                    if value.get('reviewed') is not True:raise ValueError('Revisá la selección antes de emitir el informe.')
+                    return self.send(201,studio.report(DB,value.get('ids')))
+                raise ValueError('Acción de estudio desconocida.')
+            except Conflict as error:return self.send(409,{'error':str(error)})
+            except NotFound as error:return self.send(404,{'error':str(error)})
+            except (ValueError,KeyError,TypeError) as error:return self.send(400,{'error':str(error)})
         if self.path=='/api/scientific/run':
             try:
                 length=int(self.headers.get('Content-Length',0))
