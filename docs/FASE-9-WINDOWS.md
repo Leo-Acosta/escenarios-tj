@@ -1,5 +1,7 @@
 # Fase 9 · distribución Windows
 
+Actualización del 17/11/2026: instalador **EscenariosTJ-0.1.0-Fase12-Setup.exe** con R y estudio visual integrado reconstruido y probado localmente. Instalación QA, R con PATH vacío, reinstalación y desinstalación con datos sintéticos conservados aprobadas. [Aceptación y límites actuales](ACEPTACION-ESTUDIO-VISUAL.md). Los resultados históricos de runners que siguen abajo pertenecen a sus construcciones originales.
+
 Actualización científica del 13 de octubre: se construyó un nuevo instalador local
 con R, paquetes CRAN y Keras/PyTorch CPU. Ver [pruebas y límites](CIERRE-CIENTIFICO-WINDOWS.md).
 El ZIP histórico de fase 9 no contiene este entorno científico; no se presenta

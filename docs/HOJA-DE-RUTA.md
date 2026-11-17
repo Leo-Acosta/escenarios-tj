@@ -18,11 +18,11 @@ Estado actualizado al 17 de noviembre de 2026; los resultados históricos de cad
 | 10 · Calidad de plataforma | Rendimiento, dispositivos, impresión y actualización | Implementación y aceptación automatizada terminadas: presupuestos, concurrencia, A4 y matriz Windows/Linux × Python 3.11/3.13 aprobados; cierre integral abierto por impresión HTML nativa y aceptación entre navegadores pendientes |
 | 11 · Expediente documental y seguimiento real | Originales locales, datos revisados, acciones/respuestas e informes congelados | Cerrada en alcance funcional y análisis documental disponible: originales privados, correcciones, comparación de lecturas, exportación y recuperación. Conflicto real y documentación externa pendientes. Ver FASE-11-EXPEDIENTE-DOCUMENTAL.md |
 
-| 12 · Estudio visual integrado | Actores, contactos, relaciones, escenarios y comparación congelada en un mismo espacio | Cerrada funcionalmente; 204 pruebas Python, 85 TypeScript y compilación aprobadas. Captura del lienzo, arrastre físico y aceptación visual entre navegadores pendientes. Ver FASE-12-ESTUDIO-VISUAL.md |
+| 12 · Estudio visual integrado | Actores, contactos, relaciones, escenarios y comparación congelada en un mismo espacio | Cerrada funcionalmente; 204 pruebas Python, 85 TypeScript y compilación aprobadas. Arrastre y puertos verificados posteriormente en Edge; aceptación entre motores e impresión nativa pendientes. Ver FASE-12-ESTUDIO-VISUAL.md |
 
 ## Continuación actual
 
-[Estudio visual integrado](FASE-12-ESTUDIO-VISUAL.md) implementado y demostrado con Puerto Aurora sintético, sin alterar EDESUR. Se reutilizan los motores actuales. Próximos trabajos independientes: aceptación visual manual del lienzo/puertos e impresión nativa, reconstrucción del instalador para distribuir la fase 12 y P-EMP-01 con observaciones independientes. Ampliar matrices o árboles es una fase futura con alcance y pruebas propios.
+[Estudio visual integrado](FASE-12-ESTUDIO-VISUAL.md) implementado y demostrado con Puerto Aurora sintético, sin alterar EDESUR. Se reutilizan los motores actuales. Próximos trabajos independientes: aceptación entre motores e impresión nativa, distribución del instalador con R documentada en ACEPTACION-ESTUDIO-VISUAL.md y P-EMP-01 con observaciones independientes. Ampliar matrices o árboles es una fase futura con alcance y pruebas propios.
 
 Las siguientes notas conservan el estado histórico de fases anteriores; la sección actual y la guía de fase 12 describen la integración más reciente.
 

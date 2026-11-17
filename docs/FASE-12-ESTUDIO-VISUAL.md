@@ -58,9 +58,9 @@ Los criterios funcionales 1–7 están cubiertos. El criterio 8 tiene verificaci
 
 ### Límites de aceptación que permanecen visibles
 
-La captura del navegador integrado devolvió un error. Se pudo observar y operar su árbol accesible, pero no certificar mediante captura la apariencia final del lienzo. El arrastre con puntero y la conexión física de puertos no se verificaron independientemente; sí su alternativa mediante formularios y coordenadas, persistencia y lógica de datos. No se certifican en esta fase móvil, tecnologías de asistencia completas, impresión nativa/física ni compatibilidad visual de todos los navegadores. El PDF generado se verificó de forma independiente de la impresión HTML.
+La captura del navegador integrado devolvió un error. Se pudo observar y operar su árbol accesible, pero no certificar mediante captura la apariencia final del lienzo. En el cierre funcional inicial no se verificaron arrastre con puntero ni conexión física de puertos; ambos se verificaron posteriormente en Edge, con guardado y consulta independiente de posiciones y dirección. Ver el registro de aceptación posterior. No se certifican en esta fase móvil, tecnologías de asistencia completas, impresión nativa/física ni compatibilidad visual de todos los navegadores. El PDF generado se verificó de forma independiente de la impresión HTML.
 
-La implementación funcional de la fase 12 queda cerrada con estos límites de verificación documentados. La aceptación visual manual pendiente no se presenta como aprobada. El instalador anterior no se reconstruyó para esta fase: debe actualizarse si se desea distribuir estas funciones en el paquete instalado.
+La implementación funcional de la fase 12 queda cerrada con estos límites de verificación documentados. La aceptación visual manual pendiente no se presenta como aprobada. La aceptación y reconstrucción del instalador posteriores a este cierre se registran en [Aceptación y distribución](ACEPTACION-ESTUDIO-VISUAL.md).
 
 ## Qué sigue
 

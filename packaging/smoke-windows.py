@@ -14,7 +14,7 @@ from urllib.request import urlopen
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tests'))
-from escenarios import executive, dossier
+from escenarios import executive, dossier, graph, visual_graph, studio
 from tests.test_executive import prepared
 
 
@@ -25,6 +25,19 @@ def run(executable, directory):
     report = executive.create(database, {'workflow_id': case['id'], 'version': 1,
         'title': 'Distribución · prueba sintética', 'sections': ['matrix', 'tree', 'agents'],
         'sources': refs[:2], 'evidence_mode': 'synthetic', 'reviewed': True})
+    legacy = graph.save_version(database, {'workflow_id':case['id'], 'title':'Red sintética del instalador',
+        'assumptions':'Prueba sintética sin causalidad', 'reviewed':True,
+        'graph':{'nodes':[{'id':0,'name':'Actor ficticio A','type':0},
+                          {'id':1,'name':'Actor ficticio B','type':1}], 'edges':[]}})
+    visual = visual_graph.upgrade(legacy['graph'],legacy['id'])
+    visual['nodes'][0]['position']={'x':137,'y':-41}
+    network = graph.save_version(database, {'workflow_id':case['id'], 'title':'Red visual instalada',
+        'assumptions':'Prueba sintética', 'reviewed':True, 'graph':visual})
+    scenario = studio.save(database, {'workflow_id':case['id'],'title':'Escenario del instalador',
+        'matrix_version':1,'network_id':network['id'],'assumptions':'Datos sintéticos',
+        'evidence_mode':'synthetic','payoff_units':['puntos A','puntos B'],
+        'comparable':True,'variables':[],'constraints':[],'links':[],'reviewed':True})
+    visual_report = studio.report(database,[scenario['id']])
     from reportlab.pdfgen import canvas
     stream=io.BytesIO(); page=canvas.Canvas(stream); page.drawString(50,700,'Prueba documental sintetica'); page.save()
     original=stream.getvalue()+b' '*(3*1024*1024)
@@ -57,6 +70,14 @@ def run(executable, directory):
                 for endpoint in ['/app/', '/', '/api/workflows', '/api/executive/replay?id=' + report['id']]:
                     with urlopen(base + endpoint, timeout=5) as response:
                         assert response.status == 200
+                with urlopen(base+'/api/studio/record?id='+scenario['id'],timeout=10) as response:
+                    assert json.load(response)==studio.read(database,scenario['id'])
+                with urlopen(base+'/api/studio/network?id='+network['id'],timeout=10) as response:
+                    assert json.load(response)['graph']['nodes'][0]['position']=={'x':137,'y':-41}
+                with urlopen(base+'/api/executive/replay?id='+visual_report['id'],timeout=10) as response:
+                    replay=json.load(response);assert replay['reproduced'] and not replay['new_inference']
+                with urlopen(base+'/api/studio/svg?id='+network['id'],timeout=10) as response:
+                    assert b'<svg' in response.read()
                 with urlopen(base+'/api/dossier/export?id='+frozen['id'],timeout=10) as response:
                     assert json.load(response)==frozen
                 with urlopen(base+'/api/dossier/file?id='+document['id'],timeout=10) as response:
@@ -79,7 +100,9 @@ def run(executable, directory):
     assert first == second, 'La reproducción cambió después de reiniciar.'
     result = {'synthetic': True, 'python_on_path': False, 'cycles': 2,
               'duplicate_rejected': True, 'frozen_pdf_identical': True, 'pdf_bytes': len(first),
-              'documentary_export_identical':True,'large_original_identical':True,'documentary_zip_verified':True}
+              'documentary_export_identical':True,'large_original_identical':True,'documentary_zip_verified':True,
+              'visual_studio_frozen_scenario_verified':True,'visual_positions_preserved':True,
+              'visual_report_reproduced_without_inference':True,'visual_svg_verified':True}
     (directory / 'verification.json').write_text(json.dumps(result, indent=2), encoding='utf-8')
     print(json.dumps(result))
 

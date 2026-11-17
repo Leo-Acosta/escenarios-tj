@@ -1,0 +1,57 @@
+{
+  "date": "2026-11-17",
+  "synthetic_only": true,
+  "installer": {
+    "filename": "EscenariosTJ-0.1.0-Fase12-Setup.exe",
+    "sha256": "42f2c0e3048a240945ac0150087e672982ccc7d36851b64172968f15c904e328",
+    "bytes": 434348987,
+    "synthetic": true,
+    "installed_files_verified": 24867,
+    "installed_exe_tested": true,
+    "installed_r_verified": true,
+    "runtime_python_r_path_empty": true,
+    "long_path_rejected_before_install": true,
+    "running_update_rejected": true,
+    "reinstallation_kept_data": true,
+    "uninstall_kept_data": true
+  },
+  "portable": {
+    "synthetic": true,
+    "python_on_path": false,
+    "cycles": 2,
+    "duplicate_rejected": true,
+    "frozen_pdf_identical": true,
+    "pdf_bytes": 82174,
+    "documentary_export_identical": true,
+    "large_original_identical": true,
+    "documentary_zip_verified": true,
+    "visual_studio_frozen_scenario_verified": true,
+    "visual_positions_preserved": true,
+    "visual_report_reproduced_without_inference": true,
+    "visual_svg_verified": true
+  },
+  "frontend": {
+    "typescript_tests_passed": 85,
+    "typecheck_passed": true,
+    "vite_build_passed": true
+  },
+  "manual_edge": {
+    "pointer_drag_verified": true,
+    "port_connection_verified": true,
+    "directed_edge_saved": true,
+    "persisted_nodes": 19,
+    "persisted_edges": 28,
+    "independent_saved_record_checked": true
+  },
+  "limits": {
+    "native_html_print_verified": false,
+    "cross_engine_visual_compatibility_verified": false,
+    "physical_print_verified": false,
+    "predictive_improvement_demonstrated": false
+  },
+  "private_database_unchanged": true,
+  "qa_vs_final_payload_difference": [
+    "GUIA-ESTUDIO-VISUAL.md"
+  ],
+  "qa_vs_final_runtime_and_frontend_identical": true
+}

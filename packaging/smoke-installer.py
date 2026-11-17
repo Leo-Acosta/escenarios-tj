@@ -3,6 +3,7 @@ import hashlib
 import importlib.util
 import json
 import subprocess
+import os
 import sys
 import socket
 import time
@@ -42,8 +43,11 @@ def run(setup, root):
         sock.bind(('127.0.0.1', 0))
         port = sock.getsockname()[1]
     with (root / 'running-update.log').open('ab') as log:
+        environment = {k:v for k,v in os.environ.items() if k not in
+            ('SCENARIOS_RSCRIPT','R_LIBS_USER','RETICULATE_PYTHON','PYTHONPATH','PYTHONHOME')}
+        environment['PATH'] = ''
         process = subprocess.Popen([str(app / 'EscenariosTJ.exe'), '--no-browser', '--port', str(port),
-            '--data-dir', str(database.parent)], stdout=log, stderr=log)
+            '--data-dir', str(database.parent)], stdout=log, stderr=log,env=environment)
         try:
             deadline = time.monotonic() + 30
             while True:
@@ -75,6 +79,7 @@ def run(setup, root):
     assert hashlib.sha256(database.read_bytes()).hexdigest() == original
     result = {'synthetic': True, 'installed_files_verified': count, 'installed_exe_tested': True,
               'installed_r_verified': (root/'install.log').exists() and 'runtime' in locals(),
+              'runtime_python_r_path_empty': True,
               'long_path_rejected_before_install': True,
               'running_update_rejected': True, 'reinstallation_kept_data': True, 'uninstall_kept_data': True}
     (root / 'installer-verification.json').write_text(json.dumps(result, indent=2), encoding='utf-8')
