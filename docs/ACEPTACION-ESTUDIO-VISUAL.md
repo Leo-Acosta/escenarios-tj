@@ -37,3 +37,14 @@ La variante QA y el paquete final tienen idénticos ejecutables, entorno cientí
 La instalación real del usuario no se reemplazó. EDESUR quedó intacto: verificación SHA-256 de su base principal antes y después. El instalador contiene programa y entornos, sin facturas, fotos, bases, expedientes ni documentos privados del proyecto. Al actualizar, cerrar la aplicación y conservar un respaldo según la guía Windows; una instalación nueva usa su carpeta de datos local y no importa automáticamente expedientes del repositorio.
 
 **Estado:** reconstrucción y aceptación local del instalador completas. Arrastre, conexión por puertos y persistencia aprobados en Edge; compatibilidad visual con otros motores y paginación HTML nativa pendientes por el bloqueo descrito. El PDF vectorial A4 mantiene la verificación previa independiente. Impresión física, firma de código y nuevos runners Windows limpios no se acreditan en este cierre. La validación predictiva real P-EMP-01 sigue abierta; estas pruebas no demuestran mejora de predicción.
+
+
+## Pulido de interacción · 19/11/2026
+
+Se unificó la persistencia de desplazamientos mediante eventos de posición final de React Flow. Incluye flechas del teclado y fin de arrastre, excluye clics/selección, posiciones sin cambio y cuadros intermedios de arrastre. Se validan posiciones finitas y límites de coordenadas; no se crean pasos de historial por seleccionar una entidad. Las indicaciones accesibles de movimiento están en español. El formulario de guardado utiliza campos de ancho completo, grilla adaptable y acciones separadas.
+
+87 pruebas TypeScript aprobadas (dos nuevas regresiones de eventos de movimiento), compilación tsc/Vite correcta. En navegador integrado con datos sintéticos: selección sin cambio pendiente; flecha derecha X=120 a X=125; Deshacer a 120, Rehacer a 125; revisión, guardado y reapertura con X=125 conservado. Columnas del formulario medidas desde DOM con anchos coincidentes. La captura de pantalla falló, por lo que no se declara una revisión visual completa nueva.
+
+El arrastre físico y los puertos tienen la aceptación de Edge del 17/11; no se repitió esa interacción física tras este ajuste del manejador. Los eventos de final de arrastre están incluidos en las pruebas de contrato. La impresión HTML nativa y otros motores continúan pendientes. La base real no se usó para las pruebas.
+
+Este ajuste está en el código y la interfaz compilada local. El instalador del 17/11 se conserva con su huella y aceptación originales; no se presenta como si ya incluyera este pulido. Antes de publicar otro instalador corresponde repetir el arrastre físico y luego empaquetar el nuevo frontend con su registro de aceptación.

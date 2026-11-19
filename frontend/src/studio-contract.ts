@@ -38,3 +38,10 @@ export type Journal<T>={past:T[];present:T;future:T[]};
 export function commit<T>(j:Journal<T>,next:T):Journal<T>{return {past:[...j.past,j.present].slice(-80),present:next,future:[]};}
 export function undo<T>(j:Journal<T>):Journal<T>{if(!j.past.length)return j;return {past:j.past.slice(0,-1),present:j.past[j.past.length-1],future:[j.present,...j.future]};}
 export function redo<T>(j:Journal<T>):Journal<T>{if(!j.future.length)return j;return {past:[...j.past,j.present],present:j.future[0],future:j.future.slice(1)};}
+
+// Persist completed pointer/keyboard moves, never selection or intermediate drag frames.
+export function finishedNodeMoves(graph:VisualGraph,changes:readonly {type:string;id?:string;position?:{x:number;y:number};dragging?:boolean}[]):{id:string;position:{x:number;y:number}}[]{
+ const last=new Map<string,{x:number;y:number}>();
+ for(const change of changes){if(change.type!=='position'||!change.id||!change.position||change.dragging===true)continue;const {x,y}=change.position;if(!Number.isFinite(x)||!Number.isFinite(y)||Math.abs(x)>100000||Math.abs(y)>100000)continue;last.set(change.id,{x,y});}
+ return [...last].flatMap(([id,position])=>{const node=graph.nodes.find(n=>n.uid===id);return node&&(node.position.x!==position.x||node.position.y!==position.y)?[{id,position}]:[];});
+}
