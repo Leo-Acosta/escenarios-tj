@@ -1,0 +1,70 @@
+{
+  "date": "2026-11-19",
+  "revision": "fase12-r2",
+  "runtime_frontend_source": "6eb40b5",
+  "synthetic_only": true,
+  "installer": {
+    "filename": "EscenariosTJ-0.1.0-Fase12-r2-Setup.exe",
+    "bytes": 434533099,
+    "sha256": "5e16322caee7cb44bf6081bf0a77b7679a1d3c05fa204104a241023c8ca308be",
+    "synthetic": true,
+    "installed_files_verified": 24885,
+    "installed_exe_tested": true,
+    "installed_r_verified": true,
+    "runtime_python_r_path_empty": true,
+    "long_path_rejected_before_install": true,
+    "running_update_rejected": true,
+    "reinstallation_kept_data": true,
+    "uninstall_kept_data": true
+  },
+  "portable": {
+    "synthetic": true,
+    "python_on_path": false,
+    "cycles": 2,
+    "duplicate_rejected": true,
+    "frozen_pdf_identical": true,
+    "pdf_bytes": 82174,
+    "documentary_export_identical": true,
+    "large_original_identical": true,
+    "documentary_zip_verified": true,
+    "visual_studio_frozen_scenario_verified": true,
+    "visual_positions_preserved": true,
+    "visual_report_reproduced_without_inference": true,
+    "visual_svg_verified": true,
+    "installed_api_creates_network_scenario_report": true
+  },
+  "frontend": {
+    "typescript_tests_passed": 87,
+    "typecheck_passed": true,
+    "vite_build_passed": true,
+    "packaged_index_matches_current_build": true
+  },
+  "edge": {
+    "current_pointer_drag_verified": true,
+    "save_verified_by_independent_read": true,
+    "hospital_position": {
+      "x": 343.21216617210683,
+      "y": 340.5118694362018
+    },
+    "nodes": 19,
+    "edges": 28,
+    "html_preview_opened_through_ui": true,
+    "native_print_attempted": true,
+    "native_print_verified": false,
+    "blocked_reason": "Control de Windows detenido al invocar impresión: no se pudo confirmar la URL."
+  },
+  "pdf": {
+    "a4_pages": 14,
+    "reproduced": true,
+    "new_inference": false,
+    "native_print_verified": false,
+    "all_pages_rendered": true,
+    "contact_sheets_reviewed": true,
+    "network_and_tree_pages_reviewed_enlarged": true
+  },
+  "qa_and_final_payload_identical": true,
+  "private_database_unchanged": true,
+  "other_browser_engines_verified": false,
+  "physical_print_verified": false,
+  "predictive_improvement_demonstrated": false
+}

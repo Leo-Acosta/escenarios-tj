@@ -1,6 +1,6 @@
 # Escenarios TJ · hoja de ruta actualizada
 
-Estado actualizado al 17 de noviembre de 2026; los resultados históricos de cada fase conservan su fecha y límites. Arquitectura local: núcleo Python, SQLite e interfaz React/TypeScript. IA local opcional con revisión del analista. El sistema explora consecuencias de supuestos; aún no acredita capacidad de predicción empírica.
+Estado actualizado al 19 de noviembre de 2026; los resultados históricos de cada fase conservan su fecha y límites. Arquitectura local: núcleo Python, SQLite e interfaz React/TypeScript. IA local opcional con revisión del analista. El sistema explora consecuencias de supuestos; aún no acredita capacidad de predicción empírica.
 
 ## Estado y orden de continuación
 
@@ -65,3 +65,8 @@ Ver [resultados, protocolo y límites](FASE-10-CALIDAD.md). 176 pruebas Python, 
 ## Ampliación científica R · etapas 1–2 solicitadas
 
 Etapas 1–2 cerradas funcionalmente el 10 de octubre de 2026 en Windows: R instalado, gráficos y cuatro modelos ejecutados, red profunda y modelos guardados reproducidos, resultados integrados en React e informes congelados. El 13 de octubre se verificaron giro 3D en Chromium/Firefox, vista móvil y PDF A4, y se construyó un instalador científico con R y Keras CPU. Ver [aceptación y límites](CIERRE-CIENTIFICO-WINDOWS.md). La fase 8 está cerrada funcionalmente; P-EMP-01 permanece pendiente por falta de evaluación empírica independiente; otros navegadores nativos, dispositivos, impresión física y un Windows limpio para el nuevo paquete mantienen límites de plataforma.
+
+
+## Cierre de distribución r2 · 19/11/2026
+
+Fase 12 implementada y distribuida con el pulido de interacción en instalador r2 con R. Arrastre actual, teclado y conservación de posiciones comprobados; 87 pruebas TypeScript, compilación y recorrido de instalación/reinstalación/desinstalación aprobados. Exportación A4 de 14 páginas revisada independientemente. [Aceptación y evidencias](ACEPTACION-ESTUDIO-VISUAL.md#cierre-de-distribución-r2--19112026). Siguen abiertos la impresión HTML nativa, otros motores de navegador y P-EMP-01; no se sustituyen por la aceptación del PDF o del instalador.

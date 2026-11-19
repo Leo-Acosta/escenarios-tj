@@ -10,7 +10,7 @@ import sys
 import time
 from pathlib import Path
 from urllib.error import URLError
-from urllib.request import urlopen
+from urllib.request import Request, urlopen
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tests'))
@@ -78,6 +78,21 @@ def run(executable, directory):
                     replay=json.load(response);assert replay['reproduced'] and not replay['new_inference']
                 with urlopen(base+'/api/studio/svg?id='+network['id'],timeout=10) as response:
                     assert b'<svg' in response.read()
+                def post_visual(value):
+                    request = Request(base+'/api/studio', data=json.dumps(value).encode(),
+                        headers={'Content-Type':'application/json','Origin':base}, method='POST')
+                    with urlopen(request,timeout=15) as response:return json.load(response)
+                created_network = post_visual({'action':'network','workflow_id':case['id'],
+                    'title':'Red creada en la aplicación instalada','assumptions':'Datos sintéticos',
+                    'graph':visual,'reviewed':True})
+                created_scenario = post_visual({'action':'scenario','workflow_id':case['id'],
+                    'title':'Escenario creado por API instalada','matrix_version':1,
+                    'network_id':created_network['id'],'assumptions':'Datos sintéticos',
+                    'evidence_mode':'synthetic','payoff_units':['puntos A','puntos B'],
+                    'comparable':True,'variables':[],'constraints':[],'links':[],'reviewed':True})
+                created_report = post_visual({'action':'report','ids':[created_scenario['id']],'reviewed':True})
+                with urlopen(base+'/api/executive/replay?id='+created_report['id'],timeout=10) as response:
+                    replay=json.load(response);assert replay['reproduced'] and not replay['new_inference']
                 with urlopen(base+'/api/dossier/export?id='+frozen['id'],timeout=10) as response:
                     assert json.load(response)==frozen
                 with urlopen(base+'/api/dossier/file?id='+document['id'],timeout=10) as response:
@@ -102,7 +117,8 @@ def run(executable, directory):
               'duplicate_rejected': True, 'frozen_pdf_identical': True, 'pdf_bytes': len(first),
               'documentary_export_identical':True,'large_original_identical':True,'documentary_zip_verified':True,
               'visual_studio_frozen_scenario_verified':True,'visual_positions_preserved':True,
-              'visual_report_reproduced_without_inference':True,'visual_svg_verified':True}
+              'visual_report_reproduced_without_inference':True,'visual_svg_verified':True,
+              'installed_api_creates_network_scenario_report':True}
     (directory / 'verification.json').write_text(json.dumps(result, indent=2), encoding='utf-8')
     print(json.dumps(result))
 

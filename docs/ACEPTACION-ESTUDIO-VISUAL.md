@@ -48,3 +48,30 @@ Se unificó la persistencia de desplazamientos mediante eventos de posición fin
 El arrastre físico y los puertos tienen la aceptación de Edge del 17/11; no se repitió esa interacción física tras este ajuste del manejador. Los eventos de final de arrastre están incluidos en las pruebas de contrato. La impresión HTML nativa y otros motores continúan pendientes. La base real no se usó para las pruebas.
 
 Este ajuste está en el código y la interfaz compilada local. El instalador del 17/11 se conserva con su huella y aceptación originales; no se presenta como si ya incluyera este pulido. Antes de publicar otro instalador corresponde repetir el arrastre físico y luego empaquetar el nuevo frontend con su registro de aceptación.
+
+
+## Cierre de distribución r2 · 19/11/2026
+
+**Implementación y distribución de fase 12 cerradas en el alcance documentado; aceptación visual total aún limitada.** El instalador r2 incorpora el pulido de teclado, el manejador unificado de posiciones y el formulario adaptable del commit `6eb40b5`, manteniendo el entorno científico local R/CRAN y Python/Keras/PyTorch CPU. El instalador anterior queda conservado.
+
+Artefacto local: `release/EscenariosTJ-0.1.0-Fase12-r2-Setup.exe`, 434.533.099 bytes, con archivo `.sha256`. Huella verificada: `5e16322caee7cb44bf6081bf0a77b7679a1d3c05fa204104a241023c8ca308be`. Los manifiestos completos del paquete QA y del final coinciden: 24.885 archivos, incluida la interfaz actual. Código, pruebas y documentación se publican; ejecutables, bases y expedientes privados no se suben a Git.
+
+### Aceptación realizada
+
+- Arrastre físico repetido en Edge sobre el nuevo manejador: Hospital Central cambió de posición, se guardó una nueva red y una lectura independiente confirmó las coordenadas nuevas. Los 19 nodos y 28 vínculos se conservaron. Se observó también el formulario con campos de ancho completo. No se alteraron escenarios congelados por editar la red.
+- El informe se emitió desde la interfaz y se abrió mediante su enlace de previsualización, sin introducir una URL en la barra de direcciones. Su contenido procede de las fuentes congeladas del escenario seleccionado, no se actualiza automáticamente al editar otra versión de red.
+- PDF vectorial de ese informe: 14 páginas A4, reproducción sin inferencia nueva, todas las páginas renderizadas y revisadas en planchas; red y árbol inspeccionados ampliados. Copia sintética imprimible local en `output/pdf/Verificacion-estudio-visual-A4-r2.pdf`, excluida de Git.
+- 87 pruebas TypeScript y compilación tsc/Vite aprobadas. El recorrido del ejecutable final con PATH vacío pasó dos ciclos y comprobó documentación, SVG, posiciones, escenarios y PDF congelado idéntico. Además creó una red, un escenario y un informe por la API del ejecutable instalado y reprodujo ese informe.
+- Instalación QA con AppId separado: 24.885 archivos verificados, ejecutable y carga de paquetes R aprobados con PATH vacío; ruta demasiado larga y actualización con aplicación abierta rechazadas. Reinstalación y desinstalación conservaron la base sintética idéntica. No se sustituyó la instalación real del usuario. La base original mantuvo su SHA-256 del inicio de este recorrido.
+
+### Límites que permanecen abiertos
+
+Al invocar Ctrl+P en el informe, Computer Use detuvo el control por no confirmar la URL de la vista de impresión. Se dejó de operar el navegador y se completaron las otras verificaciones. **No se declara aprobada la paginación HTML nativa ni la impresión física.** El PDF A4 sí tiene verificación independiente.
+
+No se probó la versión actual en otros motores o navegadores: no se presenta el recorrido de Edge como certificación de Firefox, WebKit o Brave. La conexión por puertos conserva su aceptación anterior; el arrastre actual y el teclado sí cuentan con las verificaciones nuevas descritas. No se acredita firma de código, un nuevo runner Windows limpio ni mejora predictiva real; P-EMP-01 permanece separado.
+
+[Registro de aceptación r2](verification/visual-study-r2-2026-11-19.json). Los registros anteriores siguen disponibles y no se reescriben como si hubieran probado esta revisión.
+
+### Repetir la construcción
+
+El paquete científico existente requiere el Python 3.12 preparado para sus bibliotecas CPU. Compilar `frontend` primero; luego puede ejecutarse `packaging/build-windows.ps1 -Python <python-del-entorno> -IncludeScientific -SkipArchive` y `packaging/build-installer.ps1 -Python <python-del-entorno> -OutputName EscenariosTJ-0.1.0-Fase12-r2-Setup`. `-SkipArchive` conserva el manifiesto y su validación, evitando generar además un ZIP cuando sólo se necesita el instalador. El comportamiento predeterminado que genera ZIP se conserva. Se comprobó la sintaxis PowerShell del script; el instalador r2 se ensambló desde el paquete científico ya validado, actualizando sus recursos React y verificando de nuevo el manifiesto.

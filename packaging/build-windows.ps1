@@ -1,4 +1,4 @@
-param([string]$Python = 'python', [switch]$IncludeScientific)
+param([string]$Python = 'python', [switch]$IncludeScientific, [switch]$SkipArchive)
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 Set-Location -LiteralPath $projectRoot
@@ -12,5 +12,9 @@ if ($IncludeScientific) {
     if ($LASTEXITCODE -ne 0) { throw 'Falló el empaquetado científico.' }
     Copy-Item -LiteralPath 'docs/CIERRE-CIENTIFICO-WINDOWS.md' -Destination 'release/EscenariosTJ/GUIA-CIENTIFICA.md'
 }
-& $Python packaging/release_manifest.py release/EscenariosTJ
+if ($SkipArchive) {
+    & $Python packaging/release_manifest.py release/EscenariosTJ --manifest-only
+} else {
+    & $Python packaging/release_manifest.py release/EscenariosTJ
+}
 if ($LASTEXITCODE -ne 0) { throw 'Falló la verificación del paquete.' }
